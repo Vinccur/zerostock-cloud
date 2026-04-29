@@ -2,8 +2,11 @@
 --  ZeroStock Cloud — Supabase PostgreSQL Schema
 --  Ejecutar en: Supabase Dashboard > SQL Editor > New Query
 --  Proyecto: zerostock-0204 / hsnhfubiluakjdsysncr.supabase.co
+--
+--  Nota: Este script usa IF NOT EXISTS y DROP IF EXISTS para ser idempotente
+--  (puedes ejecutarlo varias veces sin error)
 -- ================================================================
-
+ 
 -- ── 1. TABLA: users ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -14,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+ 
 -- ── 2. TABLA: products ───────────────────────────────────────
 CREATE TABLE IF NOT EXISTS products (
   id            BIGSERIAL PRIMARY KEY,
@@ -32,10 +35,10 @@ CREATE TABLE IF NOT EXISTS products (
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+ 
 CREATE INDEX IF NOT EXISTS idx_products_user_id ON products(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_products_name_brand ON products(user_id, name, brand);
-
+ 
 -- ── 3. TABLA: serials ────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS serials (
   id         BIGSERIAL PRIMARY KEY,
@@ -48,11 +51,11 @@ CREATE TABLE IF NOT EXISTS serials (
   sale_id    BIGINT,                         -- referencia post-venta
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+ 
 CREATE INDEX IF NOT EXISTS idx_serials_user_id    ON serials(user_id);
 CREATE INDEX IF NOT EXISTS idx_serials_product_id ON serials(product_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_serials_unique ON serials(user_id, serial);
-
+ 
 -- ── 4. TABLA: customers ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS customers (
   id         BIGSERIAL PRIMARY KEY,
@@ -64,10 +67,10 @@ CREATE TABLE IF NOT EXISTS customers (
   address    VARCHAR,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+ 
 CREATE INDEX IF NOT EXISTS idx_customers_user_id ON customers(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_id_number ON customers(user_id, id_number);
-
+ 
 -- ── 5. TABLA: sales ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS sales (
   id               BIGSERIAL PRIMARY KEY,
@@ -80,9 +83,9 @@ CREATE TABLE IF NOT EXISTS sales (
   payment_currency VARCHAR,
   created_at       TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+ 
 CREATE INDEX IF NOT EXISTS idx_sales_user_id ON sales(user_id);
-
+ 
 -- ── 6. TABLA: sale_items ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS sale_items (
   id           BIGSERIAL PRIMARY KEY,
@@ -94,9 +97,9 @@ CREATE TABLE IF NOT EXISTS sale_items (
   qty          INT DEFAULT 1,
   created_at   TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
+ 
 CREATE INDEX IF NOT EXISTS idx_sale_items_sale_id ON sale_items(sale_id);
-
+ 
 -- ── 7. TABLA: settings ───────────────────────────────────────
 CREATE TABLE IF NOT EXISTS settings (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -107,9 +110,9 @@ CREATE TABLE IF NOT EXISTS settings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id, key)
 );
-
+ 
 CREATE INDEX IF NOT EXISTS idx_settings_user_id ON settings(user_id);
-
+ 
 -- ================================================================
 --  RPC FUNCTION: decrement_qty
 --  Usada por el backend al procesar ventas de productos masivos
@@ -132,19 +135,26 @@ BEGIN
     AND user_id = p_user_id;
 END;
 $$;
-
+ 
 -- ================================================================
 --  ROW LEVEL SECURITY (RLS)
 --  Cada usuario solo puede ver y modificar SUS propios datos
---  Nota: el backend usa service_role key que bypassa RLS,
---  pero es buena práctica habilitarlo de todas formas.
+--
+--  Nota: Primero dropear políticas viejas si existen, luego crear nuevas
 -- ================================================================
+<<<<<<< HEAD
+=======
+ 
+-- Habilitar RLS en todas las tablas
+ALTER TABLE users       ENABLE ROW LEVEL SECURITY;
+>>>>>>> 017a099 (feat: auto-sync every 10 seconds)
 ALTER TABLE products    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE serials     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sales       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sale_items  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings    ENABLE ROW LEVEL SECURITY;
+<<<<<<< HEAD
 
 -- 1. Eliminar políticas si existen para evitar el error 42710
 DROP POLICY IF EXISTS "products_owner" ON products;
@@ -171,6 +181,35 @@ CREATE POLICY "sales_owner" ON sales
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
+=======
+ 
+-- ── Políticas para PRODUCTS ──
+DROP POLICY IF EXISTS "products_owner" ON products;
+CREATE POLICY "products_owner" ON products
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+ 
+-- ── Políticas para SERIALS ──
+DROP POLICY IF EXISTS "serials_owner" ON serials;
+CREATE POLICY "serials_owner" ON serials
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+ 
+-- ── Políticas para CUSTOMERS ──
+DROP POLICY IF EXISTS "customers_owner" ON customers;
+CREATE POLICY "customers_owner" ON customers
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+ 
+-- ── Políticas para SALES ──
+DROP POLICY IF EXISTS "sales_owner" ON sales;
+CREATE POLICY "sales_owner" ON sales
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+ 
+-- ── Políticas para SALE_ITEMS ──
+DROP POLICY IF EXISTS "sale_items_owner" ON sale_items;
+>>>>>>> 017a099 (feat: auto-sync every 10 seconds)
 CREATE POLICY "sale_items_owner" ON sale_items
   USING (
     EXISTS (
@@ -179,7 +218,20 @@ CREATE POLICY "sale_items_owner" ON sale_items
         AND sales.user_id = auth.uid()
     )
   );
+<<<<<<< HEAD
 
+=======
+ 
+-- ── Políticas para SETTINGS ──
+DROP POLICY IF EXISTS "settings_owner" ON settings;
+>>>>>>> 017a099 (feat: auto-sync every 10 seconds)
 CREATE POLICY "settings_owner" ON settings
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
+ 
+-- ================================================================
+--  Confirmación
+-- ================================================================
+-- Si llegaste aquí sin errores, el schema está listo.
+-- Deberías ver: "Success. No rows returned"
+ 

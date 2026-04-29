@@ -555,7 +555,84 @@ app.post('/api/sync', authMiddleware, async (req, res) => {
     dbError(res, e, 'sync/full');
   }
 });
+// ════════════════════════════════════════════════════════════
+//  SYNC — GET /api/sync (NUEVO)
+//  Descarga todos los datos de Supabase para guardarlos en local
+// ════════════════════════════════════════════════════════════
+app.get('/api/sync', authMiddleware, async (req, res) => {
+  const user = await getOrCreateUser(req.firebaseUser);
 
+  try {
+    const [
+      { data: products },
+      { data: customers },
+      { data: serials },
+      { data: sales },
+      { data: settings }
+    ] = await Promise.all([
+      supabase.from('products').select('*').eq('user_id', user.id),
+      supabase.from('customers').select('*').eq('user_id', user.id),
+      supabase.from('serials').select('*').eq('user_id', user.id),
+      supabase.from('sales').select('*, sale_items(*)').eq('user_id', user.id),
+      supabase.from('settings').select('*').eq('user_id', user.id)
+    ]);
+
+    // Formatear a camelCase para que coincida exactamente con IndexedDB (Dexie)
+    const formattedProducts = (products || []).map(p => ({
+      id: p.id, name: p.name, brand: p.brand, model: p.model,
+      category: p.category, cost: p.cost, salePrice: p.sale_price,
+      minStock: p.min_stock, qtyAvailable: p.qty_available,
+      qtySold: p.qty_sold, serialized: p.serialized,
+      createdAt: new Date(p.created_at).getTime()
+    }));
+
+    const formattedCustomers = (customers || []).map(c => ({
+      id: c.id, firstName: c.first_name, lastName: c.last_name,
+      idNumber: c.id_number, phone: c.phone, address: c.address,
+      createdAt: new Date(c.created_at).getTime()
+    }));
+
+    const formattedSerials = (serials || []).map(s => ({
+      id: s.id, productId: s.product_id, serial: s.serial,
+      cost: s.cost, salePrice: s.sale_price, status: s.status,
+      saleId: s.sale_id, addedAt: new Date(s.created_at).getTime()
+    }));
+
+    const formattedSales = [];
+    const formattedSaleItems = [];
+    (sales || []).forEach(s => {
+      formattedSales.push({
+        id: s.id, customerId: s.customer_id, total: s.total,
+        rateOff: s.rate_off, rateCus: s.rate_cus,
+        paymentMethod: s.payment_method, paymentCurrency: s.payment_currency,
+        createdAt: new Date(s.created_at).getTime()
+      });
+      (s.sale_items || []).forEach(si => {
+        formattedSaleItems.push({
+          id: si.id, saleId: s.id, productId: si.product_id,
+          serialId: si.serial_id, productName: si.product_name,
+          unitPrice: si.unit_price, qty: si.qty
+        });
+      });
+    });
+
+    const formattedSettings = (settings || []).map(s => ({
+      key: s.key, value: s.value
+    }));
+
+    res.json({
+      products: formattedProducts,
+      customers: formattedCustomers,
+      serials: formattedSerials,
+      sales: formattedSales,
+      saleItems: formattedSaleItems,
+      settings: formattedSettings
+    });
+
+  } catch (e) {
+    dbError(res, e, 'sync/pull');
+  }
+});
 // ════════════════════════════════════════════════════════════
 //  START
 // ════════════════════════════════════════════════════════════

@@ -1,0 +1,17 @@
+{
+  "name": "zerostock-cloud",
+  "version": "1.0.0",
+  "description": "ZeroStock Cloud Backend — Firebase Auth + Supabase",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "firebase-admin": "^12.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1"
+  },
+  "scripts": {
+    "dev": "node api/server.js",
+    "start": "node api/server.js"
+  }
+}

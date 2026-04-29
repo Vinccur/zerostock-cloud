@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/server.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)",      "dest": "/api/server.js" },
+    { "src": "/zerostock.html","dest": "/public/zerostock.html" },
+    { "src": "/",              "dest": "/public/zerostock.html" }
+  ]
+}

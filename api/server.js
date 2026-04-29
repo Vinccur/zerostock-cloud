@@ -433,126 +433,102 @@ app.post('/api/settings', authMiddleware, async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════
-//  SYNC — POST /api/sync
-//  Recibe un snapshot completo de IndexedDB y lo sube a Supabase
-//  Usado en la primera sincronización (migración de datos locales)
+//  SYNC — POST /api/sync (MODIFICADO PARA EVITAR DUPLICADOS)
 // ════════════════════════════════════════════════════════════
 app.post('/api/sync', authMiddleware, async (req, res) => {
   const user = await getOrCreateUser(req.firebaseUser);
   const { products = [], customers = [], serials = [], sales = [], saleItems = [], settings = [] } = req.body;
 
-  const results = { products: 0, customers: 0, serials: 0, sales: 0, errors: [] };
-
   try {
-    // Settings
-    for (const s of settings) {
-      await supabase.from('settings')
-        .upsert({ user_id: user.id, key: s.key, value: s.value }, { onConflict: 'user_id,key' });
-    }
-
-    // Customers (mapa de id local → id supabase)
-    const custMap = {};
-    for (const c of customers) {
-      const localId = c.id;
-      const row = {
-        user_id:    user.id,
-        first_name: c.firstName,
-        last_name:  c.lastName,
-        id_number:  c.idNumber,
-        phone:      c.phone || null,
-        address:    c.address || null,
-      };
-      const { data, error } = await supabase
-        .from('customers').upsert(row, { onConflict: 'user_id,id_number' })
-        .select('id').single();
-      if (error) { results.errors.push(`customer ${c.idNumber}: ${error.message}`); continue; }
-      custMap[localId] = data.id;
-      results.customers++;
-    }
-
-    // Products (mapa id local → id supabase)
+    // Helper: Si el ID tiene 36 caracteres, es un UUID de Supabase (ya existe en la nube)
+    const isUUID = (val) => typeof val === 'string' && val.length === 36;
+    const results = { products: 0, customers: 0, sales: 0 };
+    const saleMap = {}; // Para mapear ventas locales a ventas en la nube
     const prodMap = {};
-    for (const p of products) {
-      const localId = p.id;
+
+    // 1. PRODUCTOS (Upsert)
+    for (const prod of products) {
       const row = {
-        user_id:       user.id,
-        name:          p.name,
-        brand:         p.brand,
-        model:         p.model || null,
-        category:      p.category,
-        cost:          p.cost || 0,
-        sale_price:    p.salePrice || 0,
-        min_stock:     p.minStock || 1,
-        qty_available: p.qtyAvailable || 0,
-        qty_sold:      p.qtySold || 0,
-        serialized:    p.serialized !== false,
+        user_id: user.id,
+        name: prod.name, brand: prod.brand, model: prod.model,
+        category: prod.category, cost: prod.cost, sale_price: prod.salePrice,
+        min_stock: prod.minStock, qty_available: prod.qtyAvailable,
+        qty_sold: prod.qtySold, serialized: prod.serialized || false,
+        created_at: prod.createdAt ? new Date(prod.createdAt).toISOString() : new Date().toISOString()
       };
-      const { data, error } = await supabase
-        .from('products').upsert(row, { onConflict: 'user_id,name,brand' })
+      
+      // Si ya tiene un UUID de la nube, forzamos la actualización de ese ID exacto
+      if (isUUID(prod.id)) row.id = prod.id;
+
+      // upsert: Si hay conflicto de ID o de (user_id, name, brand), actualiza en vez de duplicar
+      const { data, error } = await supabase.from('products')
+        .upsert(row, { onConflict: row.id ? 'id' : 'user_id, name, brand' })
         .select('id').single();
-      if (error) { results.errors.push(`product ${p.name}: ${error.message}`); continue; }
-      prodMap[localId] = data.id;
-      results.products++;
+
+      if (!error && data) {
+        prodMap[prod.id] = data.id; 
+        results.products++;
+      }
     }
 
-    // Serials
-    const serialMap = {};
-    for (const s of serials) {
-      const newProdId = prodMap[s.productId];
-      if (!newProdId) continue;
+    // 2. CLIENTES (Upsert)
+    for (const cus of customers) {
       const row = {
-        user_id:    user.id,
-        product_id: newProdId,
-        serial:     s.serial,
-        cost:       s.cost || 0,
-        sale_price: s.salePrice || 0,
-        status:     s.status || 'available',
+        user_id: user.id,
+        first_name: cus.firstName, last_name: cus.lastName,
+        id_number: cus.idNumber, phone: cus.phone, address: cus.address,
+        created_at: cus.createdAt ? new Date(cus.createdAt).toISOString() : new Date().toISOString()
       };
-      const { data, error } = await supabase
-        .from('serials').upsert(row, { onConflict: 'user_id,serial' })
+      if (isUUID(cus.id)) row.id = cus.id;
+
+      const { data, error } = await supabase.from('customers')
+        .upsert(row, { onConflict: row.id ? 'id' : 'user_id, id_number' })
         .select('id').single();
-      if (error) { results.errors.push(`serial ${s.serial}: ${error.message}`); continue; }
-      serialMap[s.id] = data.id;
-      results.serials++;
+      if (!error && data) results.customers++;
     }
 
-    // Sales
-    const saleMap = {};
+    // 3. VENTAS (Solo Insertar las nuevas)
     for (const sale of sales) {
+      // Las ventas no se editan. Si ya tiene UUID, ya fue subida antes, la saltamos.
+      if (isUUID(sale.id)) {
+         saleMap[sale.id] = sale.id;
+         continue;
+      }
+
       const row = {
-        user_id:          user.id,
-        customer_id:      custMap[sale.customerId] || null,
-        total:            sale.total,
-        rate_off:         sale.rateOff,
-        rate_cus:         sale.rateCus,
-        payment_method:   sale.paymentMethod || 'div-elec',
+        user_id: user.id,
+        customer_id: isUUID(sale.customerId) ? sale.customerId : null,
+        total: sale.total, rate_off: sale.rateOff, rate_cus: sale.rateCus,
+        payment_method: sale.paymentMethod || 'div-elec',
         payment_currency: sale.paymentCurrency || 'usd',
-        created_at:       new Date(sale.createdAt).toISOString(),
+        created_at: sale.createdAt ? new Date(sale.createdAt).toISOString() : new Date().toISOString()
       };
-      const { data, error } = await supabase
-        .from('sales').insert(row).select('id').single();
-      if (error) { results.errors.push(`sale ${sale.id}: ${error.message}`); continue; }
-      saleMap[sale.id] = data.id;
-      results.sales++;
+
+      const { data, error } = await supabase.from('sales').insert(row).select('id').single();
+      if (!error && data) {
+        saleMap[sale.id] = data.id;
+        results.sales++;
+      }
     }
 
-    // Sale items
+    // 4. ITEMS DE VENTA (Solo para las ventas nuevas)
     for (const item of saleItems) {
+      if (isUUID(item.id)) continue; // Si el item ya es de la nube, se ignora
       const newSaleId = saleMap[item.saleId];
       if (!newSaleId) continue;
+
       await supabase.from('sale_items').insert({
-        sale_id:      newSaleId,
-        product_id:   prodMap[item.productId] || item.productId,
-        serial_id:    item.serialId ? (serialMap[item.serialId] || null) : null,
+        sale_id: newSaleId,
+        product_id: prodMap[item.productId] || item.productId,
         product_name: item.productName,
-        unit_price:   item.unitPrice,
-        qty:          item.qty || 1,
+        unit_price: item.unitPrice,
+        qty: item.qty || 1
       });
     }
 
     res.json({ ok: true, results });
   } catch (e) {
-    dbError(res, e, 'sync/full');
+    dbError(res, e, 'sync/push');
   }
 });
 // ════════════════════════════════════════════════════════════

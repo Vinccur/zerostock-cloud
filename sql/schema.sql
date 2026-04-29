@@ -139,35 +139,38 @@ $$;
 --  Nota: el backend usa service_role key que bypassa RLS,
 --  pero es buena práctica habilitarlo de todas formas.
 -- ================================================================
-
-ALTER TABLE products   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE serials     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sales       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sale_items  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings    ENABLE ROW LEVEL SECURITY;
 
--- Políticas para products
+-- 1. Eliminar políticas si existen para evitar el error 42710
+DROP POLICY IF EXISTS "products_owner" ON products;
+DROP POLICY IF EXISTS "serials_owner" ON serials;
+DROP POLICY IF EXISTS "customers_owner" ON customers;
+DROP POLICY IF EXISTS "sales_owner" ON sales;
+DROP POLICY IF EXISTS "sale_items_owner" ON sale_items;
+DROP POLICY IF EXISTS "settings_owner" ON settings;
+
+-- 2. Crear las políticas nuevamente
 CREATE POLICY "products_owner" ON products
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- Políticas para serials
 CREATE POLICY "serials_owner" ON serials
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- Políticas para customers
 CREATE POLICY "customers_owner" ON customers
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- Políticas para sales
 CREATE POLICY "sales_owner" ON sales
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- Políticas para sale_items (via sale)
 CREATE POLICY "sale_items_owner" ON sale_items
   USING (
     EXISTS (
@@ -177,7 +180,6 @@ CREATE POLICY "sale_items_owner" ON sale_items
     )
   );
 
--- Políticas para settings
 CREATE POLICY "settings_owner" ON settings
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());

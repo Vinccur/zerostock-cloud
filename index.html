@@ -3764,37 +3764,55 @@ async function cloudDelete(path) {
   return r.json();
 }
 
-/* ── Full sync: upload local IndexedDB → Supabase ── */
+/* ── Full sync: upload local → download cloud → update local ── */
 async function fullSync() {
   if (!CLOUD.token || !navigator.onLine || CLOUD.syncing) return;
   CLOUD.syncing = true;
   setSyncBadge('syncing', 'Sincronizando…');
   try {
-    // Collect all local data
+    // 1. PUSH: Enviar datos locales pendientes a la nube
     const [products, customers, serials, sales, saleItems] = await Promise.all([
-      DB.products.toArray(),
-      DB.customers.toArray(),
-      DB.serials.toArray(),
-      DB.sales.toArray(),
-      DB.saleItems.toArray(),
+      DB.products.toArray(), DB.customers.toArray(), DB.serials.toArray(),
+      DB.sales.toArray(), DB.saleItems.toArray(),
     ]);
-
-    // Collect settings
     const settingsArr = await DB.settings.toArray();
     const settings = settingsArr.map(s => ({ key: s.key, value: s.value }));
 
-    const result = await cloudPost('/api/sync', {
+    await cloudPost('/api/sync', {
       products, customers, serials, sales, saleItems, settings
+    });
+
+    // 2. PULL: Descargar la base de datos unificada de la nube
+    const cloudData = await cloudGet('/api/sync');
+
+    // 3. REEMPLAZAR: Limpiar base de datos local y llenarla con los datos de la nube
+    await DB.transaction('rw', DB.products, DB.customers, DB.serials, DB.sales, DB.saleItems, DB.settings, async () => {
+      await DB.products.clear();
+      await DB.customers.clear();
+      await DB.serials.clear();
+      await DB.sales.clear();
+      await DB.saleItems.clear();
+      await DB.settings.clear();
+
+      if(cloudData.products?.length) await DB.products.bulkAdd(cloudData.products);
+      if(cloudData.customers?.length) await DB.customers.bulkAdd(cloudData.customers);
+      if(cloudData.serials?.length) await DB.serials.bulkAdd(cloudData.serials);
+      if(cloudData.sales?.length) await DB.sales.bulkAdd(cloudData.sales);
+      if(cloudData.saleItems?.length) await DB.saleItems.bulkAdd(cloudData.saleItems);
+      if(cloudData.settings?.length) await DB.settings.bulkAdd(cloudData.settings);
     });
 
     CLOUD.lastSync = Date.now();
     setSyncBadge('synced', 'Sincronizado');
-    console.log('[ZeroStock Cloud] Sync result:', result.results);
-    toast('✅ Datos sincronizados en la nube', 'ok');
+    toast('✅ Datos sincronizados', 'ok');
+    
+    // 4. ACTUALIZAR UI: Refrescar la pantalla actual para mostrar los datos nuevos
+    go(A.view, A.params);
+
   } catch (e) {
     setSyncBadge('error', 'Error sync');
     console.warn('[ZeroStock Cloud] Sync failed:', e.message);
-    toast('Sincronización falló — datos guardados localmente', 'warn');
+    toast('Error de sincronización — operando localmente', 'warn');
   } finally {
     CLOUD.syncing = false;
   }

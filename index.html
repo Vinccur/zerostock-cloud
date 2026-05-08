@@ -3353,35 +3353,64 @@ async function cloudDelete(path){
   return r.json();
 }
 
-/* ── pullFromCloud: descarga la nube y reemplaza local (pull-only) ── */
+/* ── pullFromCloud: Sincronización inteligente (Compara timestamps) ── */
 async function pullFromCloud(){
-  const cloudData=await cloudGet('/api/sync');
-  await DB.transaction('rw',DB.products,DB.customers,DB.serials,DB.sales,DB.saleItems,DB.settings,async()=>{
-    await DB.products.clear();await DB.customers.clear();await DB.serials.clear();
-    await DB.sales.clear();await DB.saleItems.clear();await DB.settings.clear();
-    if(cloudData.products?.length)await DB.products.bulkAdd(cloudData.products);
-    if(cloudData.customers?.length)await DB.customers.bulkAdd(cloudData.customers);
-    if(cloudData.serials?.length)await DB.serials.bulkAdd(cloudData.serials);
-    if(cloudData.sales?.length)await DB.sales.bulkAdd(cloudData.sales);
-    if(cloudData.saleItems?.length)await DB.saleItems.bulkAdd(cloudData.saleItems);
-    if(cloudData.settings?.length)await DB.settings.bulkAdd(cloudData.settings);
+  const cloudData = await cloudGet('/api/sync');
+  
+  // Tablas a procesar
+  const tables = ['products', 'customers', 'serials', 'sales', 'saleItems', 'settings'];
+
+  await DB.transaction('rw', tables.map(t => DB[t]), async () => {
+    for (const table of tables) {
+      const remoteItems = cloudData[table] || [];
+      
+      for (const remoteItem of remoteItems) {
+        // En settings usamos 'key', en las demás usamos 'id'
+        const primaryKey = table === 'settings' ? remoteItem.key : remoteItem.id;
+        const localItem = await DB[table].get(primaryKey);
+
+        // REGLA DE ORO:
+        // Si el item no existe localmente O el de la nube es más nuevo (_mod mayor)
+        // entonces actualizamos el local.
+        if (!localItem || (remoteItem._mod > (localItem._mod || 0))) {
+          await DB[table].put(remoteItem);
+        }
+      }
+
+      // OPCIONAL: Eliminar localmente lo que ya no existe en la nube y no está marcado como borrado local
+      // (Si manejas borrado total desde el panel de Supabase directamente)
+    }
   });
-  CLOUD.lastSync=Date.now();
+
+  CLOUD.lastSync = Date.now();
+  localStorage.setItem('zs_last_sync', CLOUD.lastSync);
 }
 
-/* ── fullSync: solo pull (la nube es la fuente de verdad) ── */
-async function fullSync(){
-  if(!CLOUD.token||!navigator.onLine||CLOUD.syncing)return;
-  CLOUD.syncing=true;setSyncBadge('syncing','Sincronizando…');
-  try{
+async function fullSync() {
+  if (!CLOUD.token || !navigator.onLine || CLOUD.syncing) return;
+  CLOUD.syncing = true;
+  setSyncBadge('syncing', 'Sincronizando...');
+
+  try {
+    // 1. Enviamos lo que borraste o cambiaste
+    // Es vital el 'await' para que no empiece el pull hasta que el push termine
+    await pushToCloud(); 
+
+    // 2. Ahora que Supabase ya sabe que borraste cosas, descargamos
     await pullFromCloud();
-    setSyncBadge('synced','Sincronizado');
-    go(A.view,A.params);
-  }catch(e){
-    setSyncBadge('error','Error sync');
-    console.warn('[ZeroStock Cloud] Sync failed:',e.message);
-    toast('Error de sincronización — operando localmente','warn');
-  }finally{CLOUD.syncing=false;}
+
+    localStorage.setItem('zs_last_sync', Date.now());
+    setSyncBadge('synced', 'Sincronizado');
+    
+    // Refrescar la vista actual para ocultar lo borrado
+    go(A.view, A.params); 
+    
+  } catch (e) {
+    setSyncBadge('error', 'Error sync');
+    console.error('Fallo de sincronización:', e);
+  } finally {
+    CLOUD.syncing = false;
+  }
 }
 
 async function manualSync(){

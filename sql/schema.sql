@@ -114,9 +114,28 @@ CREATE TABLE IF NOT EXISTS settings (
 CREATE INDEX IF NOT EXISTS idx_settings_user_id ON settings(user_id);
  
 -- ================================================================
---  RPC FUNCTION: decrement_qty
---  Usada por el backend al procesar ventas de productos masivos
+-- ACTUALIZACIÓN DE ESQUEMA PARA COMPATIBILIDAD CON CLAUDE
 -- ================================================================
+
+DO $$ 
+DECLARE 
+    tablas TEXT[] := ARRAY['products', 'serials', 'customers', 'sales', 'sale_items', 'settings'];
+    t TEXT;
+BEGIN
+    FOREACH t IN ARRAY tablas LOOP
+        -- 1. Eliminamos las columnas anteriores para evitar conflictos
+        EXECUTE format('ALTER TABLE %I DROP COLUMN IF EXISTS _mod', t);
+        EXECUTE format('ALTER TABLE %I DROP COLUMN IF EXISTS _del', t);
+
+        -- 2. Agregamos las columnas con los nombres que usa Claude
+        -- updatedAt: para el timestamp de JS (BIGINT)
+        -- _deleted: para el borrado lógico (BOOLEAN porque Claude usa true/false)
+        EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS "updatedAt" BIGINT DEFAULT (extract(epoch from now()) * 1000)', t);
+        EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS "_deleted" BOOLEAN DEFAULT FALSE', t);
+    END LOOP;
+END $$;
+
+-- 3. Actualizamos la función RPC para que use el nuevo nombre de columna
 CREATE OR REPLACE FUNCTION decrement_qty(
   p_product_id BIGINT,
   p_qty        INT,
@@ -131,83 +150,27 @@ BEGIN
     qty_available = GREATEST(0, qty_available - p_qty),
     qty_sold      = qty_sold + p_qty,
     updated_at    = NOW(),
-     _mod          = (extract(epoch from now()) * 1000)
+    "updatedAt"   = (extract(epoch from now()) * 1000)::BIGINT
   WHERE id = p_product_id
     AND user_id = p_user_id;
 END;
 $$;
  
--- 1. Agregar columnas de control a PRODUCTS
-ALTER TABLE products 
-ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
-ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
-
--- 2. Agregar columnas de control a SERIALS
-ALTER TABLE serials 
-ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
-ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
-
--- 3. Agregar columnas de control a CUSTOMERS
-ALTER TABLE customers 
-ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
-ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
-
--- 4. Agregar columnas de control a SALES
-ALTER TABLE sales 
-ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
-ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
-
--- 5. Agregar columnas de control a SALE_ITEMS
-ALTER TABLE sale_items 
-ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
-ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
-
 -- ================================================================
 --  ROW LEVEL SECURITY (RLS)
 --  Cada usuario solo puede ver y modificar SUS propios datos
 --
 --  Nota: Primero dropear políticas viejas si existen, luego crear nuevas
 -- ================================================================
-<<<<<<< HEAD
-=======
  
 -- Habilitar RLS en todas las tablas
 ALTER TABLE users       ENABLE ROW LEVEL SECURITY;
->>>>>>> 017a099 (feat: auto-sync every 10 seconds)
 ALTER TABLE products    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE serials     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sales       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sale_items  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings    ENABLE ROW LEVEL SECURITY;
-<<<<<<< HEAD
-
--- 1. Eliminar políticas si existen para evitar el error 42710
-DROP POLICY IF EXISTS "products_owner" ON products;
-DROP POLICY IF EXISTS "serials_owner" ON serials;
-DROP POLICY IF EXISTS "customers_owner" ON customers;
-DROP POLICY IF EXISTS "sales_owner" ON sales;
-DROP POLICY IF EXISTS "sale_items_owner" ON sale_items;
-DROP POLICY IF EXISTS "settings_owner" ON settings;
-
--- 2. Crear las políticas nuevamente
-CREATE POLICY "products_owner" ON products
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "serials_owner" ON serials
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "customers_owner" ON customers
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "sales_owner" ON sales
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
-
-=======
  
 -- ── Políticas para PRODUCTS ──
 DROP POLICY IF EXISTS "products_owner" ON products;
@@ -235,7 +198,6 @@ CREATE POLICY "sales_owner" ON sales
  
 -- ── Políticas para SALE_ITEMS ──
 DROP POLICY IF EXISTS "sale_items_owner" ON sale_items;
->>>>>>> 017a099 (feat: auto-sync every 10 seconds)
 CREATE POLICY "sale_items_owner" ON sale_items
   USING (
     EXISTS (
@@ -244,13 +206,9 @@ CREATE POLICY "sale_items_owner" ON sale_items
         AND sales.user_id = auth.uid()
     )
   );
-<<<<<<< HEAD
-
-=======
  
 -- ── Políticas para SETTINGS ──
 DROP POLICY IF EXISTS "settings_owner" ON settings;
->>>>>>> 017a099 (feat: auto-sync every 10 seconds)
 CREATE POLICY "settings_owner" ON settings
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());

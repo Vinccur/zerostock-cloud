@@ -707,6 +707,8 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 <script>
 'use strict';
 const DB = new Dexie('ZeroStockDB_v3');
+
+// Mantenemos la v1 por compatibilidad si ya hay usuarios usándola
 DB.version(1).stores({
   products:  '++id, name, brand, category, createdAt',
   serials:   '++id, productId, serial, status, saleId',
@@ -714,6 +716,21 @@ DB.version(1).stores({
   sales:     '++id, customerId, createdAt',
   saleItems: '++id, saleId, productId, serialId',
   settings:  '&key'
+});
+
+// Agregamos la v2 para la sincronización
+DB.version(2).stores({
+  // Añadimos _mod y _del para poder filtrar cambios
+  products:  '++id, name, brand, category, createdAt, _mod, _del',
+  serials:   '++id, productId, serial, status, saleId, _mod, _del',
+  customers: '++id, idNumber, lastName, _mod, _del',
+  sales:     '++id, customerId, createdAt, _mod, _del',
+  saleItems: '++id, saleId, productId, serialId, _mod, _del',
+  settings:  '&key' // settings usualmente no se sincroniza igual
+}).upgrade(tx => {
+    // Esto se ejecuta solo una vez cuando el usuario actualiza de v1 a v2
+    // Podemos inicializar los campos nuevos para que no sean undefined
+    return tx.products.toCollection().modify({ _mod: Date.now(), _del: 0 });
 });
 
 const A = {
@@ -796,17 +813,38 @@ const DL = {
     return DB.products.add({...r, id:newId, qtyAvailable:0, qtySold:0, createdAt:Date.now()});
   },
 
-  async deleteProduct(id){
-    const sold=await DB.serials.where({productId:id,status:'sold'}).count();
-    if(sold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
-    const p=await DB.products.get(id);
-    if(p&&!p.serialized&&p.qtySold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
-    // 1. Eliminar en la nube
-    await DL._cloudOp(()=>cloudDelete('/api/products/'+id));
-    // 2. Eliminar localmente
-    await DB.serials.where('productId').equals(id).delete();
-    await DB.products.delete(id);
-  },
+async deleteProduct(id) {
+  // 1. Validaciones de seguridad (se mantienen igual)
+  const sold = await DB.serials.where({productId: id, status: 'sold'}).count();
+  if (sold > 0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
+  
+  const p = await DB.products.get(id);
+  if (p && !p.serialized && p.qtySold > 0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
+
+  // 2. CAMBIO CLAVE: Borrado Lógico Local
+  // En lugar de .delete(), marcamos el registro
+  const now = Date.now();
+  
+  await DB.products.update(id, { 
+    _del: 1,      // Marcamos como borrado
+    _mod: now     // Registramos el momento del cambio para el "push"
+  });
+
+  // También marcamos sus seriales como borrados para que la nube lo sepa
+  await DB.serials.where('productId').equals(id).modify({ 
+    _del: 1, 
+    _mod: now 
+  });
+
+  // 3. Sincronización
+  // Eliminamos la llamada directa a cloudDelete porque ahora el 
+  // proceso lo hará 'pushToCloud' enviando el estado _del: 1 a Supabase
+  if (navigator.onLine) {
+    fullSync(); 
+  } else {
+    toast('Eliminado localmente. Se sincronizará al volver el internet.', 'info');
+  }
+},
 
   async getSerials(pid,status=null){
     const rows=await DB.serials.where('productId').equals(pid).toArray();
@@ -1144,7 +1182,9 @@ function setDashPeriod(p){ A.dashPeriod=p; go('dashboard'); }
 
 /* ── INVENTORY ── */
 async function vInv(){
-  const prods=await DL.getProducts();
+ // CAMBIO AQUÍ: Filtramos para ignorar los registros que tienen _del: 1
+  const allProds = await DL.getProducts();
+  const prods = allProds.filter(p => p._del !== 1);
   const adm=A.role==='admin';
   const rows=prods.map(p=>{
     const sc=p._av===0?'c-err':p._av<=p.minStock?'c-warn':'c-ok';
@@ -3353,6 +3393,32 @@ async function cloudDelete(path){
   return r.json();
 }
 
+/* -Esta función buscará todo lo que hayas cambiado localmente (incluyendo lo que marcaste como borrado) y lo enviará a Supabase usando un upsert. -*/
+async function pushToCloud() {
+  if (!CLOUD.token) return;
+  
+  // Tablas a sincronizar
+  const tables = ['products', 'customers', 'sales', 'categories'];
+  const lastSync = localStorage.getItem('zs_last_sync') || 0;
+
+  for (const table of tables) {
+    // 1. Obtener cambios locales realizados después de la última sincronización
+    const localChanges = await DB[table]
+      .where('_mod')
+      .above(Number(lastSync))
+      .toArray();
+
+    if (localChanges.length > 0) {
+      // 2. Enviar a Supabase (Upsert)
+      const { error } = await supabase
+        .from(table)
+        .upsert(localChanges, { onConflict: 'id' });
+      
+      if (error) throw new Error(`Error subiendo ${table}: ${error.message}`);
+    }
+  }
+}
+
 /* ── pullFromCloud: descarga la nube y reemplaza local (pull-only) ── */
 async function pullFromCloud(){
   const cloudData=await cloudGet('/api/sync');
@@ -3374,7 +3440,15 @@ async function fullSync(){
   if(!CLOUD.token||!navigator.onLine||CLOUD.syncing)return;
   CLOUD.syncing=true;setSyncBadge('syncing','Sincronizando…');
   try{
+    // PRIMERO: Enviamos lo que tú hiciste (borrados, ediciones, nuevos)
+    await pushToCloud();
+
+   // SEGUNDO: Traemos lo que hay en la nube
     await pullFromCloud();
+
+    // Guardamos el timestamp de esta sincronización exitosa
+    localStorage.setItem('zs_last_sync', Date.now());
+    
     setSyncBadge('synced','Sincronizado');
     go(A.view,A.params);
   }catch(e){

@@ -68,12 +68,10 @@ a{text-decoration:none;color:inherit}
 .spin{animation:spin .9s linear infinite}
 .page{animation:fadeUp .2s ease both}
 
-/* ── LAYOUT ── */
 #app{display:flex;height:100vh;overflow:hidden;position:relative}
 #sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
 #sb-overlay.on{display:block}
 
-/* ── SIDEBAR ── */
 #sidebar{width:228px;min-width:228px;background:var(--sb);display:flex;flex-direction:column;
   border-right:1px solid var(--sb-bdr);z-index:50;transition:transform var(--t)}
 .sb-head{padding:18px 14px 12px;border-bottom:1px solid var(--sb-bdr);flex-shrink:0}
@@ -115,7 +113,6 @@ a{text-decoration:none;color:inherit}
 .role-nm{font-size:12px;font-weight:700;color:#fff}
 .role-lb{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.3)}
 
-/* ── MAIN ── */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 #topbar{height:50px;background:var(--surface);display:flex;align-items:center;
   padding:0 14px;gap:8px;border-bottom:1px solid var(--bdr);box-shadow:var(--sh1);z-index:10;flex-shrink:0}
@@ -133,7 +130,6 @@ a{text-decoration:none;color:inherit}
 #hamburger{display:none}
 #content{flex:1;overflow-y:auto;padding:16px}
 
-/* ── RESPONSIVE SIDEBAR ── */
 @media(max-width:768px){
   #sidebar{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%)}
   #sidebar.open{transform:translateX(0)}
@@ -141,7 +137,6 @@ a{text-decoration:none;color:inherit}
   #content{padding:12px}
 }
 
-/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--r5);
   font-size:12px;font-weight:700;cursor:pointer;transition:all var(--t);border:none;
   white-space:nowrap;font-family:var(--font);line-height:1}
@@ -164,7 +159,6 @@ a{text-decoration:none;color:inherit}
 .btn-xl{padding:11px 20px;font-size:13px;border-radius:var(--r3);width:100%;justify-content:center}
 .btn-xl i{width:16px;height:16px}
 
-/* ── CARDS / TABLE ── */
 .card{background:var(--surface);border-radius:var(--r3);border:1px solid var(--bdr);box-shadow:var(--sh1);padding:14px}
 .card-hdr{display:flex;align-items:center;justify-content:space-between;
   margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr)}
@@ -182,7 +176,6 @@ tbody tr:hover td{background:var(--s2)}
 tbody tr.rw td{background:var(--warn-bg)!important}
 .tacts{display:flex;gap:3px;align-items:center}
 
-/* ── CHIPS ── */
 .chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;
   border-radius:var(--r5);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
 .chip i{width:10px;height:10px}
@@ -196,7 +189,6 @@ tbody tr.rw td{background:var(--warn-bg)!important}
 [data-theme="dark"] .c-ser{background:#2D1B69;color:#C4B5FD}
 [data-theme="dark"] .c-bat{background:#292000;color:#FBBF24}
 
-/* ── FORMS ── */
 .fg{display:flex;flex-direction:column;gap:3px;margin-bottom:11px}
 .fl{font-size:11px;font-weight:700;color:var(--txt2)}
 .fc{padding:7px 10px;border:1.5px solid var(--bdr2);border-radius:var(--r1);
@@ -209,14 +201,12 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
 .fhint{font-size:10px;color:var(--txt3)}
 
-/* ── MARGIN INDICATOR ── */
 .margin-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;
   border-radius:var(--r5);font-size:10px;font-weight:800;margin-top:3px}
 .mp-ok{background:var(--ok-bg);color:var(--ok)}
 .mp-warn{background:var(--warn-bg);color:var(--warn)}
 .mp-err{background:var(--err-bg);color:var(--err)}
 
-/* ── SEARCH / AUTOCOMPLETE ── */
 .sbar{display:flex;align-items:center;gap:7px;background:var(--s2);
   border:1.5px solid var(--bdr);border-radius:var(--r5);padding:6px 11px;transition:border-color var(--t)}
 .sbar:focus-within{border-color:var(--brand)}
@@ -238,7 +228,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .ac-price{font-size:12px;font-weight:800;color:var(--brand);white-space:nowrap}
 .ac-empty{padding:11px;font-size:12px;color:var(--txt3);text-align:center}
 
-/* ── MODAL ── */
 .mo-bg{position:fixed;inset:0;background:var(--overlay);display:flex;
   align-items:center;justify-content:center;z-index:100;padding:18px;
   backdrop-filter:blur(4px);animation:fadeIn .18s ease}
@@ -253,7 +242,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .mo-foot{padding:10px 18px 16px;display:flex;justify-content:flex-end;gap:8px;
   border-top:1px solid var(--bdr);flex-shrink:0}
 
-/* ── TOASTS ── */
 #tc{position:fixed;bottom:16px;right:16px;z-index:200;
   display:flex;flex-direction:column;gap:6px;pointer-events:none}
 .toast{display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:var(--r2);
@@ -266,7 +254,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .t-warn{background:#1F180A;color:#fef3c7;border-color:var(--warn)}
 .t-info{background:#0A1828;color:#bae6fd;border-color:var(--info)}
 
-/* ── STATS ROW ── */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:11px;margin-bottom:14px}
 .sc{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r3);padding:13px 14px;box-shadow:var(--sh1)}
 .sc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
@@ -276,13 +263,11 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .sc-val{font-size:24px;font-weight:800;color:var(--txt);line-height:1}
 .sc-note{font-size:10px;color:var(--txt3);margin-top:3px}
 
-/* ── PAGE HEADER ── */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .ph-ttl{font-size:19px;font-weight:800;color:var(--txt);line-height:1.1}
 .ph-sub{font-size:12px;color:var(--txt2);margin-top:2px}
 .ph-r{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 
-/* ── TIME FILTER TABS ── */
 .tf-tabs{display:flex;gap:3px;background:var(--s2);border:1px solid var(--bdr);
   border-radius:var(--r5);padding:3px;margin-bottom:14px;flex-wrap:wrap}
 .tf-tab{padding:4px 11px;border-radius:var(--r5);font-size:11px;font-weight:700;
@@ -296,21 +281,18 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .tf-custom input{border:none;background:transparent;outline:none;font-family:var(--font);
   font-size:12px;color:var(--txt)}
 
-/* ── EMPTY STATE ── */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center}
 .empty i{width:42px;height:42px;color:var(--txt3);margin-bottom:12px}
 .empty-ttl{font-size:14px;font-weight:800;color:var(--txt2);margin-bottom:4px}
 .empty-sub{font-size:12px;color:var(--txt3);max-width:260px;line-height:1.5}
 .empty-cta{margin-top:14px}
 
-/* ── INFO BOX ── */
 .infobox{display:flex;gap:8px;padding:9px 11px;border-radius:var(--r2);font-size:11px;line-height:1.5;margin-bottom:11px}
 .infobox i{width:13px;height:13px;flex-shrink:0;margin-top:1px}
 .ib-p{background:var(--brand-tint);color:var(--brand);border:1px solid rgba(26,86,219,.2)}
 .ib-w{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(217,119,6,.2)}
 .ib-e{background:var(--err-bg);color:var(--err);border:1px solid rgba(220,38,38,.2)}
 
-/* ── POS ── */
 .pos-grid{display:grid;grid-template-columns:1fr 295px;gap:13px;height:calc(100vh - 82px)}
 @media(max-width:900px){.pos-grid{grid-template-columns:1fr;height:auto}}
 .pos-left{display:flex;flex-direction:column;gap:11px;overflow:hidden;min-height:0}
@@ -326,7 +308,7 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .cart-info{flex:1;min-width:0}
 .cart-pname{font-size:12px;font-weight:700;color:var(--txt)}
 .cart-serial{font-size:10px;color:var(--txt2);font-family:'Courier New',monospace}
-.cart-usd{font-size:13px;font-weight:800;color:var(--brand);white-space:nowrap}
+.cart-usd{font-size:13px;font-weight:800;color:var(--brand);white-space:nowrap;min-width:72px;text-align:right}
 .summary-card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r3);padding:13px;box-shadow:var(--sh1);flex-shrink:0}
 .cur-block{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r2);padding:10px 12px;margin-bottom:11px}
 .cur-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0}
@@ -335,7 +317,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .cur-val.big{color:var(--brand);font-size:17px}
 .cur-rate{font-size:10px;color:var(--txt3);margin-top:1px}
 
-/* ── SERIAL SELECT ── */
 .srl-item{display:flex;align-items:center;justify-content:space-between;
   padding:9px 11px;border:1.5px solid var(--bdr);border-radius:var(--r2);
   margin-bottom:6px;cursor:pointer;transition:all var(--t)}
@@ -344,7 +325,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .srl-price{font-size:13px;font-weight:800;color:var(--brand)}
 .srl-dt{font-size:10px;color:var(--txt2)}
 
-/* ── PER-SERIAL PRICING TABLE ── */
 .serial-pricing-table{width:100%;border-collapse:collapse;font-size:12px}
 .serial-pricing-table th{padding:7px 9px;text-align:left;font-size:10px;font-weight:800;
   text-transform:uppercase;letter-spacing:.8px;color:var(--txt3);
@@ -355,7 +335,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   transition:border-color var(--t)}
 .serial-pricing-table input:focus{outline:none;border-color:var(--brand)}
 
-/* ── PRODUCT TYPE BADGE ── */
 .ptype-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
   border-radius:var(--r2);border:2px solid;cursor:pointer;transition:all var(--t)}
 .ptype-card.ser{border-color:var(--bdr);background:var(--surface)}
@@ -365,7 +344,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 [data-theme="dark"] .ptype-card.sel-ser{background:#2D1B69}
 [data-theme="dark"] .ptype-card.sel-bat{background:#292000}
 
-/* ── RECEIPT PRINTABLE ── */
 .rcpt-export{background:#fff;color:#0F172A;padding:22px;width:320px;
   font-family:'Courier New',monospace;font-size:12px;border-radius:var(--r3)}
 .rcpt-hd{text-align:center;margin-bottom:12px;padding-bottom:12px;border-bottom:2px dashed #CBD5E1}
@@ -378,7 +356,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .rcpt-footer{margin-top:12px;font-size:10px;color:#94A3B8;text-align:center;
   padding-top:10px;border-top:1px dashed #CBD5E1}
 
-/* ── PRODUCT DETAIL ── */
 .pd-header{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--r3);
   padding:14px 16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:13px;box-shadow:var(--sh1)}
 .pd-icon{width:46px;height:46px;border-radius:var(--r2);background:var(--brand-tint);
@@ -387,7 +364,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .pd-nm{font-size:16px;font-weight:800;color:var(--txt);line-height:1.1}
 .pd-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
 
-/* ── MISC ── */
 .mono{font-family:'Courier New',monospace;font-size:11px}
 .fw7{font-weight:700}.fw8{font-weight:800}
 .sm{font-size:11px}.muted{color:var(--txt2)}
@@ -408,13 +384,11 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   display:none;align-items:center;justify-content:center;gap:7px}
 #ob.on{display:flex}
 
-/* ── PRODUCT FILTER TOOLBAR ── */
 .prod-toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .prod-toolbar select{padding:5px 8px;border:1.5px solid var(--bdr2);border-radius:var(--r5);
   background:var(--s2);color:var(--txt2);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer}
 .prod-toolbar select:focus{outline:none;border-color:var(--brand)}
 
-/* ── CUSTOMER SEARCH COMBOBOX ── */
 .cust-combo{position:relative}
 .cust-combo-input-row{display:flex;gap:6px;align-items:center}
 .cust-combo-drop{position:absolute;top:calc(100% + 5px);left:0;right:0;
@@ -429,7 +403,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .cust-combo-id{font-size:10px;color:var(--txt2)}
 .cust-combo-empty{padding:14px;font-size:12px;color:var(--txt3);text-align:center}
 
-/* ── PRODUCT PICKER MODAL ── */
 .ppk-list{display:flex;flex-direction:column;gap:5px;max-height:420px;overflow-y:auto}
 .ppk-item{display:flex;align-items:center;justify-content:space-between;
   padding:10px 12px;border:1.5px solid var(--bdr);border-radius:var(--r2);
@@ -444,7 +417,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .ppk-toolbar select{padding:5px 9px;border:1.5px solid var(--bdr2);border-radius:var(--r5);
   background:var(--s2);color:var(--txt2);font-family:var(--font);font-size:11px;font-weight:600}
 
-/* ── PAYMENT METHOD ── */
 .pm-card{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;
   border:2px solid var(--bdr);border-radius:var(--r2);cursor:pointer;
   transition:all var(--t);margin-bottom:7px;background:var(--surface)}
@@ -460,11 +432,9 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .pm-total-lbl{font-size:11px;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
 .pm-total-val{font-size:24px;font-weight:800;color:var(--brand)}
 
-/* ── WhatsApp button ── */
 .btn-wa{background:#25D366;color:#fff;border:none}
 .btn-wa:hover{background:#1ebe5d;transform:translateY(-1px)}
 .btn-wa svg{width:13px;height:13px;flex-shrink:0}
-/* ── WA Settings toggle ── */
 .wa-toggle-row{display:flex;align-items:center;justify-content:space-between;
   padding:9px 11px;background:var(--s2);border-radius:var(--r2);
   border:1px solid var(--bdr);margin-bottom:9px}
@@ -479,14 +449,12 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle-sw input:checked+.slider::before{transform:translateX(17px)}
 
-/* ── ADMIN LOCK ── */
 .admin-lock-overlay{display:flex;align-items:center;justify-content:center;
   min-height:300px;flex-direction:column;gap:16px}
 .lock-icon{width:56px;height:56px;border-radius:50%;background:var(--s3);
   display:flex;align-items:center;justify-content:center;border:2px solid var(--bdr)}
 .lock-icon i{width:26px;height:26px;color:var(--txt3)}
 
-/* ── CLOUD AUTH — LOGIN SCREEN ── */
 #auth-screen{
   position:fixed;inset:0;z-index:9999;
   background:linear-gradient(135deg,#090E1A 0%,#0F172A 50%,#1A237E 100%);
@@ -511,13 +479,20 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .auth-btn-google svg{width:20px;height:20px;flex-shrink:0}
 .auth-divider{height:1px;background:rgba(255,255,255,.07);margin:20px 0}
 .auth-footer{font-size:11px;color:rgba(255,255,255,.25);line-height:1.8}
+.auth-guest-btn{
+  background:transparent;border:none;cursor:pointer;
+  color:rgba(255,255,255,.35);font-size:12px;font-family:var(--font);
+  text-decoration:underline;text-underline-offset:3px;
+  padding:4px 8px;border-radius:var(--r1);
+  transition:color .2s ease;margin-bottom:14px;display:block;width:100%;text-align:center;
+}
+.auth-guest-btn:hover{color:rgba(255,255,255,.65);}
 .auth-loading{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.5);
   font-size:13px;margin-top:16px;justify-content:center}
 .auth-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);
   border-top-color:#3B82F6;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── CLOUD SYNC BADGE ── */
 .sync-badge{
   display:flex;align-items:center;gap:5px;padding:3px 9px;
   border-radius:var(--r5);font-size:10px;font-weight:700;
@@ -534,7 +509,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .error .sync-dot{background:var(--err)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── USER AVATAR in sidebar ── */
 .user-chip{
   display:flex;align-items:center;gap:8px;padding:8px 10px;
   background:rgba(255,255,255,.05);border-radius:var(--r2);
@@ -553,10 +527,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   background:var(--brand);color:#fff;flex-shrink:0}
 .step-badge.done{background:var(--ok)}
 
-/* ══════════════════════════════════════════
-   IMPORT MODULE
-══════════════════════════════════════════ */
-/* ── Drag-Drop Zone ── */
 .dz{border:2.5px dashed var(--bdr2);border-radius:var(--r3);padding:32px 20px;
   text-align:center;cursor:pointer;transition:all .2s ease;position:relative;
   background:var(--s2)}
@@ -569,13 +539,11 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .dz-formats{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .dz-fmt{padding:2px 9px;border-radius:var(--r5);font-size:10px;font-weight:800;
   background:var(--s3);border:1px solid var(--bdr);color:var(--txt2)}
-/* ── File Info Bar ── */
 .file-bar{display:flex;align-items:center;gap:10px;padding:10px 13px;
   background:var(--ok-bg);border:1.5px solid var(--ok);border-radius:var(--r2);margin-bottom:11px}
 .file-bar i{width:16px;height:16px;color:var(--ok);flex-shrink:0}
 .file-bar-name{font-size:12px;font-weight:800;color:var(--txt);flex:1}
 .file-bar-meta{font-size:11px;color:var(--txt2)}
-/* ── Entity Selector ── */
 .entity-tabs{display:flex;gap:5px;margin-bottom:13px}
 .entity-tab{flex:1;padding:9px 6px;border-radius:var(--r2);border:2px solid var(--bdr);
   cursor:pointer;text-align:center;transition:all .15s ease;background:var(--surface)}
@@ -583,7 +551,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .entity-tab.sel{border-color:var(--brand);background:var(--brand-tint)}
 .entity-tab-icon{font-size:18px;margin-bottom:3px}
 .entity-tab-lbl{font-size:11px;font-weight:800;color:var(--txt)}
-/* ── Column Mapper ── */
 .mapper-wrap{border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden;margin-bottom:11px}
 .mapper-head{display:grid;grid-template-columns:1fr 32px 1fr;gap:0;background:var(--s2);
   padding:7px 11px;font-size:10px;font-weight:800;text-transform:uppercase;
@@ -601,7 +568,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   background:var(--surface);color:var(--txt);font-family:var(--font);font-size:11px;
   width:100%;font-weight:700;transition:border-color .15s}
 .mapper-dst select:focus{outline:none;border-color:var(--brand)}
-/* ── Data Preview ── */
 .preview-table-wrap{border:1px solid var(--bdr);border-radius:var(--r2);
   overflow-x:auto;max-height:180px;overflow-y:auto;margin-bottom:11px}
 .preview-table{border-collapse:collapse;font-size:11px;width:100%;min-width:400px}
@@ -610,14 +576,12 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   border-bottom:1px solid var(--bdr);white-space:nowrap;position:sticky;top:0}
 .preview-table td{padding:5px 9px;border-bottom:1px solid var(--bdr);
   color:var(--txt2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* ── Progress ── */
 .imp-progress{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r2);
   padding:16px;text-align:center;margin-bottom:11px}
 .imp-prog-bar-wrap{height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;margin:10px 0}
 .imp-prog-bar{height:100%;background:var(--brand);border-radius:4px;
   transition:width .3s ease;width:0%}
 .imp-prog-lbl{font-size:12px;font-weight:700;color:var(--txt2)}
-/* ── Report ── */
 .imp-report{border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden;margin-bottom:11px}
 .imp-report-hdr{padding:10px 13px;display:flex;align-items:center;justify-content:space-between;
   background:var(--s2);border-bottom:1px solid var(--bdr)}
@@ -653,6 +617,9 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
       <span id="auth-loading-txt">Iniciando sesión…</span>
     </div>
     <div class="auth-divider"></div>
+    <button class="auth-guest-btn" onclick="enterGuestMode()">
+      Continuar sin iniciar sesión
+    </button>
     <div class="auth-footer">
       Tus datos se sincronizan en la nube · Funciona sin conexión<br>
       Cada cuenta tiene su propio ZeroStock completamente aislado
@@ -669,7 +636,6 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
       <div class="sb-icon" id="sb-icon" onclick="easterEgg(this)">Ø</div>
       <div><div class="sb-name">ZeroStock</div><div class="sb-sub">Inventario · Ventas</div></div>
     </div>
-    <!-- User chip (shown after login) -->
     <div class="user-chip" id="user-chip" style="display:none" onclick="showUserMenu()">
       <div class="user-avatar" id="user-avatar-el">?</div>
       <div style="flex:1;min-width:0">
@@ -738,13 +704,8 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 </div>
 <div id="mr"></div>
 <div id="tc"></div>
-
 <script>
 'use strict';
-/* ═══════════════════════════════════════════════
-   § 1 — DATABASE SCHEMA v1
-   (non-indexed new fields stored directly on records)
-═══════════════════════════════════════════════ */
 const DB = new Dexie('ZeroStockDB_v3');
 DB.version(1).stores({
   products:  '++id, name, brand, category, createdAt',
@@ -755,9 +716,6 @@ DB.version(1).stores({
   settings:  '&key'
 });
 
-/* ═══════════════════════════════════════════════
-   § 2 — APP STATE
-═══════════════════════════════════════════════ */
 const A = {
   view:'dashboard', params:{},
   role:'admin',
@@ -765,25 +723,21 @@ const A = {
   rates:{ off:36.50, cus:42.00 },
   cart:[], selCust:null, guestMode:false,
   adminAuth: false,
-  // dashboard filter state
   dashPeriod: 'month',
   dashCustomStart: '',
   dashCustomEnd: '',
 };
 
-/* ═══════════════════════════════════════════════
-   § 3 — CONSTANTS
-═══════════════════════════════════════════════ */
 const SER_CATS  = ['Smartphones','Laptops','Tablets','Electrónica','Monitores','Gaming'];
 const BATCH_CATS= ['Accesorios','Fundas','Cables','Cargadores','Audio','Redes','Otros'];
 const ALL_CATS  = [...SER_CATS, ...BATCH_CATS];
 
-/* ═══════════════════════════════════════════════
-   § 4 — DATA LAYER
-═══════════════════════════════════════════════ */
 const DL = {
   async cfg(k,def=null){ try{const r=await DB.settings.get(k);return r?r.value:def;}catch{return def;}},
-  async setCfg(k,v){ return DB.settings.put({key:k,value:v}); },
+  async setCfg(k,v){
+    await DB.settings.put({key:k,value:v});
+    await DL._cloudOp(()=>cloudPost('/api/settings',{key:k,value:v}));
+  },
   async syncRates(){
     A.rates.off=parseFloat(await DL.cfg('rate_off','36.50'));
     A.rates.cus=parseFloat(await DL.cfg('rate_cus','42.00'));
@@ -791,8 +745,6 @@ const DL = {
     if(co) co.textContent=`Bs.${fmt(A.rates.off)}/USD`;
     if(cc) cc.textContent=`Bs.${fmt(A.rates.cus)}/USD`;
   },
-
-  // PRODUCTS
   async getProducts(q=''){
     let rows=await DB.products.orderBy('name').toArray();
     if(q){const lq=q.toLowerCase();rows=rows.filter(p=>[p.name,p.brand,p.model,p.category].some(f=>(f||'').toLowerCase().includes(lq)));}
@@ -804,7 +756,7 @@ const DL = {
     await DL._hydrateProduct(p);return p;
   },
   async _hydrateProduct(p){
-    const isSer = p.serialized !== false; // default true for backwards compat
+    const isSer = p.serialized !== false;
     if(isSer){
       p._av=await DB.serials.where({productId:p.id,status:'available'}).count();
       p._tt=await DB.serials.where('productId').equals(p.id).count();
@@ -815,92 +767,136 @@ const DL = {
       p._sd=p.qtySold||0;
     }
   },
+  /* ─ HELPER: ejecutar operación en backend si hay sesión y conexión ─ */
+  async _cloudOp(fn){
+    if(!CLOUD.token||!navigator.onLine) return null;
+    try{ return await fn(); }
+    catch(e){ console.warn('[ZeroStock] Cloud op failed:', e.message); return null; }
+  },
+
   async saveProduct(d){
     const isSer = SER_CATS.includes(d.category);
     const r={
       name:(d.name||'').trim(), brand:(d.brand||'').trim(),
       model:(d.model||'').trim(), category:d.category||'Otros',
-      minStock:parseInt(d.minStock,10)||1,
-      serialized: isSer,
-      // Non-serialized fields
+      minStock:parseInt(d.minStock,10)||1, serialized: isSer,
       cost: isSer ? 0 : (parseFloat(d.cost)||0),
       salePrice: isSer ? 0 : (parseFloat(d.salePrice)||0),
     };
     if(!r.name) throw new Error('El nombre es obligatorio.');
     if(!r.brand) throw new Error('La marca es obligatoria.');
+    // 1. Persistir en la nube
+    const cloudPayload={...r, sale_price:r.salePrice, min_stock:r.minStock,
+      qty_available:0, qty_sold:0};
+    if(d.id) cloudPayload.id=String(d.id);
+    const cloudRes=await DL._cloudOp(()=>cloudPost('/api/products',cloudPayload));
+    // 2. Persistir localmente
     if(d.id){ await DB.products.update(d.id,r); return d.id; }
-    return DB.products.add({...r, qtyAvailable:0, qtySold:0, createdAt:Date.now()});
+    const newId=cloudRes?.data?.id||undefined;
+    return DB.products.add({...r, id:newId, qtyAvailable:0, qtySold:0, createdAt:Date.now()});
   },
+
   async deleteProduct(id){
     const sold=await DB.serials.where({productId:id,status:'sold'}).count();
     if(sold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
     const p=await DB.products.get(id);
     if(p&&!p.serialized&&p.qtySold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
+    // 1. Eliminar en la nube
+    await DL._cloudOp(()=>cloudDelete('/api/products/'+id));
+    // 2. Eliminar localmente
     await DB.serials.where('productId').equals(id).delete();
     await DB.products.delete(id);
   },
 
-  // SERIALS
   async getSerials(pid,status=null){
     const rows=await DB.serials.where('productId').equals(pid).toArray();
     return status?rows.filter(s=>s.status===status):rows;
   },
+
   async addSerialsBulk(pid,items){
-    // items: [{serial, cost, salePrice}]
     if(!items.length) throw new Error('Sin seriales para agregar.');
     const exist=new Set((await DB.serials.where('productId').equals(pid).toArray()).map(s=>s.serial.toUpperCase()));
-    const toAdd=[],dupes=[];
-    const seen=new Set();
+    const toAdd=[],dupes=[],seen=new Set();
     for(const it of items){
       const k=it.serial.toUpperCase();
       if(seen.has(k)||exist.has(k)){dupes.push(it.serial);continue;}
       toAdd.push({productId:pid,serial:it.serial,status:'available',
-        cost:parseFloat(it.cost)||0, salePrice:parseFloat(it.salePrice)||0,
-        addedAt:Date.now()});
+        cost:parseFloat(it.cost)||0,salePrice:parseFloat(it.salePrice)||0,addedAt:Date.now()});
       seen.add(k);
     }
-    if(toAdd.length) await DB.serials.bulkAdd(toAdd);
+    if(!toAdd.length) return {added:0,dupes};
+    // 1. Enviar a la nube
+    await DL._cloudOp(()=>cloudPost('/api/serials/bulk',{
+      product_id:pid, items:toAdd.map(s=>({serial:s.serial,cost:s.cost,salePrice:s.salePrice}))
+    }));
+    // 2. Guardar localmente
+    await DB.serials.bulkAdd(toAdd);
     return {added:toAdd.length,dupes};
   },
+
   async addBulkQty(pid,{qty,cost,salePrice,variant}){
     const q=parseInt(qty,10)||0;
     if(q<=0) throw new Error('Cantidad inválida.');
+    const p=await DB.products.get(pid);
+    // 1. Actualizar en la nube
+    if(p){
+      await DL._cloudOp(()=>cloudPost('/api/products',{
+        id:String(pid), name:p.name, brand:p.brand, model:p.model||'',
+        category:p.category, min_stock:p.minStock, serialized:p.serialized,
+        cost:parseFloat(cost)||0, sale_price:parseFloat(salePrice)||0,
+        qty_available:(p.qtyAvailable||0)+q, qty_sold:p.qtySold||0,
+      }));
+    }
+    // 2. Actualizar localmente
     await DB.products.where('id').equals(pid).modify(p=>{
       p.qtyAvailable=(p.qtyAvailable||0)+q;
       p.cost=parseFloat(cost)||0;
       p.salePrice=parseFloat(salePrice)||0;
-      if(variant) p.lastVariant=variant;
+      if(variant)p.lastVariant=variant;
     });
     return q;
   },
+
   async delSerial(id){
     const s=await DB.serials.get(id);
     if(!s) throw new Error('Serial no encontrado.');
     if(s.status==='sold') throw new Error('No se puede eliminar un serial vendido.');
+    // 1. Eliminar en la nube
+    await DL._cloudOp(()=>cloudDelete('/api/serials/'+id));
+    // 2. Eliminar localmente
     await DB.serials.delete(id);
   },
 
-  // CUSTOMERS
   async getCustomers(q=''){
     let rows=await DB.customers.orderBy('lastName').toArray();
     if(q){const lq=q.toLowerCase();rows=rows.filter(c=>[c.firstName,c.lastName,c.idNumber,c.phone].some(f=>(f||'').toLowerCase().includes(lq)));}
     return rows;
   },
+
   async saveCustomer(d){
     const r={firstName:(d.firstName||'').trim(),lastName:(d.lastName||'').trim(),
       idNumber:(d.idNumber||'').trim(),phone:(d.phone||'').trim(),address:(d.address||'').trim()};
     if(!r.idNumber) throw new Error('La Cédula/ID es obligatoria.');
     if(!r.firstName||!r.lastName) throw new Error('Nombre y Apellido son obligatorios.');
+    // 1. Persistir en la nube
+    const cloudPayload={first_name:r.firstName,last_name:r.lastName,id_number:r.idNumber,
+      phone:r.phone,address:r.address};
+    if(d.id) cloudPayload.id=String(d.id);
+    const cloudRes=await DL._cloudOp(()=>cloudPost('/api/customers',cloudPayload));
+    // 2. Persistir localmente
     if(d.id){await DB.customers.update(d.id,r);return d.id;}
-    return DB.customers.add({...r,createdAt:Date.now()});
+    const newId=cloudRes?.data?.id||undefined;
+    return DB.customers.add({...r,id:newId,createdAt:Date.now()});
   },
+
   async delCustomer(id){
     const cnt=await DB.sales.where('customerId').equals(id).count();
     if(cnt>0) throw new Error('Tiene ventas asociadas. No se puede eliminar.');
+    // 1. Eliminar en la nube
+    await DL._cloudOp(()=>cloudDelete('/api/customers/'+id));
+    // 2. Eliminar localmente
     await DB.customers.delete(id);
   },
-
-  // SALES
   async getSales(){
     const rows=await DB.sales.orderBy('createdAt').reverse().toArray();
     for(const s of rows){
@@ -911,6 +907,16 @@ const DL = {
   },
   async processSale({customerId,items,rateOff,rateCus,paymentMethod,paymentCurrency}){
     const total=items.reduce((s,i)=>s+(i.unitPrice*(i.qty||1)),0);
+    // 1. Intentar procesar en la nube directamente (fuente de verdad)
+    const cloudRes=await DL._cloudOp(()=>cloudPost('/api/sales',{
+      customerId,items,rateOff,rateCus,paymentMethod,paymentCurrency
+    }));
+    if(cloudRes?.data?.id){
+      // Pull para sincronizar estado local con la nube
+      try{await pullFromCloud();}catch(e){console.warn('Pull after sale:',e);}
+      return cloudRes.data.id;
+    }
+    // 2. Fallback offline: solo local
     const sid=await DB.sales.add({customerId:customerId||null,total,rateOff,rateCus,
       paymentMethod:paymentMethod||'div-elec',
       paymentCurrency:paymentCurrency||'usd',
@@ -929,14 +935,11 @@ const DL = {
     }
     return sid;
   },
-
-  // SEED
   async seed(){
     const cnt=await DB.products.count();
     if(cnt>0) throw new Error('Ya existen datos. Borra la BD primero.');
     const now=Date.now();
     const catalog=[
-      // Serializados
       {name:'iPhone 15 Pro Max',brand:'Apple',model:'A3108',category:'Smartphones',minStock:2,
        serials:[{s:'IMEI351234560001AA',c:1100,p:1400},{s:'IMEI351234560002BB',c:1100,p:1400},
                 {s:'IMEI351234560003CC',c:1050,p:1350},{s:'IMEI351234560004DD',c:1050,p:1350}]},
@@ -948,7 +951,6 @@ const DL = {
        serials:[{s:'SN-MBA-001-2024-XX',c:900,p:1299},{s:'SN-MBA-002-2024-YY',c:900,p:1299},{s:'SN-MBA-003-2024-ZZ',c:880,p:1280}]},
       {name:'Dell XPS 15 9530',brand:'Dell',model:'XPS-9530-i7',category:'Laptops',minStock:1,
        serials:[{s:'SN-DELL-XPS15-001',c:1300,p:1850},{s:'SN-DELL-XPS15-002',c:1300,p:1850}]},
-      // No serializados
       {name:'Cargador USB-C 65W GaN',brand:'Anker',model:'A2667',category:'Cargadores',minStock:5,cost:20,salePrice:35,qty:10},
       {name:'Cargador Apple 20W USB-C',brand:'Apple',model:'MHJA3',category:'Cargadores',minStock:4,cost:12,salePrice:22,qty:8},
       {name:'Cargador Samsung 45W Super Fast',brand:'Samsung',model:'EP-T4510',category:'Cargadores',minStock:4,cost:15,salePrice:28,qty:6},
@@ -965,7 +967,6 @@ const DL = {
        serials:[{s:'GBP-SN-001',c:100,p:149},{s:'GBP-SN-002',c:100,p:149},{s:'GBP-SN-003',c:98,p:145}]},
       {name:'Funda MacBook Air 13" M3',brand:'Incase',model:'INMB200748',category:'Fundas',minStock:2,cost:22,salePrice:35,qty:6},
     ];
-
     for(const p of catalog){
       const isSer=SER_CATS.includes(p.category)||(p.serials!=null);
       const pid=await DB.products.add({
@@ -992,16 +993,13 @@ const DL = {
     await DL.setCfg('rate_cus','42.00');
     await DL.setCfg('default_margin','20');
     await DL.setCfg('admin_pass','admin');
-    // Demo sale
     await DL.processSale({customerId:1,
       items:[{productId:1,productName:'iPhone 15 Pro Max',serialId:1,serial:'IMEI351234560001AA',unitPrice:1400,serialized:true}],
       rateOff:36.50,rateCus:42.00});
   },
 };
 
-/* ═══════════════════════════════════════════════
-   § 5 — ROUTER
-═══════════════════════════════════════════════ */
+/* ── ROUTER ── */
 const TITLES={dashboard:'Dashboard',inventory:'Inventario',product:'Detalle de Producto',
   pos:'Nueva Venta',sales:'Historial de Ventas',customers:'Clientes',settings:'Configuración'};
 
@@ -1024,9 +1022,7 @@ async function go(v,params={}){
   refreshBadge();
 }
 
-function afterRender(v){
-  if(v==='dashboard') bindDashFilters();
-}
+function afterRender(v){ if(v==='dashboard') bindDashFilters(); }
 
 async function refreshBadge(){
   try{
@@ -1037,9 +1033,7 @@ async function refreshBadge(){
   }catch{}
 }
 
-/* ═══════════════════════════════════════════════
-   § 6 — DASHBOARD (with time filters)
-═══════════════════════════════════════════════ */
+/* ── DASHBOARD ── */
 function filterSalesByPeriod(sales, period, customStart, customEnd){
   const now=new Date();
   let s,e;
@@ -1073,10 +1067,8 @@ async function vDash(){
   const sers=await DB.serials.toArray();
   const avail=sers.filter(s=>s.status==='available').length
     + prods.filter(p=>!p.serialized).reduce((a,p)=>a+(p._av||0),0);
-
   const PERIODS=[{k:'all',l:'Todo'},{k:'year',l:'Año'},{k:'month',l:'Mes'},{k:'week',l:'Semana'},{k:'day',l:'Hoy'},{k:'custom',l:'Personalizado'}];
   const tabHtml=PERIODS.map(p=>`<button class="tf-tab ${A.dashPeriod===p.k?'act':''}" onclick="setDashPeriod('${p.k}')">${p.l}</button>`).join('');
-
   const sales=filterSalesByPeriod(allSales,A.dashPeriod,A.dashCustomStart,A.dashCustomEnd);
   const rev=sales.reduce((s,x)=>s+(x.total||0),0);
   const low=prods.filter(p=>p._av<=p.minStock&&p.minStock>0);
@@ -1095,13 +1087,11 @@ async function vDash(){
     <td><span class="chip ${p._av===0?'c-err':'c-warn'}">${p._av===0?'Agotado':p._av+' uds.'}</span></td>
     <td class="sm muted">Mín:${p.minStock}</td>
   </tr>`).join('');
-
   return `<div class="page">
   <div class="ph"><div><div class="ph-ttl">Dashboard</div>
     <div class="ph-sub">Vista general del negocio</div></div>
     <button class="btn btn-p btn-sm" onclick="go('pos')"><i data-lucide="plus"></i>Nueva Venta</button>
   </div>
-
   <div class="tf-tabs">${tabHtml}</div>
   <div id="tf-custom" style="display:${A.dashPeriod==='custom'?'flex':'none'}" class="tf-custom">
     <span class="sm muted fw7">Desde:</span>
@@ -1111,7 +1101,6 @@ async function vDash(){
     <input type="date" id="tf-end" value="${A.dashCustomEnd}"
       onchange="A.dashCustomEnd=this.value;go('dashboard')" style="min-width:0">
   </div>
-
   <div class="stats">
     <div class="sc"><div class="sc-hd"><span class="sc-lbl">Productos</span>
       <div class="sc-ico" style="background:var(--brand-tint)"><i data-lucide="package-2" style="color:var(--brand)"></i></div>
@@ -1130,7 +1119,6 @@ async function vDash(){
       <div class="sc-ico" style="background:var(--warn-bg)"><i data-lucide="alert-triangle" style="color:var(--warn)"></i></div>
     </div><div class="sc-val" style="color:var(--warn)">${low.length}</div><div class="sc-note">bajo stock mínimo</div></div>`:''}
   </div>
-
   <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:13px">
     <div class="card" style="padding:0">
       <div class="card-hdr" style="padding:12px 14px 10px;margin:0">
@@ -1151,18 +1139,10 @@ async function vDash(){
 </div>`;
 }
 
-function bindDashFilters(){
-  // already handled by inline event handlers
-}
+function bindDashFilters(){}
+function setDashPeriod(p){ A.dashPeriod=p; go('dashboard'); }
 
-function setDashPeriod(p){
-  A.dashPeriod=p;
-  go('dashboard');
-}
-
-/* ═══════════════════════════════════════════════
-   § 7 — INVENTORY
-═══════════════════════════════════════════════ */
+/* ── INVENTORY ── */
 async function vInv(){
   const prods=await DL.getProducts();
   const adm=A.role==='admin';
@@ -1185,7 +1165,6 @@ async function vInv(){
       </div></td>
     </tr>`;
   }).join('');
-
   return `<div class="page">
   <div class="ph">
     <div><div class="ph-ttl">Inventario</div>
@@ -1236,7 +1215,6 @@ async function vProd(){
   const isSer=p.serialized!==false;
   const adm=A.role==='admin';
   const sc=p._av===0?'var(--err)':p._av<=p.minStock?'var(--warn)':'var(--ok)';
-
   let content='';
   if(isSer){
     const sers=await DL.getSerials(id);
@@ -1282,7 +1260,6 @@ async function vProd(){
       </div>
     </div>`;
   }
-
   return `<div class="page">
   <button class="back-btn" onclick="go('inventory')"><i data-lucide="arrow-left"></i>Volver al Inventario</button>
   <div class="pd-header">
@@ -1326,19 +1303,12 @@ async function vProd(){
 </div>`;
 }
 
-/* ═══════════════════════════════════════════════
-   § 8 — POS (improved)
-═══════════════════════════════════════════════ */
+/* ── POS ── */
 async function vPOS(){
   A.cart=[]; A.selCust=null; A.guestMode=false;
-  const allCusts=await DL.getCustomers();
-  const custOpts=allCusts.map(c=>`<option value="${c.id}">${c.lastName}, ${c.firstName} — ${c.idNumber}</option>`).join('');
-
   return `<div class="page" style="padding:0">
   <div class="pos-grid">
   <div class="pos-left">
-
-    <!-- Customer selector — searchable combobox -->
     <div class="card" style="flex-shrink:0;padding:11px 13px">
       <div class="card-ttl" style="margin-bottom:9px;font-size:12px"><i data-lucide="user"></i>Cliente</div>
       <div class="cust-combo" id="cust-combo-wrap">
@@ -1349,13 +1319,13 @@ async function vPOS(){
               oninput="srchCustInput(this.value)" autocomplete="off"
               onfocus="srchCustInput(this.value)">
           </div>
-          <button class="btn btn-o btn-sm" onclick="toggleCustDrop()" title="Ver todos los clientes" style="white-space:nowrap">
+          <button class="btn btn-o btn-sm" onclick="toggleCustDrop()" style="white-space:nowrap">
             <i data-lucide="chevron-down"></i>Todos
           </button>
-          <button class="btn btn-o btn-sm" onclick="setGuest()" title="Modo Guest">
+          <button class="btn btn-o btn-sm" onclick="setGuest()">
             <i data-lucide="user-x"></i>Guest
           </button>
-          <button class="btn btn-g btn-ico" onclick="openNewCustFromPOS()" title="Nuevo cliente">
+          <button class="btn btn-g btn-ico" onclick="openNewCustFromPOS()">
             <i data-lucide="user-plus"></i>
           </button>
         </div>
@@ -1371,7 +1341,6 @@ async function vPOS(){
       </div>
     </div>
 
-    <!-- Product search — opens picker modal -->
     <div class="card" style="flex-shrink:0;padding:11px 13px">
       <div class="card-ttl" style="margin-bottom:9px;font-size:12px"><i data-lucide="package-2"></i>Agregar Producto</div>
       <button class="btn btn-o" style="width:100%;justify-content:center;padding:9px" onclick="openProdPicker()">
@@ -1379,7 +1348,6 @@ async function vPOS(){
       </button>
     </div>
 
-    <!-- Cart -->
     <div class="cart-wrap">
       <div class="cart-hdr">
         <span class="card-ttl" style="font-size:12px">
@@ -1398,7 +1366,6 @@ async function vPOS(){
     </div>
   </div>
 
-  <!-- RIGHT: Summary -->
   <div class="pos-right">
     <div class="summary-card">
       <div class="card-ttl" style="margin-bottom:11px;font-size:12px"><i data-lucide="calculator"></i>Resumen</div>
@@ -1436,33 +1403,21 @@ async function vPOS(){
 </div>`;
 }
 
-function posReinit(){ go('pos'); }
-
 /* ── Customer combobox ── */
 async function srchCustInput(q){
-  const drop=document.getElementById('cust-drop');
-  if(!drop) return;
+  const drop=document.getElementById('cust-drop');if(!drop)return;
   const custs=await DL.getCustomers(q||'');
-  renderCustDrop(custs);
-  drop.classList.add('open');
+  renderCustDrop(custs);drop.classList.add('open');
 }
-
 async function toggleCustDrop(){
-  const drop=document.getElementById('cust-drop');
-  if(!drop) return;
-  if(drop.classList.contains('open')){ drop.classList.remove('open'); return; }
-  const custs=await DL.getCustomers('');
-  renderCustDrop(custs);
-  drop.classList.add('open');
+  const drop=document.getElementById('cust-drop');if(!drop)return;
+  if(drop.classList.contains('open')){drop.classList.remove('open');return;}
+  const custs=await DL.getCustomers('');renderCustDrop(custs);drop.classList.add('open');
   document.getElementById('cust-search-inp')?.focus();
 }
-
 function renderCustDrop(custs){
   const drop=document.getElementById('cust-drop');
-  if(!custs.length){
-    drop.innerHTML=`<div class="cust-combo-empty">Sin clientes registrados</div>`;
-    return;
-  }
+  if(!custs.length){drop.innerHTML=`<div class="cust-combo-empty">Sin clientes registrados</div>`;return;}
   drop.innerHTML=custs.map(c=>`
     <div class="cust-combo-item" onclick="pickCust(${c.id})">
       <div>
@@ -1473,15 +1428,11 @@ function renderCustDrop(custs){
     </div>`).join('');
   lucide.createIcons({el:drop});
 }
-
 async function pickCust(id){
-  const c=await DB.customers.get(parseInt(id,10));
-  if(!c) return;
-  A.selCust=c; A.guestMode=false;
-  const drop=document.getElementById('cust-drop');
-  if(drop) drop.classList.remove('open');
-  const inp=document.getElementById('cust-search-inp');
-  if(inp) inp.value='';
+  const c=await DB.customers.get(parseInt(id,10));if(!c)return;
+  A.selCust=c;A.guestMode=false;
+  const drop=document.getElementById('cust-drop');if(drop)drop.classList.remove('open');
+  const inp=document.getElementById('cust-search-inp');if(inp)inp.value='';
   document.getElementById('cust-badge').style.display='block';
   document.getElementById('cbdg-nm').textContent=`${c.firstName} ${c.lastName}`;
   document.getElementById('cbdg-id').textContent=`C.I.: ${c.idNumber}${c.phone?' · '+c.phone:''}`;
@@ -1489,28 +1440,11 @@ async function pickCust(id){
   document.getElementById('sum-cust-sub').textContent=`C.I.: ${c.idNumber}`;
   lucide.createIcons({el:document.getElementById('cust-badge')});
 }
-
-async function openNewCustFromPOS(){
-  // Open customer modal, then when saved, reload POS preserving cart
-  const cartSnapshot=[...A.cart];
-  const custSnapshot=A.selCust;
-  const guestSnapshot=A.guestMode;
-  await moCust();
-  // After moCust closes, cart etc are still in A (no reload)
-}
-
-// Legacy compat
-async function pickCustFromSelect(val){
-  if(!val){ clearCust(); return; }
-  await pickCust(parseInt(val,10));
-}
-
+async function openNewCustFromPOS(){ await moCust(); }
 function setGuest(){
-  A.selCust=null; A.guestMode=true;
-  const drop=document.getElementById('cust-drop');
-  if(drop) drop.classList.remove('open');
-  const inp=document.getElementById('cust-search-inp');
-  if(inp) inp.value='';
+  A.selCust=null;A.guestMode=true;
+  const drop=document.getElementById('cust-drop');if(drop)drop.classList.remove('open');
+  const inp=document.getElementById('cust-search-inp');if(inp)inp.value='';
   clearCustUI();
   document.getElementById('cust-badge').style.display='block';
   document.getElementById('cbdg-nm').textContent='Modo Guest';
@@ -1519,10 +1453,9 @@ function setGuest(){
   document.getElementById('sum-cust-sub').textContent='';
   toast('Modo Guest activado','info');
 }
-
 function clearCust(){
-  A.selCust=null; A.guestMode=false; clearCustUI();
-  const inp=document.getElementById('cust-search-inp'); if(inp) inp.value='';
+  A.selCust=null;A.guestMode=false;clearCustUI();
+  const inp=document.getElementById('cust-search-inp');if(inp)inp.value='';
 }
 function clearCustUI(){
   document.getElementById('cust-badge').style.display='none';
@@ -1535,7 +1468,6 @@ async function openProdPicker(){
   const allProds=await DL.getProducts('');
   const avail=allProds.filter(p=>p._av>0);
   const catOpts=ALL_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
-
   openModal(`
     <div class="mo-hdr">
       <span class="mo-ttl"><i data-lucide="package-2" style="width:16px;height:16px;color:var(--brand);margin-right:4px"></i>Seleccionar Producto</span>
@@ -1549,8 +1481,7 @@ async function openProdPicker(){
             oninput="filterProdPicker()" autocomplete="off">
         </div>
         <select id="ppk-cat" class="fc" style="height:34px;min-width:120px" onchange="filterProdPicker()">
-          <option value="">Todas las categorías</option>
-          ${catOpts}
+          <option value="">Todas las categorías</option>${catOpts}
         </select>
         <select id="ppk-sort" class="fc" style="height:34px;min-width:105px" onchange="filterProdPicker()">
           <option value="az">A → Z</option>
@@ -1561,15 +1492,13 @@ async function openProdPicker(){
           <option value="price-l">Menor precio</option>
         </select>
       </div>
-      <div class="ppk-list" id="ppk-list">
-        ${renderProdPickerItems(avail)}
-      </div>
+      <div class="ppk-list" id="ppk-list">${renderProdPickerItems(avail)}</div>
     </div>
-  `, true);
+  `,true);
 }
 
 function renderProdPickerItems(prods){
-  if(!prods.length) return `<div class="cust-combo-empty">Sin productos disponibles con ese criterio</div>`;
+  if(!prods.length)return`<div class="cust-combo-empty">Sin productos disponibles con ese criterio</div>`;
   return prods.map(p=>`
     <div class="ppk-item" onclick="selectFromPicker(${p.id})">
       <div class="ppk-info">
@@ -1583,39 +1512,33 @@ function renderProdPickerItems(prods){
     </div>`).join('');
 }
 
-async function selectFromPicker(pid){
-  closeModal();
-  await pickProd(pid);
-}
+async function selectFromPicker(pid){ closeModal(); await pickProd(pid); }
 
 async function filterProdPicker(){
   const q=(document.getElementById('ppk-q')?.value||'').toLowerCase();
   const cat=document.getElementById('ppk-cat')?.value||'';
   const sort=document.getElementById('ppk-sort')?.value||'az';
   let prods=await DL.getProducts(q);
-  if(cat) prods=prods.filter(p=>p.category===cat);
+  if(cat)prods=prods.filter(p=>p.category===cat);
   prods=prods.filter(p=>p._av>0);
   prods.sort((a,b)=>{
     switch(sort){
-      case 'za': return b.name.localeCompare(a.name);
-      case 'new': return b.createdAt-a.createdAt;
-      case 'old': return a.createdAt-b.createdAt;
-      case 'price-h': return (b.salePrice||0)-(a.salePrice||0);
-      case 'price-l': return (a.salePrice||0)-(b.salePrice||0);
-      default: return a.name.localeCompare(b.name);
+      case 'za':return b.name.localeCompare(a.name);
+      case 'new':return b.createdAt-a.createdAt;
+      case 'old':return a.createdAt-b.createdAt;
+      case 'price-h':return(b.salePrice||0)-(a.salePrice||0);
+      case 'price-l':return(a.salePrice||0)-(b.salePrice||0);
+      default:return a.name.localeCompare(b.name);
     }
   });
   const list=document.getElementById('ppk-list');
-  if(list){ list.innerHTML=renderProdPickerItems(prods); }
+  if(list)list.innerHTML=renderProdPickerItems(prods);
 }
 
 async function pickProd(pid){
-  // Note: #pl / #pi no longer exist (replaced by modal picker); safe to skip
   const p=await DL.getProduct(pid);
   if(!p||p._av===0){toast('Sin unidades disponibles','err');return;}
-
   if(p.serialized!==false){
-    // Serial selection
     const avail=await DL.getSerials(pid,'available');
     openModal(`
       <div class="mo-hdr"><span class="mo-ttl">Seleccionar Serial / IMEI</span>
@@ -1627,7 +1550,7 @@ async function pickProd(pid){
         </div>
         <div style="max-height:340px;overflow-y:auto">
           ${avail.map(s=>`
-            <div class="srl-item" onclick="addToCart(${p.id},'${esc(p.name)}',${s.id},'${esc(s.serial)}',${s.salePrice||0},true)">
+            <div class="srl-item" onclick="confirmSerialPrice(${p.id},'${esc(p.name)}',${s.id},'${esc(s.serial)}',${s.salePrice||0},${s.cost||0})">
               <div><div class="srl-nm">${s.serial}</div><div class="srl-dt">Ingresado: ${fmtDT(s.addedAt)}</div></div>
               <div style="text-align:right">
                 <div class="srl-price">$${fmt(s.salePrice||0)}</div>
@@ -1638,7 +1561,6 @@ async function pickProd(pid){
       </div>
     `);
   } else {
-    // Qty selector for non-serialized
     const max=p._av||0;
     openModal(`
       <div class="mo-hdr"><span class="mo-ttl">Agregar al Carrito</span>
@@ -1646,33 +1568,113 @@ async function pickProd(pid){
       <div class="mo-body">
         <div style="padding:11px;background:var(--s2);border-radius:var(--r2);margin-bottom:12px;border:1px solid var(--bdr)">
           <div class="fw8">${p.name}</div>
-          <div class="sm muted">${p.brand} · $${fmt(p.salePrice||0)} · ${max} disponibles</div>
+          <div class="sm muted">${p.brand} · ${max} disponibles</div>
         </div>
         <div class="g2">
           <div class="fg"><label class="fl">Cantidad</label>
-            <input type="number" class="fc" id="qty-inp" value="1" min="1" max="${max}" style="font-size:20px;text-align:center;height:48px;font-weight:800">
+            <input type="number" class="fc" id="qty-inp" value="1" min="1" max="${max}"
+              style="font-size:20px;text-align:center;height:48px;font-weight:800"
+              oninput="updBatchModal(${p.salePrice||0},${max})">
             <div class="fhint">Máx: ${max} unidades</div>
           </div>
-          <div class="fg"><label class="fl">Total</label>
-            <div style="font-size:20px;font-weight:800;color:var(--brand);padding:10px 0" id="qty-total">$${fmt(p.salePrice||0)}</div>
-            <div class="fhint" id="qty-bs">Bs.${fmt((p.salePrice||0)*A.rates.off)}</div>
+          <div class="fg"><label class="fl">Precio unitario (USD)</label>
+            <input type="number" class="fc" id="batch-price-inp" value="${p.salePrice||0}"
+              step="0.01" min="0"
+              style="font-size:20px;text-align:center;height:48px;font-weight:800;color:var(--brand)"
+              oninput="updBatchModal(null,${max})">
+            <div class="fhint">Precio registrado: $${fmt(p.salePrice||0)}</div>
           </div>
         </div>
+        <div style="padding:9px 11px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bdr);margin-bottom:4px">
+          <div class="sm muted fw7" style="margin-bottom:3px">TOTAL</div>
+          <div style="font-size:20px;font-weight:800;color:var(--brand)" id="qty-total">$${fmt(p.salePrice||0)}</div>
+          <div class="fhint" id="qty-bs">Bs.${fmt((p.salePrice||0)*A.rates.off)}</div>
+        </div>
+        <div id="batch-margin-preview"></div>
       </div>
       <div class="mo-foot">
         <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-p" onclick="addBatchToCart(${p.id},'${esc(p.name)}',${p.salePrice||0},${max})">
+        <button class="btn btn-p" onclick="addBatchToCart(${p.id},'${esc(p.name)}',${p.cost||0},${max})">
           <i data-lucide="plus"></i>Agregar
         </button>
       </div>
     `);
-    document.getElementById('qty-inp')?.addEventListener('input', function(){
-      const q=Math.min(parseInt(this.value)||1,max);
-      const t=(p.salePrice||0)*q;
-      document.getElementById('qty-total').textContent='$'+fmt(t);
-      document.getElementById('qty-bs').textContent='Bs.'+fmt(t*A.rates.off);
-    });
+    setTimeout(()=>updBatchModal(p.salePrice||0, max),50);
   }
+}
+
+function updBatchModal(defaultPrice, max){
+  const qtyEl=document.getElementById('qty-inp');
+  const priceEl=document.getElementById('batch-price-inp');
+  const totalEl=document.getElementById('qty-total');
+  const bsEl=document.getElementById('qty-bs');
+  const margEl=document.getElementById('batch-margin-preview');
+  if(!qtyEl||!priceEl)return;
+  const q=Math.min(parseInt(qtyEl.value)||1,max);
+  const price=parseFloat(priceEl.value)||0;
+  const t=price*q;
+  if(totalEl)totalEl.textContent='$'+fmt(t);
+  if(bsEl)bsEl.textContent='Bs.'+fmt(t*A.rates.off);
+  // We don't have cost here easily, skip margin for batch modal
+}
+
+/* ── confirmSerialPrice — precio editable al seleccionar serial ── */
+function confirmSerialPrice(pid,pname,sid,serial,defaultPrice,cost){
+  openModal(`
+    <div class="mo-hdr">
+      <span class="mo-ttl"><i data-lucide="tag" style="width:15px;height:15px;color:var(--brand);margin-right:4px"></i>Confirmar precio</span>
+      <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="mo-body">
+      <div style="padding:10px 12px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bdr);margin-bottom:14px">
+        <div class="fw8">${pname}</div>
+        <div class="sm muted mono" style="margin-top:2px">SN: ${serial}</div>
+        <div class="sm muted" style="margin-top:2px">Costo registrado: <strong>$${fmt(cost||0)}</strong></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Precio de venta (USD) <span style="color:var(--err)">*</span></label>
+        <input type="number" class="fc" id="srl-price-inp"
+          value="${defaultPrice}" step="0.01" min="0"
+          style="font-size:22px;font-weight:800;color:var(--brand);text-align:center;height:56px"
+          oninput="updSrlPricePreview(${cost||0})"
+          onkeydown="if(event.key==='Enter')addSerialWithCustomPrice(${pid},'${esc(pname)}',${sid},'${esc(serial)}',${cost||0})">
+        <div class="fhint">Presiona Enter o el botón para confirmar · Precio original: $${fmt(defaultPrice)}</div>
+      </div>
+      <div id="srl-price-margin" style="margin-top:6px"></div>
+    </div>
+    <div class="mo-foot">
+      <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="addSerialWithCustomPrice(${pid},'${esc(pname)}',${sid},'${esc(serial)}',${cost||0})">
+        <i data-lucide="shopping-cart"></i>Agregar al carrito
+      </button>
+    </div>
+  `);
+  setTimeout(()=>{
+    const inp=document.getElementById('srl-price-inp');
+    if(inp){inp.focus();inp.select();}
+    updSrlPricePreview(cost||0);
+  },80);
+}
+
+function updSrlPricePreview(cost){
+  const priceEl=document.getElementById('srl-price-inp');
+  const margEl=document.getElementById('srl-price-margin');
+  if(!priceEl||!margEl)return;
+  const price=parseFloat(priceEl.value)||0;
+  const m=calcMargin(cost,price);
+  const cls=marginClass(cost,price);
+  const icon=m<0?'❌':m>35?'⚠️':'✅';
+  const msg=m<0?'Precio por debajo del costo':m>35?'Margen alto — verifica precio':`Ganancia: <strong>$${fmt(price-cost)}</strong> por unidad`;
+  margEl.innerHTML=`<div class="margin-pill mp-${cls==='c-ok'?'ok':cls==='c-warn'?'warn':'err'}">${icon} Margen: ${fmt(m,1)}% · ${msg}</div>`;
+}
+
+function addSerialWithCustomPrice(pid,pname,sid,serial,cost){
+  const priceEl=document.getElementById('srl-price-inp');
+  const price=parseFloat(priceEl?.value);
+  if(isNaN(price)||price<0){toast('Precio inválido','err');return;}
+  if(price===0&&cost>0)toast('⚠️ Precio en $0 — guardando de todas formas','warn');
+  else if(price<cost)toast('⚠️ Precio por debajo del costo','warn');
+  addToCart(pid,pname,sid,serial,price,true);
 }
 
 function addToCart(pid,pname,sid,serial,price,serialized=true){
@@ -1684,25 +1686,64 @@ function addToCart(pid,pname,sid,serial,price,serialized=true){
   toast(`${pname} agregado ✓`,'ok');
 }
 
-function addBatchToCart(pid,pname,price,maxQty){
+function addBatchToCart(pid,pname,cost,maxQty){
   const qty=Math.min(parseInt(document.getElementById('qty-inp')?.value)||1,maxQty);
+  const price=parseFloat(document.getElementById('batch-price-inp')?.value)||0;
   closeModal();
-  // If same product already in cart, update qty
   const existing=A.cart.find(i=>i.productId===pid&&!i.serialized);
   if(existing){
     existing.qty=Math.min(existing.qty+qty,maxQty);
+    existing.unitPrice=price;
     renderCart();
     toast(`${pname}: ${existing.qty} uds. en carrito`,'ok');
     return;
   }
   A.cart.push({productId:pid,productName:pname,serialId:null,serial:'',
-    unitPrice:parseFloat(price),qty,serialized:false});
+    unitPrice:price,qty,serialized:false});
   renderCart();
   toast(`${pname} ×${qty} agregado ✓`,'ok');
 }
 
-function removeFromCart(idx){ A.cart.splice(idx,1); renderCart(); }
+function removeFromCart(idx){A.cart.splice(idx,1);renderCart();}
 
+/* ── editCartPrice — edición inline de precio en carrito ── */
+function editCartPrice(idx){
+  const row=document.querySelector(`#cart-row-${idx}`);
+  if(!row||row.dataset.editing==='1')return;
+  row.dataset.editing='1';
+  const item=A.cart[idx];
+  const priceEl=row.querySelector('.cart-usd');
+  if(!priceEl)return;
+  priceEl.outerHTML=`
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+      <span class="sm muted">$</span>
+      <input type="number" id="price-inp-${idx}" value="${item.unitPrice}"
+        step="0.01" min="0"
+        style="width:78px;padding:3px 6px;border:1.5px solid var(--brand);
+          border-radius:var(--r1);font-family:var(--font);font-size:12px;
+          font-weight:800;color:var(--brand);background:var(--surface);outline:none"
+        onkeydown="if(event.key==='Enter')saveCartPrice(${idx},this.value);if(event.key==='Escape')renderCart();"
+        onblur="saveCartPrice(${idx},this.value)">
+      <button class="btn btn-g btn-ico btn-sm" title="Cancelar"
+        onmousedown="event.preventDefault();renderCart()">
+        <i data-lucide="x" style="width:11px;height:11px"></i>
+      </button>
+    </div>`;
+  const inp=document.getElementById(`price-inp-${idx}`);
+  if(inp){inp.focus();inp.select();}
+  lucide.createIcons({el:row});
+}
+
+function saveCartPrice(idx,val){
+  const price=parseFloat(val);
+  if(isNaN(price)||price<0){toast('Precio inválido','err');renderCart();return;}
+  if(A.cart[idx])A.cart[idx].unitPrice=price;
+  renderCart();
+  updateTotals();
+  toast(`Precio actualizado → $${fmt(price)}`,'ok');
+}
+
+/* ── renderCart — con id por fila y botón editar ── */
 function renderCart(){
   const body=document.getElementById('cart-body'),cn=document.getElementById('cart-n');
   if(!body)return;
@@ -1710,19 +1751,24 @@ function renderCart(){
   if(!A.cart.length){
     body.innerHTML=`<div class="empty" style="padding:28px"><i data-lucide="shopping-cart"></i>
       <div class="empty-ttl">Carrito vacío</div></div>`;
-    lucide.createIcons({el:body}); updateTotals(); return;
+    lucide.createIcons({el:body});updateTotals();return;
   }
   body.innerHTML=A.cart.map((it,i)=>`
-    <div class="cart-row">
+    <div class="cart-row" id="cart-row-${i}">
       <div class="cart-info">
-        <div class="cart-pname">${it.productName} ${it.qty>1?`<span class="chip c-neu">×${it.qty}</span>`:''}</div>
-        ${it.serial?`<div class="cart-serial">SN: ${it.serial}</div>`:
-          `<div class="cart-serial">Masivo · ${it.qty} uds.</div>`}
+        <div class="cart-pname">${it.productName}${it.qty>1?` <span class="chip c-neu">×${it.qty}</span>`:''}</div>
+        ${it.serial?`<div class="cart-serial">SN: ${it.serial}</div>`:`<div class="cart-serial">Masivo · ${it.qty} uds.</div>`}
       </div>
-      <div class="cart-usd">$${fmt((it.unitPrice)*(it.qty||1))}</div>
-      <button class="btn btn-g btn-ico" style="color:var(--err);flex-shrink:0" onclick="removeFromCart(${i})"><i data-lucide="x"></i></button>
+      <span class="cart-usd">$${fmt(it.unitPrice*(it.qty||1))}</span>
+      <button class="btn btn-g btn-ico" style="color:var(--brand);flex-shrink:0"
+        title="Editar precio" onclick="editCartPrice(${i})">
+        <i data-lucide="pencil" style="width:13px;height:13px"></i>
+      </button>
+      <button class="btn btn-g btn-ico" style="color:var(--err);flex-shrink:0" onclick="removeFromCart(${i})">
+        <i data-lucide="x"></i>
+      </button>
     </div>`).join('');
-  lucide.createIcons({el:body}); updateTotals();
+  lucide.createIcons({el:body});updateTotals();
 }
 
 function updateTotals(){
@@ -1737,40 +1783,32 @@ function updateTotals(){
   }
 }
 
-function clearCartUI(){ A.cart=[]; A.selCust=null; A.guestMode=false; go('pos'); }
+function clearCartUI(){A.cart=[];A.selCust=null;A.guestMode=false;go('pos');}
 
-/* ── Confirm sale with payment method ── */
+/* ── PROCESS SALE MODAL ── */
 async function processSale(){
   if(!A.cart.length){toast('El carrito está vacío','warn');return;}
   if(!A.selCust&&!A.guestMode){toast('Selecciona un cliente o activa modo Guest','warn');return;}
   const total=A.cart.reduce((s,i)=>s+(i.unitPrice*(i.qty||1)),0);
-
   const METHODS=[
-    {id:'div-elec',  icon:'💳', nm:'Divisas Electrónicas',    sub:'Transferencia o pago digital en USD',     cur:'usd'},
-    {id:'div-fisico',icon:'💵', nm:'Divisas en Físico',        sub:'Efectivo en dólares',                     cur:'usd'},
-    {id:'bs-elec-off',icon:'📲',nm:'Bs. Electrónicos (BCV)',   sub:`Transferencia en Bs. · Tasa: ${fmt(A.rates.off)}/USD`, cur:'bs-off'},
-    {id:'bs-elec-cus',icon:'📲',nm:'Bs. Electrónicos (Custom)',sub:`Transferencia en Bs. · Tasa: ${fmt(A.rates.cus)}/USD`, cur:'bs-cus'},
-    {id:'bs-fisico', icon:'💴', nm:'Bolívares en Físico',       sub:'Efectivo en Bolívares',                   cur:'bs-off'},
+    {id:'div-elec',  icon:'💳',nm:'Divisas Electrónicas',    sub:'Transferencia o pago digital en USD',     cur:'usd'},
+    {id:'div-fisico',icon:'💵',nm:'Divisas en Físico',        sub:'Efectivo en dólares',                     cur:'usd'},
+    {id:'bs-elec-off',icon:'📲',nm:'Bs. Electrónicos (BCV)', sub:`Transferencia en Bs. · Tasa: ${fmt(A.rates.off)}/USD`,cur:'bs-off'},
+    {id:'bs-elec-cus',icon:'📲',nm:'Bs. Electrónicos (Custom)',sub:`Transferencia en Bs. · Tasa: ${fmt(A.rates.cus)}/USD`,cur:'bs-cus'},
+    {id:'bs-fisico', icon:'💴',nm:'Bolívares en Físico',       sub:'Efectivo en Bolívares',                   cur:'bs-off'},
   ];
-
-  const pmCards=METHODS.map((m,i)=>`
+  const pmCards=METHODS.map(m=>`
     <div class="pm-card" id="pm-${m.id}" onclick="selectPayMethod('${m.id}','${m.cur}',${total})">
       <input type="radio" name="paymethod" value="${m.id}" class="pm-radio">
       <div class="pm-icon">${m.icon}</div>
-      <div style="flex:1">
-        <div class="pm-nm">${m.nm}</div>
-        <div class="pm-sub">${m.sub}</div>
-      </div>
+      <div style="flex:1"><div class="pm-nm">${m.nm}</div><div class="pm-sub">${m.sub}</div></div>
     </div>`).join('');
-
   openModal(`
     <div class="mo-hdr">
       <span class="mo-ttl">✅ Confirmar Venta</span>
       <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button>
     </div>
     <div class="mo-body">
-
-      <!-- Order summary -->
       <div style="padding:10px 12px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bdr);margin-bottom:14px">
         <div class="sm muted fw7" style="text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Resumen del pedido</div>
         ${A.cart.map(it=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0">
@@ -1779,21 +1817,16 @@ async function processSale(){
         </div>`).join('')}
         <hr style="border:none;border-top:1px dashed var(--bdr2);margin:8px 0">
         <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800">
-          <span>Total</span>
-          <span class="c-brand">$${fmt(total)}</span>
+          <span>Total</span><span class="c-brand">$${fmt(total)}</span>
         </div>
         <div style="font-size:11px;color:var(--txt2);margin-top:2px">
           Cliente: <strong>${A.selCust?`${A.selCust.firstName} ${A.selCust.lastName}`:'Guest'}</strong>
         </div>
       </div>
-
-      <!-- Payment method (mandatory) -->
       <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">
         Método de pago <span style="color:var(--err)">*</span>
       </div>
       ${pmCards}
-
-      <!-- Total preview in selected currency -->
       <div id="pm-total-preview" style="display:none">
         <div class="pm-total-preview">
           <div class="pm-total-lbl" id="pm-total-lbl">A cobrar</div>
@@ -1807,158 +1840,116 @@ async function processSale(){
         <i data-lucide="check-circle"></i>Procesar Nota de Entrega
       </button>
     </div>
-  `, false);
+  `,false);
 }
 
-function selectPayMethod(methodId, currency, total){
-  // Deselect all
+function selectPayMethod(methodId,currency,total){
   document.querySelectorAll('.pm-card').forEach(c=>c.classList.remove('sel'));
   document.querySelectorAll('input[name="paymethod"]').forEach(r=>r.checked=false);
-  // Select chosen
   const card=document.getElementById(`pm-${methodId}`);
-  if(card){ card.classList.add('sel'); card.querySelector('input')&&(card.querySelector('input').checked=true); }
-  // Store selection
-  window._selPayMethod=methodId;
-  window._selPayCur=currency;
-  // Show total preview
+  if(card){card.classList.add('sel');card.querySelector('input')&&(card.querySelector('input').checked=true);}
+  window._selPayMethod=methodId;window._selPayCur=currency;
   const prev=document.getElementById('pm-total-preview');
   const lbl=document.getElementById('pm-total-lbl');
   const val=document.getElementById('pm-total-val');
   if(prev&&lbl&&val){
     prev.style.display='block';
-    if(currency==='usd'){
-      lbl.textContent='Total a cobrar en USD';
-      val.textContent=`$${fmt(total)}`;
-    } else if(currency==='bs-off'){
-      lbl.textContent=`Total en Bs. (Tasa ${fmt(A.rates.off)}/USD)`;
-      val.textContent=`Bs. ${fmt(total*A.rates.off)}`;
-    } else if(currency==='bs-cus'){
-      lbl.textContent=`Total en Bs. (Tasa ${fmt(A.rates.cus)}/USD)`;
-      val.textContent=`Bs. ${fmt(total*A.rates.cus)}`;
-    }
+    if(currency==='usd'){lbl.textContent='Total a cobrar en USD';val.textContent=`$${fmt(total)}`;}
+    else if(currency==='bs-off'){lbl.textContent=`Total en Bs. (Tasa ${fmt(A.rates.off)}/USD)`;val.textContent=`Bs. ${fmt(total*A.rates.off)}`;}
+    else if(currency==='bs-cus'){lbl.textContent=`Total en Bs. (Tasa ${fmt(A.rates.cus)}/USD)`;val.textContent=`Bs. ${fmt(total*A.rates.cus)}`;}
   }
-  // Enable confirm button
   const btn=document.getElementById('btn-confirm-sale');
-  if(btn) btn.disabled=false;
+  if(btn)btn.disabled=false;
 }
 
 async function confirmAndProcessSale(total){
   if(!window._selPayMethod){toast('Selecciona un método de pago','warn');return;}
-  const snap=[...A.cart]; const cust=A.selCust;
-  const payMethod=window._selPayMethod;
-  const payCur=window._selPayCur;
+  const snap=[...A.cart];const cust=A.selCust;
+  const payMethod=window._selPayMethod;const payCur=window._selPayCur;
   try{
     const sid=await DL.processSale({
       customerId:cust?.id||null,items:snap,
       rateOff:A.rates.off,rateCus:A.rates.cus,
-      paymentMethod:payMethod,
-      paymentCurrency:payCur,
+      paymentMethod:payMethod,paymentCurrency:payCur,
     });
     A.cart=[];A.selCust=null;A.guestMode=false;
-    window._selPayMethod=null; window._selPayCur=null;
-    // Re-read from DB to get complete stored data
+    window._selPayMethod=null;window._selPayCur=null;
     const stored=(await DL.getSales()).find(x=>x.id===sid);
     const saleData=stored||{id:sid,customerId:cust?.id||null,total,
       rateOff:A.rates.off,rateCus:A.rates.cus,
       paymentMethod:payMethod,paymentCurrency:payCur,
       createdAt:Date.now(),_cust:cust,_items:snap.map(it=>({...it}))};
     showReceiptModal(saleData,true);
-    // Auto WhatsApp if online + setting enabled
     if(navigator.onLine){
       const waAuto=await DL.cfg('wa_auto','0');
-      if(waAuto==='1') await sendInvoiceToWhatsApp(saleData);
+      if(waAuto==='1')await sendInvoiceToWhatsApp(saleData);
     }
   }catch(e){toast(e.message,'err');}
 }
 
-/* ═══════════════════════════════════════════════
-   § WA — WHATSAPP ENGINE
-═══════════════════════════════════════════════ */
-
-/* Build WhatsApp-formatted message with WA markdown */
+/* ── WHATSAPP ENGINE ── */
 function buildWhatsAppText(s){
   const sep='─'.repeat(28);
   const items=s._items||[];
   const {val:payVal,lbl:payLbl}=getPaymentTotal(s);
   const custName=s._cust?`${s._cust.firstName} ${s._cust.lastName}`:'Sin cliente (Guest)';
-
   let t='';
   t+=`🧾 *Nota de Entrega NE-${String(s.id).padStart(4,'0')}*\n`;
   t+=`📅 ${fmtDT(s.createdAt)}\n`;
   t+=sep+'\n';
   t+=`*Cliente:* ${custName}\n`;
-  if(s._cust?.idNumber) t+=`*C.I.:* ${s._cust.idNumber}\n`;
-  if(s._cust?.phone) t+=`*Tel:* ${s._cust.phone}\n`;
+  if(s._cust?.idNumber)t+=`*C.I.:* ${s._cust.idNumber}\n`;
+  if(s._cust?.phone)t+=`*Tel:* ${s._cust.phone}\n`;
   t+=sep+'\n';
   t+=`📦 *Productos:*\n`;
   for(const it of items){
     t+=`• *${it.productName}*`;
-    if(it.qty>1) t+=` ×${it.qty}`;
+    if(it.qty>1)t+=` ×${it.qty}`;
     t+='\n';
-    if(it.serial) t+=`  _SN: ${it.serial}_\n`;
+    if(it.serial)t+=`  _SN: ${it.serial}_\n`;
     t+=`  $${fmt(it.unitPrice*(it.qty||1))}\n`;
   }
   t+=sep+'\n';
-  t+=`💰 *${payLbl}*\n`;
-  t+=`*${payVal}*\n`;
+  t+=`💰 *${payLbl}*\n*${payVal}*\n`;
   t+=`💳 *Método:* ${getPaymentLabel(s)}\n`;
-  t+=sep+'\n';
-  t+=`_Nota generada por ZeroStock_`;
+  t+=sep+'\n_Nota generada por ZeroStock_';
   return t;
 }
 
-/* Clean text and open wa.me link */
 async function sendInvoiceToWhatsApp(sale){
   const phone=await DL.cfg('wa_phone','');
-  if(!phone){
-    toast('Configura el número de WhatsApp en Ajustes primero','warn');
-    return;
-  }
-  // Build and sanitize the message
+  if(!phone){toast('Configura el número de WhatsApp en Ajustes primero','warn');return;}
   const raw=buildWhatsAppText(sale);
-  // Remove non-printable chars except newlines, keep WA markdown symbols
   const clean=raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g,'');
   const encoded=encodeURIComponent(clean);
-  const url=`https://wa.me/${phone}?text=${encoded}`;
-  window.open(url,'_blank','noopener');
+  window.open(`https://wa.me/${phone}?text=${encoded}`,'_blank','noopener');
 }
 
-/* Called from history row — fetches full sale data then opens WA */
 async function waFromHistory(id){
-  if(!navigator.onLine){
-    toast('Sin conexión — el enlace se abrirá pero puede no cargar WhatsApp','warn');
-  }
+  if(!navigator.onLine)toast('Sin conexión — el enlace se abrirá pero puede no cargar WhatsApp','warn');
   const sales=await DL.getSales();
   const s=sales.find(x=>x.id===id);
   if(!s){toast('Venta no encontrada','err');return;}
   await sendInvoiceToWhatsApp(s);
 }
 
-/* ═══════════════════════════════════════════════
-   § 9 — RECEIPT / INVOICE
-═══════════════════════════════════════════════ */
+/* ── RECEIPT ── */
 function getPaymentLabel(s){
-  const map={
-    'div-elec':'Divisas Electrónicas (USD)',
-    'div-fisico':'Divisas en Físico (USD)',
-    'bs-elec-off':`Bs. Electrónicos — BCV`,
-    'bs-elec-cus':`Bs. Electrónicos — Custom`,
-    'bs-fisico':'Bolívares en Físico',
-  };
+  const map={'div-elec':'Divisas Electrónicas (USD)','div-fisico':'Divisas en Físico (USD)',
+    'bs-elec-off':'Bs. Electrónicos — BCV','bs-elec-cus':'Bs. Electrónicos — Custom','bs-fisico':'Bolívares en Físico'};
   return map[s.paymentMethod]||s.paymentMethod||'—';
 }
-
 function getPaymentTotal(s){
   const cur=s.paymentCurrency||'usd';
-  if(cur==='usd') return {val:`$${fmt(s.total)}`, lbl:'Total USD'};
-  if(cur==='bs-off') return {val:`Bs. ${fmt(s.total*s.rateOff)}`, lbl:`Total Bs. (@${fmt(s.rateOff)}/USD)`};
-  if(cur==='bs-cus') return {val:`Bs. ${fmt(s.total*s.rateCus)}`, lbl:`Total Bs. (@${fmt(s.rateCus)}/USD)`};
-  return {val:`$${fmt(s.total)}`, lbl:'Total'};
+  if(cur==='usd')return{val:`$${fmt(s.total)}`,lbl:'Total USD'};
+  if(cur==='bs-off')return{val:`Bs. ${fmt(s.total*s.rateOff)}`,lbl:`Total Bs. (@${fmt(s.rateOff)}/USD)`};
+  if(cur==='bs-cus')return{val:`Bs. ${fmt(s.total*s.rateCus)}`,lbl:`Total Bs. (@${fmt(s.rateCus)}/USD)`};
+  return{val:`$${fmt(s.total)}`,lbl:'Total'};
 }
 
 function buildReceiptHTML(s){
   const items=s._items||[];
-  const {val:payVal, lbl:payLbl}=getPaymentTotal(s);
+  const {val:payVal,lbl:payLbl}=getPaymentTotal(s);
   const rows=items.map(i=>`
     <div class="rcpt-row"><span>${i.productName}${i.qty>1?' ×'+i.qty:''}</span><span>$${fmt(i.unitPrice*(i.qty||1))}</span></div>
     ${i.serial?`<div style="font-size:10px;color:#64748B;padding-left:4px">SN: ${i.serial}</div>`:''}`).join('');
@@ -1990,22 +1981,21 @@ function buildReceiptText(s){
   const {val:payVal,lbl:payLbl}=getPaymentTotal(s);
   let t=`Ø ZeroStock\nNota de Entrega #${String(s.id).padStart(4,'0')}\n${fmtDT(s.createdAt)}\n${sep}\n`;
   t+=`Cliente: ${s._cust?`${s._cust.firstName} ${s._cust.lastName}`:'Guest'}\n`;
-  if(s._cust) t+=`C.I.: ${s._cust.idNumber}\n`;
+  if(s._cust)t+=`C.I.: ${s._cust.idNumber}\n`;
   t+=sep+'\n';
   for(const i of(s._items||[])){
     t+=`${i.productName}${i.qty>1?' ×'+i.qty:''}\n`;
-    if(i.serial) t+=`  SN: ${i.serial}\n`;
+    if(i.serial)t+=`  SN: ${i.serial}\n`;
     t+=`  $${fmt(i.unitPrice*(i.qty||1))}\n`;
   }
   t+=sep+'\n';
-  t+=`${payLbl}: ${payVal}\n`;
-  t+=`Método: ${getPaymentLabel(s)}\n`;
+  t+=`${payLbl}: ${payVal}\nMétodo: ${getPaymentLabel(s)}\n`;
   t+=sep+'\nZeroStock';
   return t;
 }
 
-function showReceiptModal(sale, newSale=false){
-  window._lastReceiptSale = sale; // stash for WA button in modal
+function showReceiptModal(sale,newSale=false){
+  window._lastReceiptSale=sale;
   const receiptHtml=buildReceiptHTML(sale);
   openModal(`
     <div class="mo-hdr">
@@ -2015,14 +2005,10 @@ function showReceiptModal(sale, newSale=false){
     <div class="mo-body" style="display:flex;flex-direction:column;align-items:center;gap:12px">
       ${receiptHtml}
       <div style="display:flex;gap:8px;width:100%;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-o btn-sm" onclick="copyReceipt(${sale.id})">
-          <i data-lucide="copy"></i>Copiar texto
-        </button>
-        <button class="btn btn-o btn-sm" onclick="exportReceiptImg(${sale.id})">
-          <i data-lucide="image"></i>Guardar imagen
-        </button>
+        <button class="btn btn-o btn-sm" onclick="copyReceipt(${sale.id})"><i data-lucide="copy"></i>Copiar texto</button>
+        <button class="btn btn-o btn-sm" onclick="exportReceiptImg(${sale.id})"><i data-lucide="image"></i>Guardar imagen</button>
         <button class="btn btn-wa btn-sm" onclick="sendInvoiceToWhatsApp(window._lastReceiptSale||{})"
-          title="Enviar por WhatsApp" style="display:flex;align-items:center;gap:5px">
+          style="display:flex;align-items:center;gap:5px">
           <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Enviar WA
         </button>
@@ -2040,7 +2026,7 @@ function copyReceipt(id){
   const el=document.getElementById(`rcpt-text-${id}`);
   if(!el){toast('Error al copiar','err');return;}
   const txt=el.value;
-  if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast('Factura copiada ✓','ok')).catch(()=>fbCopy(txt));
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('Factura copiada ✓','ok')).catch(()=>fbCopy(txt));
   else fbCopy(txt);
 }
 function fbCopy(txt){
@@ -2048,7 +2034,6 @@ function fbCopy(txt){
   try{document.execCommand('copy');toast('Factura copiada ✓','ok');}catch{toast('Error al copiar','err');}
   document.body.removeChild(ta);
 }
-
 async function exportReceiptImg(id){
   const el=document.getElementById(`rcpt-print-${id}`);
   if(!el||!window.html2canvas){toast('html2canvas no disponible','err');return;}
@@ -2058,20 +2043,16 @@ async function exportReceiptImg(id){
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
     a.download=`ZeroStock-NotaEntrega-${String(id).padStart(4,'0')}.png`;
-    a.click();
-    toast('Imagen descargada ✓','ok');
+    a.click();toast('Imagen descargada ✓','ok');
   }catch(e){toast('Error al exportar: '+e.message,'err');}
 }
-
 async function showInvoice(id){
   const sales=await DL.getSales();
   const s=sales.find(x=>x.id===id);
-  if(s) showReceiptModal(s,false);
+  if(s)showReceiptModal(s,false);
 }
 
-/* ═══════════════════════════════════════════════
-   § 10 — SALES HISTORY
-═══════════════════════════════════════════════ */
+/* ── SALES HISTORY ── */
 async function vSales(){
   const sales=await DL.getSales();
   const rev=sales.reduce((s,x)=>s+(x.total||0),0);
@@ -2089,14 +2070,13 @@ async function vSales(){
       <td><div style="font-size:11px;line-height:1.5;color:var(--txt2)">${pmLabel}</div></td>
       <td class="sm muted">${fmtDT(s.createdAt)}</td>
       <td><div class="tacts">
-        <button class="btn btn-o btn-sm" onclick="showInvoice(${s.id})" title="Ver nota de entrega"><i data-lucide="eye"></i></button>
-        <button class="btn btn-wa btn-sm" onclick="waFromHistory(${s.id})" title="Enviar por WhatsApp" style="display:flex;align-items:center;gap:4px">
+        <button class="btn btn-o btn-sm" onclick="showInvoice(${s.id})"><i data-lucide="eye"></i></button>
+        <button class="btn btn-wa btn-sm" onclick="waFromHistory(${s.id})" style="display:flex;align-items:center;gap:4px">
           <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WA
         </button>
       </div></td>
     </tr>`;
   }).join('');
-
   return `<div class="page">
   <div class="ph">
     <div><div class="ph-ttl">Historial de Ventas</div>
@@ -2112,9 +2092,7 @@ async function vSales(){
 </div>`;
 }
 
-/* ═══════════════════════════════════════════════
-   § 11 — CUSTOMERS
-═══════════════════════════════════════════════ */
+/* ── CUSTOMERS ── */
 async function vCusts(){
   const custs=await DL.getCustomers();
   const rows=custs.map(c=>`<tr>
@@ -2144,6 +2122,7 @@ async function vCusts(){
   </div></div>
 </div>`;
 }
+
 async function filtCusts(q){
   const rows=await DL.getCustomers(q);
   const tb=document.querySelector('#ctbl tbody');if(!tb)return;
@@ -2159,9 +2138,7 @@ async function filtCusts(q){
   lucide.createIcons({el:tb});
 }
 
-/* ═══════════════════════════════════════════════
-   § 12 — SETTINGS (admin-protected)
-═══════════════════════════════════════════════ */
+/* ── SETTINGS ── */
 async function vSettings(){
   if(!A.adminAuth){
     return `<div class="page"><div class="admin-lock-overlay">
@@ -2190,7 +2167,6 @@ async function vSettings(){
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:13px;max-width:960px">
 
-    <!-- Rates -->
     <div class="card">
       <div class="card-hdr"><span class="card-ttl"><i data-lucide="landmark"></i>Tasas VES / USD</span></div>
       <div class="fg"><label class="fl">🏦 Tasa Oficial (BCV)</label>
@@ -2207,7 +2183,6 @@ async function vSettings(){
       <button class="btn btn-p" onclick="saveRates()"><i data-lucide="save"></i>Guardar Tasas</button>
     </div>
 
-    <!-- Margin + Password -->
     <div class="card">
       <div class="card-hdr"><span class="card-ttl"><i data-lucide="percent"></i>Margen y Seguridad</span></div>
       <div class="fg"><label class="fl">Margen de Ganancia Objetivo (%)</label>
@@ -2222,7 +2197,6 @@ async function vSettings(){
       <button class="btn btn-p" onclick="saveSecuritySettings()"><i data-lucide="save"></i>Guardar</button>
     </div>
 
-    <!-- Role -->
     <div class="card">
       <div class="card-hdr"><span class="card-ttl"><i data-lucide="shield-check"></i>Rol de Acceso</span></div>
       ${[{v:'admin',l:'👑 Administrador',d:'Gestión completa del sistema.'},
@@ -2235,7 +2209,6 @@ async function vSettings(){
       </label>`).join('')}
     </div>
 
-    <!-- DB -->
     <div class="card">
       <div class="card-hdr"><span class="card-ttl"><i data-lucide="database"></i>Base de Datos Local</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px">
@@ -2253,7 +2226,6 @@ async function vSettings(){
       </div>
     </div>
 
-    <!-- WhatsApp Notifications -->
     <div class="card">
       <div class="card-hdr">
         <span class="card-ttl">
@@ -2262,75 +2234,62 @@ async function vSettings(){
         </span>
         <span class="chip c-ok" style="font-size:9px">100% Gratis</span>
       </div>
-
       <div class="infobox ib-p" style="margin-bottom:11px">
         <i data-lucide="info"></i>
-        <span>Usa la API gratuita de WhatsApp Web (<strong>wa.me</strong>). No requiere cuenta de Business ni tokens. El mensaje se abre listo para enviar en WhatsApp o WhatsApp Web.</span>
+        <span>Usa la API gratuita de WhatsApp Web (<strong>wa.me</strong>). No requiere cuenta de Business ni tokens.</span>
       </div>
-
       <div class="fg">
         <label class="fl">📱 Número de WhatsApp para Reportes</label>
         <input type="tel" class="fc" id="wa-phone" value="${waPhone}"
-          placeholder="584121234567 (código país sin +)"
-          oninput="waPhonePreview()">
-        <div class="fhint" id="wa-phone-hint" style="margin-top:3px">
+          placeholder="584121234567 (código país sin +)" oninput="waPhonePreview()">
+        <div class="fhint" id="wa-phone-hint">
           ${waPhone?`✅ wa.me/${waPhone}`:'Ej: 584121234567 (Venezuela: 58 + número sin 0)'}
         </div>
       </div>
-
       <div class="wa-toggle-row">
         <div>
           <div class="wa-toggle-lbl">Envío automático al facturar</div>
-          <div class="wa-toggle-sub">Abre WhatsApp con la nota al completar cada venta (solo si hay conexión)</div>
+          <div class="wa-toggle-sub">Abre WhatsApp con la nota al completar cada venta</div>
         </div>
         <label class="toggle-sw">
-          <input type="checkbox" id="wa-auto" ${waAuto==='1'?'checked':''}
-            onchange="saveWaSettings()">
+          <input type="checkbox" id="wa-auto" ${waAuto==='1'?'checked':''} onchange="saveWaSettings()">
           <span class="slider"></span>
         </label>
       </div>
-
       <div style="display:flex;gap:7px;flex-wrap:wrap">
         <button class="btn btn-p" onclick="saveWaSettings()"><i data-lucide="save"></i>Guardar</button>
         <button class="btn btn-wa btn-sm" onclick="testWaLink()" style="display:flex;align-items:center;gap:5px">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Probar enlace
         </button>
       </div>
     </div>
 
-    <!-- About -->
     <div class="card" style="background:var(--sb);border-color:var(--sb-bdr)">
       <div style="font-size:28px;margin-bottom:8px">Ø</div>
       <div style="font-size:17px;font-weight:800;color:#fff">ZeroStock</div>
-      <div style="font-size:10px;color:rgba(255,255,255,.35);margin:3px 0 13px">MVP v3.0 · Offline-First</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.35);margin:3px 0 13px">MVP v4.0 · Offline-First · Cloud Sync</div>
       <ul style="font-size:11px;color:rgba(255,255,255,.5);line-height:2.1;padding-left:14px">
-        <li><strong style="color:rgba(255,255,255,.8)">UI:</strong> Material Design 3 · Microsoft Sans Serif</li>
-        <li><strong style="color:rgba(255,255,255,.8)">DB:</strong> IndexedDB / Dexie.js · Offline</li>
+        <li><strong style="color:rgba(255,255,255,.8)">Auth:</strong> Firebase Google Login</li>
+        <li><strong style="color:rgba(255,255,255,.8)">DB:</strong> IndexedDB / Dexie.js · Supabase PostgreSQL</li>
         <li><strong style="color:rgba(255,255,255,.8)">Tipos:</strong> Serializados + Masivos/Lote</li>
-        <li><strong style="color:rgba(255,255,255,.8)">Precios:</strong> Por unidad (serializado)</li>
+        <li><strong style="color:rgba(255,255,255,.8)">Precios:</strong> Editables por unidad en el POS</li>
         <li><strong style="color:rgba(255,255,255,.8)">Monedas:</strong> USD · Bs. Oficial · Bs. Custom</li>
-        <li><strong style="color:rgba(255,255,255,.8)">Facturas:</strong> Copiar texto · Exportar imagen</li>
-        <li><strong style="color:rgba(255,255,255,.8)">Seguridad:</strong> Contraseña de admin</li>
+        <li><strong style="color:rgba(255,255,255,.8)">Facturas:</strong> Copiar texto · Exportar imagen · WA</li>
       </ul>
     </div>
   </div>
 
-  <!-- ██ MIGRACIÓN DE DATOS — full width ██ -->
   <div style="max-width:960px;margin-top:13px">
     <div class="card" id="imp-card">
       <div class="card-hdr">
         <span class="card-ttl"><i data-lucide="file-up"></i>Migración de Datos</span>
         <span class="chip c-info" style="font-size:9px">Solo Admin</span>
       </div>
-
-      <!-- Safety warning -->
       <div class="infobox ib-w" style="margin-bottom:13px">
         <i data-lucide="alert-triangle"></i>
-        <span><strong>Precaución:</strong> Se recomienda exportar o respaldar la base de datos antes de importar masivamente. La importación de archivos <code>.accdb</code> puede tener limitaciones en el navegador — se recomienda convertir a CSV/Excel primero usando la función "Exportar" de Microsoft Access.</span>
+        <span><strong>Precaución:</strong> Se recomienda exportar o respaldar la base de datos antes de importar masivamente.</span>
       </div>
-
-      <!-- State: IDLE -->
       <div id="imp-idle">
         <div class="dz" id="imp-dz" onclick="document.getElementById('imp-file-inp').click()"
           ondragover="event.preventDefault();this.classList.add('hover')"
@@ -2342,64 +2301,38 @@ async function vSettings(){
           <div class="dz-title">Arrastra tu archivo aquí o haz clic para seleccionar</div>
           <div class="dz-sub">Formatos soportados · Tamaño máximo recomendado: 10 MB</div>
           <div class="dz-formats">
-            <span class="dz-fmt">CSV</span>
-            <span class="dz-fmt">JSON</span>
-            <span class="dz-fmt">Excel .xlsx</span>
-            <span class="dz-fmt">Excel .xls</span>
+            <span class="dz-fmt">CSV</span><span class="dz-fmt">JSON</span>
+            <span class="dz-fmt">Excel .xlsx</span><span class="dz-fmt">Excel .xls</span>
             <span class="dz-fmt" style="color:var(--warn);border-color:var(--warn)">Access .accdb ⚠️</span>
           </div>
         </div>
       </div>
-
-      <!-- State: PARSED (entity select + mapper + preview) -->
       <div id="imp-parsed" style="display:none">
         <div id="imp-file-bar"></div>
-
-        <!-- Entity type selector -->
-        <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">
-          ¿Qué tipo de datos estás importando?
-        </div>
+        <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">¿Qué tipo de datos estás importando?</div>
         <div class="entity-tabs" id="imp-entity-tabs">
           <div class="entity-tab sel" onclick="setImpEntity('products')" data-e="products">
-            <div class="entity-tab-icon">📦</div>
-            <div class="entity-tab-lbl">Productos</div>
+            <div class="entity-tab-icon">📦</div><div class="entity-tab-lbl">Productos</div>
           </div>
           <div class="entity-tab" onclick="setImpEntity('customers')" data-e="customers">
-            <div class="entity-tab-icon">👥</div>
-            <div class="entity-tab-lbl">Clientes</div>
+            <div class="entity-tab-icon">👥</div><div class="entity-tab-lbl">Clientes</div>
           </div>
         </div>
-
-        <!-- Preview -->
         <details open style="margin-bottom:11px">
-          <summary style="font-size:11px;font-weight:800;color:var(--txt2);cursor:pointer;margin-bottom:7px;
-            text-transform:uppercase;letter-spacing:.6px">Vista previa del archivo (5 filas)</summary>
+          <summary style="font-size:11px;font-weight:800;color:var(--txt2);cursor:pointer;margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px">Vista previa del archivo (5 filas)</summary>
           <div id="imp-preview-wrap"></div>
         </details>
-
-        <!-- Column mapper -->
-        <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">
-          Mapeo de columnas
-        </div>
+        <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Mapeo de columnas</div>
         <div class="mapper-wrap">
-          <div class="mapper-head">
-            <span>Columna del archivo</span>
-            <span></span>
-            <span>Campo en ZeroStock</span>
-          </div>
+          <div class="mapper-head"><span>Columna del archivo</span><span></span><span>Campo en ZeroStock</span></div>
           <div id="imp-mapper-rows"></div>
         </div>
-
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
           <button class="btn btn-g btn-sm" onclick="impReset()"><i data-lucide="x"></i>Cancelar</button>
           <button class="btn btn-warn btn-sm" onclick="autoMapColumns()"><i data-lucide="wand-2"></i>Auto-mapear</button>
-          <button class="btn btn-p" onclick="runImportValidation()">
-            <i data-lucide="shield-check"></i>Validar e Importar
-          </button>
+          <button class="btn btn-p" onclick="runImportValidation()"><i data-lucide="shield-check"></i>Validar e Importar</button>
         </div>
       </div>
-
-      <!-- State: IMPORTING -->
       <div id="imp-importing" style="display:none">
         <div class="imp-progress">
           <div class="imp-prog-lbl" id="imp-prog-lbl">Procesando…</div>
@@ -2407,8 +2340,6 @@ async function vSettings(){
           <div class="sm muted" id="imp-prog-detail">Preparando datos…</div>
         </div>
       </div>
-
-      <!-- State: DONE -->
       <div id="imp-done" style="display:none">
         <div id="imp-report-wrap"></div>
         <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
@@ -2425,44 +2356,35 @@ function prevRates(){
   const ro=parseFloat(document.getElementById('iro')?.value)||0;
   const rc=parseFloat(document.getElementById('irc')?.value)||0;
   const o=document.getElementById('pv-o'),c=document.getElementById('pv-c');
-  if(o) o.textContent=fmt(100*ro);
-  if(c) c.textContent=fmt(100*rc);
+  if(o)o.textContent=fmt(100*ro);if(c)c.textContent=fmt(100*rc);
 }
 async function saveRates(){
   const ro=parseFloat(document.getElementById('iro').value);
   const rc=parseFloat(document.getElementById('irc').value);
   if(!ro||!rc||ro<=0||rc<=0){toast('Ingresa tasas válidas','err');return;}
-  await DL.setCfg('rate_off',String(ro));
-  await DL.setCfg('rate_cus',String(rc));
-  A.rates.off=ro;A.rates.cus=rc;
-  await DL.syncRates();
+  await DL.setCfg('rate_off',String(ro));await DL.setCfg('rate_cus',String(rc));
+  A.rates.off=ro;A.rates.cus=rc;await DL.syncRates();
   toast(`Tasas guardadas · Oficial:${fmt(ro)} · Custom:${fmt(rc)}`,'ok');
 }
 async function saveSecuritySettings(){
   const dm=parseInt(document.getElementById('idm')?.value,10)||20;
   const ap=(document.getElementById('iap')?.value||'').trim();
   if(!ap){toast('La contraseña no puede estar vacía','err');return;}
-  await DL.setCfg('default_margin',String(dm));
-  await DL.setCfg('admin_pass',ap);
+  await DL.setCfg('default_margin',String(dm));await DL.setCfg('admin_pass',ap);
   toast('Configuración guardada ✓','ok');
 }
-
 async function saveWaSettings(){
   const phone=(document.getElementById('wa-phone')?.value||'').trim().replace(/\D/g,'');
   const auto=document.getElementById('wa-auto')?.checked?'1':'0';
-  if(phone&&phone.length<7){toast('Número inválido — incluye código de país (ej: 584121234567)','err');return;}
-  await DL.setCfg('wa_phone',phone);
-  await DL.setCfg('wa_auto',auto);
-  toast('Configuración WhatsApp guardada ✓','ok');
-  waPhonePreview();
+  if(phone&&phone.length<7){toast('Número inválido — incluye código de país','err');return;}
+  await DL.setCfg('wa_phone',phone);await DL.setCfg('wa_auto',auto);
+  toast('Configuración WhatsApp guardada ✓','ok');waPhonePreview();
 }
-
 function waPhonePreview(){
   const v=(document.getElementById('wa-phone')?.value||'').replace(/\D/g,'');
   const hint=document.getElementById('wa-phone-hint');
-  if(hint) hint.textContent=v.length>=7?`✅ wa.me/${v}`:'Ej: 584121234567 (Venezuela: 58 + número sin 0)';
+  if(hint)hint.textContent=v.length>=7?`✅ wa.me/${v}`:'Ej: 584121234567 (Venezuela: 58 + número sin 0)';
 }
-
 async function testWaLink(){
   const phone=await DL.cfg('wa_phone','');
   if(!phone){toast('Primero guarda un número de WhatsApp','warn');return;}
@@ -2470,11 +2392,7 @@ async function testWaLink(){
   window.open(`https://wa.me/${phone}?text=${txt}`,'_blank');
 }
 
-/* ═══════════════════════════════════════════════
-   § 13 — MODALS
-═══════════════════════════════════════════════ */
-
-/* ── ADMIN AUTH ── */
+/* ── MODALS ── */
 function requireAdmin(cb){
   if(A.adminAuth){cb();return;}
   A._pendingAuth=cb;
@@ -2495,22 +2413,21 @@ function requireAdmin(cb){
   `);
   setTimeout(()=>document.getElementById('adm-pw')?.focus(),100);
 }
-function showAdminLogin(cb){ A._pendingAuth=cb; requireAdmin(cb); }
+function showAdminLogin(cb){A._pendingAuth=cb;requireAdmin(cb);}
 async function verifyAdmin(){
   const input=document.getElementById('adm-pw')?.value||'';
   const stored=await DL.cfg('admin_pass','admin');
   if(input===stored){
-    A.adminAuth=true; closeModal();
-    toast('Acceso concedido ✓','ok');
+    A.adminAuth=true;closeModal();toast('Acceso concedido ✓','ok');
     if(A._pendingAuth){A._pendingAuth();A._pendingAuth=null;}
   } else {
     const pw=document.getElementById('adm-pw');
-    if(pw){pw.value='';pw.classList.add('err-fc');setTimeout(()=>pw.classList.remove('err-fc'),700);}
+    if(pw){pw.value='';pw.style.borderColor='var(--err)';setTimeout(()=>pw.style.borderColor='',700);}
     toast('Contraseña incorrecta','err');
   }
 }
 
-/* ── PRODUCT MODAL (Category-first) ── */
+/* ── PRODUCT MODAL ── */
 async function moProd(id=null){
   const p=id?await DB.products.get(id):null;
   openModal(`
@@ -2520,10 +2437,8 @@ async function moProd(id=null){
     </div>
     <div class="mo-body">
       <input type="hidden" id="fp-id" value="${p?.id||''}">
-
-      <!-- Step 1: Category (mandatory first) -->
       <div class="fg">
-        <label class="fl">📂 Categoría <span style="color:var(--err)">*</span> — define el flujo del producto</label>
+        <label class="fl">📂 Categoría <span style="color:var(--err)">*</span></label>
         <select class="fc" id="fp-cat" onchange="adaptProdForm(this.value)" style="height:38px;font-weight:700">
           <option value="">— Selecciona una categoría —</option>
           <optgroup label="Productos Serializados (por unidad)">
@@ -2535,8 +2450,6 @@ async function moProd(id=null){
         </select>
         <div id="cat-badge" style="margin-top:6px"></div>
       </div>
-
-      <!-- Step 2: Dynamic form -->
       <div id="fp-rest" style="${p?'':'display:none'}">
         <hr class="divider" style="margin-bottom:11px">
         <div id="fp-fields"></div>
@@ -2549,25 +2462,22 @@ async function moProd(id=null){
       </button>
     </div>
   `);
-  if(p) adaptProdForm(p.category, p);
+  if(p)adaptProdForm(p.category,p);
 }
 
-function adaptProdForm(cat, existingData=null){
-  if(!cat) return;
+function adaptProdForm(cat,existingData=null){
+  if(!cat)return;
   const isSer=SER_CATS.includes(cat);
   const p=existingData;
   const badge=document.getElementById('cat-badge');
   const rest=document.getElementById('fp-rest');
   const fields=document.getElementById('fp-fields');
   const saveBtn=document.getElementById('fp-save');
-
-  if(badge) badge.innerHTML=isSer
+  if(badge)badge.innerHTML=isSer
     ?`<span class="chip c-ser"><i data-lucide="cpu"></i>Serializado — precio individual por serial</span>`
     :`<span class="chip c-bat"><i data-lucide="box"></i>Masivo — precio global por lote</span>`;
-
-  if(rest) rest.style.display='block';
-  if(saveBtn) saveBtn.style.display='inline-flex';
-
+  if(rest)rest.style.display='block';
+  if(saveBtn)saveBtn.style.display='inline-flex';
   const common=`
     <div class="g2">
       <div class="fg"><label class="fl">Nombre *</label>
@@ -2582,26 +2492,23 @@ function adaptProdForm(cat, existingData=null){
         <input type="number" class="fc" id="fp-ms" value="${p?.minStock||2}" step="1" min="0">
         <div class="fhint">Alerta cuando stock baje de aquí</div></div>
     </div>`;
-
   if(isSer){
     fields.innerHTML=common+`
       <div class="infobox ib-p" style="margin-top:4px">
         <i data-lucide="info"></i>
-        <span>El <strong>Costo</strong> y <strong>Precio de Venta</strong> se asignan individualmente a cada Serial/IMEI al agregarlos. Esto permite manejar costos distintos por unidad.</span>
+        <span>El <strong>Costo</strong> y <strong>Precio de Venta</strong> se asignan individualmente a cada Serial/IMEI al agregarlos.</span>
       </div>`;
   } else {
     fields.innerHTML=common+`
       <hr class="divider">
       <div class="g2">
         <div class="fg"><label class="fl">Costo por Unidad (USD)</label>
-          <input type="number" class="fc" id="fp-cost" value="${p?.cost||''}" step="0.01" min="0" oninput="updMarginPreview()">
-        </div>
+          <input type="number" class="fc" id="fp-cost" value="${p?.cost||''}" step="0.01" min="0" oninput="updMarginPreview()"></div>
         <div class="fg"><label class="fl">Precio de Venta (USD)</label>
-          <input type="number" class="fc" id="fp-px" value="${p?.salePrice||''}" step="0.01" min="0" oninput="updMarginPreview()">
-        </div>
+          <input type="number" class="fc" id="fp-px" value="${p?.salePrice||''}" step="0.01" min="0" oninput="updMarginPreview()"></div>
       </div>
       <div id="margin-preview"></div>`;
-    setTimeout(updMarginPreview, 50);
+    setTimeout(updMarginPreview,50);
   }
   lucide.createIcons({el:document.getElementById('mr')});
 }
@@ -2609,14 +2516,12 @@ function adaptProdForm(cat, existingData=null){
 function updMarginPreview(){
   const cost=parseFloat(document.getElementById('fp-cost')?.value)||0;
   const price=parseFloat(document.getElementById('fp-px')?.value)||0;
-  const el=document.getElementById('margin-preview');
-  if(!el) return;
+  const el=document.getElementById('margin-preview');if(!el)return;
   if(!price){el.innerHTML='';return;}
-  const m=calcMargin(cost,price);
-  const cls=marginClass(cost,price);
+  const m=calcMargin(cost,price);const cls=marginClass(cost,price);
   let msg='';
-  if(m<0) msg='⚠️ Precio por debajo del costo (pérdida)';
-  else if(m>35) msg='⚠️ Margen muy alto (>35%) — verificar precio';
+  if(m<0)msg='⚠️ Precio por debajo del costo (pérdida)';
+  else if(m>35)msg='⚠️ Margen muy alto (>35%) — verificar precio';
   el.innerHTML=`<div class="margin-pill mp-${cls==='c-ok'?'ok':cls==='c-warn'?'warn':'err'}">
     ${m<0?'❌':m>35?'⚠️':'✅'} Margen: ${fmt(m,1)}% ${msg?'— '+msg:''}
   </div>`;
@@ -2630,51 +2535,42 @@ async function saveProd(){
     const isSer=SER_CATS.includes(cat);
     const cost=isSer?0:(parseFloat(document.getElementById('fp-cost')?.value)||0);
     const salePrice=isSer?0:(parseFloat(document.getElementById('fp-px')?.value)||0);
-
-    // Warn on margin but allow save
     if(!isSer&&salePrice>0){
       const m=calcMargin(cost,salePrice);
-      if(m<0) toast('⚠️ Guardando con precio por debajo del costo','warn');
-      else if(m>35) toast('⚠️ Margen mayor al 35% — guardado de todas formas','warn');
+      if(m<0)toast('⚠️ Guardando con precio por debajo del costo','warn');
+      else if(m>35)toast('⚠️ Margen mayor al 35% — guardado de todas formas','warn');
     }
-
     await DL.saveProduct({
       id:id?parseInt(id,10):null,
       name:document.getElementById('fp-nm')?.value,
       brand:document.getElementById('fp-br')?.value,
       model:document.getElementById('fp-mo')?.value,
-      category:cat,
-      minStock:document.getElementById('fp-ms')?.value,
-      cost, salePrice,
+      category:cat,minStock:document.getElementById('fp-ms')?.value,
+      cost,salePrice,
     });
-    closeModal();
-    toast(id?'Producto actualizado ✓':'Producto creado ✓','ok');
-    go('inventory');
+    closeModal();toast(id?'Producto actualizado ✓':'Producto creado ✓','ok');go('inventory');
   }catch(e){toast(e.message,'err');}
 }
 
-/* ── CONFIRM DELETE PRODUCT ── */
 function cfDelProd(id,name){
-  dblConfirm('Eliminar producto',`¿Eliminar <strong>${name}</strong> y todos sus seriales disponibles?`,
-    ()=>delProd(id));
+  dblConfirm('Eliminar producto',`¿Eliminar <strong>${name}</strong> y todos sus seriales disponibles?`,()=>delProd(id));
 }
 async function delProd(id){
   try{await DL.deleteProduct(id);closeModal();toast('Eliminado','ok');go('inventory');}
   catch(e){toast(e.message,'err');}
 }
 
-/* ── SERIAL BULK-ADD MODAL (per-serial pricing) ── */
+/* ── SERIAL BULK-ADD MODAL ── */
 async function moSerials(pid){
   const p=await DB.products.get(pid);
-  const defPrice=p?.salePrice||0;
-  const defCost=p?.cost||0;
+  const defPrice=p?.salePrice||0;const defCost=p?.cost||0;
   openModal(`
     <div class="mo-hdr"><span class="mo-ttl">Agregar Seriales — ${p?.name}</span>
       <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
     <div class="mo-body">
       <div class="infobox ib-p">
         <i data-lucide="info"></i>
-        <span>Ingresa los seriales (uno por línea o separados por coma/;). Luego asigna <strong>Costo y Precio individual</strong> a cada unidad. Los precios se pre-rellenan con los valores del producto.</span>
+        <span>Ingresa los seriales (uno por línea o separados por coma/;). Luego asigna <strong>Costo y Precio individual</strong> a cada unidad.</span>
       </div>
       <div class="fg">
         <label class="fl">Paso 1 — Seriales / IMEI</label>
@@ -2702,32 +2598,27 @@ async function moSerials(pid){
         <i data-lucide="plus"></i>Agregar Seriales
       </button>
     </div>
-  `, true);
+  `,true);
 }
 
-// Window-level serials staging array
-window._stagingSerials = [];
+window._stagingSerials=[];
 
-async function prevBulkTable(pid, defCost, defPrice){
+async function prevBulkTable(pid,defCost,defPrice){
   const raw=document.getElementById('bi')?.value||'';
   const lines=raw.split(/[\n,;]+/).map(l=>l.trim()).filter(l=>l);
   document.getElementById('bc').textContent=`${lines.length} seriales detectados`;
   const btn=document.getElementById('bsub');
-  if(!lines.length){
-    document.getElementById('serial-table-wrap').style.display='none';
-    if(btn) btn.disabled=true; return;
-  }
+  if(!lines.length){document.getElementById('serial-table-wrap').style.display='none';if(btn)btn.disabled=true;return;}
   const exist=new Set((await DB.serials.where('productId').equals(pid).toArray()).map(s=>s.serial.toUpperCase()));
-  const seen=new Set(), rows=[];
+  const seen=new Set(),rows=[];
   window._stagingSerials=[];
   for(const ln of lines){
     const k=ln.toUpperCase();
-    const isDup=exist.has(k)||seen.has(k);
-    if(!isDup){seen.add(k);rows.push(ln);window._stagingSerials.push({serial:ln,cost:defCost,salePrice:defPrice});}
+    if(exist.has(k)||seen.has(k))continue;
+    seen.add(k);rows.push(ln);window._stagingSerials.push({serial:ln,cost:defCost,salePrice:defPrice});
   }
   const dupes=lines.length-rows.length;
   document.getElementById('bc').textContent=`${rows.length} nuevos · ${dupes>0?dupes+' duplicados ignorados':''}`;
-
   const tbody=document.getElementById('spt-body');
   tbody.innerHTML=rows.map((s,i)=>`<tr>
     <td class="mono fw7" style="padding:6px 9px">${s}</td>
@@ -2739,40 +2630,32 @@ async function prevBulkTable(pid, defCost, defPrice){
     <td><button class="btn btn-g btn-ico" style="color:var(--err)" onclick="removeStagingSerial(${i})"><i data-lucide="x"></i></button></td>
   </tr>`).join('');
   lucide.createIcons({el:tbody});
-
   document.getElementById('serial-table-wrap').style.display='block';
-  if(btn) btn.disabled=rows.length===0;
+  if(btn)btn.disabled=rows.length===0;
 }
 
-function updStagingSerial(i,field,val){
-  if(window._stagingSerials[i]) window._stagingSerials[i][field]=parseFloat(val)||0;
-}
+function updStagingSerial(i,field,val){if(window._stagingSerials[i])window._stagingSerials[i][field]=parseFloat(val)||0;}
 function updSerialMargin(i){
-  if(!window._stagingSerials[i]) return;
+  if(!window._stagingSerials[i])return;
   const {cost,salePrice}=window._stagingSerials[i];
-  const el=document.getElementById(`sm-${i}`);
-  if(!el) return;
+  const el=document.getElementById(`sm-${i}`);if(!el)return;
   el.className=`chip ${marginClass(cost,salePrice)}`;
   el.textContent=`${fmt(calcMargin(cost,salePrice),1)}%`;
 }
 function removeStagingSerial(i){
   window._stagingSerials.splice(i,1);
-  const tr=document.querySelector(`#spt-body tr:nth-child(${i+1})`);
-  if(tr) tr.remove();
-  const btn=document.getElementById('bsub');
-  if(btn) btn.disabled=window._stagingSerials.length===0;
+  const tr=document.querySelector(`#spt-body tr:nth-child(${i+1})`);if(tr)tr.remove();
+  const btn=document.getElementById('bsub');if(btn)btn.disabled=window._stagingSerials.length===0;
 }
 function bulkFillPrices(cost,price){
   const rows=document.querySelectorAll('#spt-body tr');
   rows.forEach((tr,i)=>{
     const inputs=tr.querySelectorAll('input');
-    if(inputs[0]) inputs[0].value=cost;
-    if(inputs[1]) inputs[1].value=price;
+    if(inputs[0])inputs[0].value=cost;if(inputs[1])inputs[1].value=price;
     if(window._stagingSerials[i]){window._stagingSerials[i].cost=cost;window._stagingSerials[i].salePrice=price;}
     updSerialMargin(i);
   });
 }
-
 async function submitSerials(pid){
   if(!window._stagingSerials.length){toast('Sin seriales para agregar','err');return;}
   try{
@@ -2782,13 +2665,12 @@ async function submitSerials(pid){
     go('product',{id:pid});
   }catch(e){toast(e.message,'err');}
 }
-
 async function delSrl(id,pid){
   try{await DL.delSerial(id);toast('Serial eliminado','ok');go('product',{id:pid});}
   catch(e){toast(e.message,'err');}
 }
 
-/* ── ADD QTY (non-serialized) ── */
+/* ── ADD QTY MODAL ── */
 async function moAddQty(pid){
   const p=await DB.products.get(pid);
   openModal(`
@@ -2803,11 +2685,9 @@ async function moAddQty(pid){
       </div>
       <div class="g2">
         <div class="fg"><label class="fl">Costo por unidad (USD)</label>
-          <input type="number" class="fc" id="aq-cost" value="${p?.cost||''}" step="0.01" min="0" oninput="updAqMargin()">
-        </div>
+          <input type="number" class="fc" id="aq-cost" value="${p?.cost||''}" step="0.01" min="0" oninput="updAqMargin()"></div>
         <div class="fg"><label class="fl">Precio de venta (USD)</label>
-          <input type="number" class="fc" id="aq-price" value="${p?.salePrice||''}" step="0.01" min="0" oninput="updAqMargin()">
-        </div>
+          <input type="number" class="fc" id="aq-price" value="${p?.salePrice||''}" step="0.01" min="0" oninput="updAqMargin()"></div>
       </div>
       <div id="aq-margin"></div>
     </div>
@@ -2825,8 +2705,6 @@ function updAqMargin(){
   if(!price){el.innerHTML='';return;}
   const m=calcMargin(cost,price);
   el.innerHTML=`<div class="margin-pill mp-${m<0?'err':m>35?'warn':'ok'}">${m<0?'❌':m>35?'⚠️':'✅'} Margen: ${fmt(m,1)}%</div>`;
-  if(m<0) toast('⚠️ Precio por debajo del costo','warn');
-  else if(m>35) toast('⚠️ Margen alto (>35%)','warn');
 }
 async function submitAddQty(pid){
   const qty=document.getElementById('aq-qty')?.value;
@@ -2834,10 +2712,6 @@ async function submitAddQty(pid){
   const price=document.getElementById('aq-price')?.value;
   const variant=document.getElementById('aq-var')?.value||'';
   if(!parseFloat(price)&&price!='0'){toast('Ingresa el precio de venta','err');return;}
-  // Warn but allow
-  const m=calcMargin(parseFloat(cost)||0,parseFloat(price)||0);
-  if(m<0) toast('⚠️ Guardando con pérdida — verifica los precios','warn');
-  else if(m>35) toast('⚠️ Margen >35% — guardado de todas formas','warn');
   try{
     const added=await DL.addBulkQty(pid,{qty,cost,salePrice:price,variant});
     closeModal();toast(`${added} unidades agregadas ✓`,'ok');go('product',{id:pid});
@@ -2886,8 +2760,8 @@ async function delCust(id){
   catch(e){toast(e.message,'err');}
 }
 
-/* ── DOUBLE CONFIRM MODAL ── */
-function dblConfirm(title, msg, onConfirm){
+/* ── DOUBLE CONFIRM ── */
+function dblConfirm(title,msg,onConfirm){
   openModal(`
     <div class="mo-hdr"><span class="mo-ttl">⚠️ ${title}</span>
       <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
@@ -2904,10 +2778,9 @@ function dblConfirm(title, msg, onConfirm){
       <button class="btn btn-warn" onclick="dblConfirmStep2('${title}','${msg.replace(/'/g,"\\'")}',window._dblCb)">Sí, continuar →</button>
     </div>
   `);
-  window._dblCb = onConfirm;
+  window._dblCb=onConfirm;
 }
-
-function dblConfirmStep2(title, msg, onConfirm){
+function dblConfirmStep2(title,msg,onConfirm){
   openModal(`
     <div class="mo-hdr"><span class="mo-ttl">⚠️ ${title} — Confirma de nuevo</span>
       <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
@@ -2920,7 +2793,6 @@ function dblConfirmStep2(title, msg, onConfirm){
         <span>${msg} Esta acción es <strong>irreversible</strong>.</span></div>
     </div>
     <div class="mo-foot" style="justify-content:space-between">
-      <!-- Botones INVERTIDOS para forzar relectura -->
       <button class="btn btn-d" onclick="closeModal();if(window._dblCb)window._dblCb()">
         <i data-lucide="check"></i>Confirmar definitivamente
       </button>
@@ -2929,16 +2801,8 @@ function dblConfirmStep2(title, msg, onConfirm){
   `);
 }
 
-function cfSeed(){
-  dblConfirm('Cargar Datos de Ejemplo',
-    'Se cargarán 18 productos con seriales, 3 clientes y 1 venta de demostración.',
-    seedData);
-}
-function cfClear(){
-  dblConfirm('Borrar Base de Datos',
-    'Se borrarán TODOS los datos: productos, seriales, clientes, ventas y configuración.',
-    clearAll);
-}
+function cfSeed(){dblConfirm('Cargar Datos de Ejemplo','Se cargarán 18 productos con seriales, 3 clientes y 1 venta de demostración.',seedData);}
+function cfClear(){dblConfirm('Borrar Base de Datos','Se borrarán TODOS los datos: productos, seriales, clientes, ventas y configuración.',clearAll);}
 async function seedData(){
   try{await DL.seed();toast('Datos de ejemplo cargados ✓','ok');go('inventory');}
   catch(e){toast(e.message,'warn');}
@@ -2948,9 +2812,310 @@ async function clearAll(){
   A.adminAuth=false;toast('Base de datos borrada','warn');go('dashboard');
 }
 
-/* ═══════════════════════════════════════════════
-   § 14 — UI UTILITIES
-═══════════════════════════════════════════════ */
+/* ── IMPORT ENGINE ── */
+const IMP_FIELDS={
+  products:[
+    {k:'',lbl:'— Ignorar columna —'},{k:'name',lbl:'Nombre *'},{k:'brand',lbl:'Marca *'},
+    {k:'model',lbl:'Modelo'},{k:'category',lbl:'Categoría'},{k:'cost',lbl:'Costo (USD)'},
+    {k:'salePrice',lbl:'Precio de Venta (USD)'},{k:'minStock',lbl:'Stock Mínimo'},
+    {k:'qty',lbl:'Cantidad (Masivo)'},{k:'serial',lbl:'Serial / IMEI (Serializado)'},{k:'variant',lbl:'Variante'},
+  ],
+  customers:[
+    {k:'',lbl:'— Ignorar columna —'},{k:'firstName',lbl:'Nombre *'},{k:'lastName',lbl:'Apellido *'},
+    {k:'idNumber',lbl:'Cédula / ID *'},{k:'phone',lbl:'Teléfono'},{k:'address',lbl:'Dirección'},
+  ],
+};
+const IMP_AUTOMAP={
+  nombre:'name',name:'name',producto:'name',product:'name',item:'name',descripcion:'name',
+  marca:'brand',brand:'brand',fabricante:'brand',manufacturer:'brand',
+  modelo:'model',model:'model',referencia:'model',ref:'model',sku:'model',
+  categoria:'category',category:'category',tipo:'category',type:'category',
+  costo:'cost',cost:'cost',precio_costo:'cost',costo_unitario:'cost',
+  precio:'salePrice',precio_venta:'salePrice',sale_price:'salePrice',price:'salePrice',pvp:'salePrice',
+  stock_minimo:'minStock',min_stock:'minStock',minstock:'minStock',minimum:'minStock',
+  cantidad:'qty',qty:'qty',stock:'qty',quantity:'qty',existencia:'qty',
+  serial:'serial',imei:'serial',serie:'serial',sn:'serial',numero_serie:'serial',serial_number:'serial',
+  variante:'variant',variant:'variant',color:'variant',
+  nombre_completo:'firstName',nombre_pila:'firstName',first_name:'firstName',firstname:'firstName',
+  apellido:'lastName',last_name:'lastName',lastname:'lastName',
+  cedula:'idNumber',ci:'idNumber',rif:'idNumber',id_number:'idNumber',documento:'idNumber',
+  telefono:'phone',phone:'phone',celular:'phone',movil:'phone',
+  direccion:'address',address:'address',domicilio:'address',
+};
+const IMP={file:null,rawRows:[],headers:[],entity:'products',mapping:{},
+  reset(){this.file=null;this.rawRows=[];this.headers=[];this.mapping={};this.entity='products';}
+};
+
+function impState(s){
+  ['idle','parsed','importing','done'].forEach(st=>{
+    const el=document.getElementById('imp-'+st);
+    if(el)el.style.display=st===s?'block':'none';
+  });
+}
+function impReset(){
+  IMP.reset();impState('idle');
+  const fi=document.getElementById('imp-file-inp');if(fi)fi.value='';
+  lucide.createIcons({el:document.getElementById('imp-card')});
+}
+function handleImportDrop(e){const file=e.dataTransfer?.files?.[0];if(file)handleImportFile(file);}
+
+async function handleImportFile(file){
+  if(!file)return;IMP.file=file;
+  const ext=file.name.split('.').pop().toLowerCase();
+  toast(`Leyendo ${file.name}…`,'info');
+  try{
+    let rows=[];
+    if(ext==='csv')rows=await parseCSV(file);
+    else if(ext==='json')rows=await parseJSON(file);
+    else if(ext==='xlsx'||ext==='xls')rows=await parseExcel(file);
+    else if(ext==='accdb')rows=await parseAccdb(file);
+    else{toast('Formato no soportado: .'+ext,'err');return;}
+    if(!rows.length){toast('El archivo no contiene datos legibles','warn');return;}
+    IMP.rawRows=rows;IMP.headers=Object.keys(rows[0]);
+    autoMapColumns();renderParsedState();
+    toast(`${rows.length} filas detectadas ✓`,'ok');
+  }catch(e){toast('Error al leer archivo: '+e.message,'err');console.error(e);}
+}
+
+function parseCSV(file){
+  return new Promise((res,rej)=>{
+    if(!window.Papa){rej(new Error('PapaParse no disponible'));return;}
+    Papa.parse(file,{header:true,skipEmptyLines:true,dynamicTyping:false,
+      complete:r=>{if(r.errors.length&&!r.data.length)rej(new Error(r.errors[0].message));else res(r.data);},
+      error:e=>rej(new Error(e.message))});
+  });
+}
+function parseJSON(file){
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        let data=JSON.parse(e.target.result);
+        if(Array.isArray(data))res(data);
+        else if(typeof data==='object'){
+          const key=Object.keys(data).find(k=>Array.isArray(data[k]));
+          if(key)res(data[key]);else rej(new Error('JSON no contiene un array de objetos'));
+        }else rej(new Error('Formato JSON inválido'));
+      }catch(err){rej(new Error('JSON inválido: '+err.message));}
+    };
+    reader.onerror=()=>rej(new Error('Error al leer el archivo'));
+    reader.readAsText(file,'UTF-8');
+  });
+}
+function parseExcel(file){
+  return new Promise((res,rej)=>{
+    if(!window.XLSX){rej(new Error('SheetJS no disponible'));return;}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        res(XLSX.utils.sheet_to_json(ws,{defval:''}));
+      }catch(err){rej(new Error('Error al parsear Excel: '+err.message));}
+    };
+    reader.onerror=()=>rej(new Error('Error al leer el archivo'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+function parseAccdb(file){
+  return new Promise((res,rej)=>{
+    toast('⚠️ Formato .accdb tiene soporte limitado en el navegador.','warn');
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const bytes=new Uint8Array(e.target.result);
+        let cur='',strings=[];
+        for(let i=0;i<bytes.length;i++){
+          const b=bytes[i];
+          if(b>=32&&b<127)cur+=String.fromCharCode(b);
+          else{if(cur.length>3)strings.push(cur);cur='';}
+        }
+        if(cur.length>3)strings.push(cur);
+        const dataLines=strings.filter(s=>s.includes('\t')||s.includes('|'));
+        if(dataLines.length){
+          res(dataLines.map(l=>{const parts=l.split(/\t|\|/);return parts.reduce((o,v,i)=>({...o,['Col'+i]:v.trim()}),{});}));
+        }else{
+          const rows=strings.slice(0,200).map(s=>({extracted_value:s}));
+          if(!rows.length)rej(new Error('No se pudo extraer datos del .accdb. Exporta desde Access a CSV primero.'));
+          else{toast('Extracción parcial de .accdb — revisa el mapeo','warn');res(rows);}
+        }
+      }catch(err){rej(new Error('No se pudo leer .accdb: '+err.message));}
+    };
+    reader.onerror=()=>rej(new Error('Error al leer el archivo'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function autoMapColumns(){
+  IMP.mapping={};
+  for(const h of IMP.headers){
+    const key=h.toLowerCase().trim().replace(/\s+/g,'_').replace(/[^\w]/g,'');
+    IMP.mapping[h]=IMP_AUTOMAP[key]||'';
+  }
+  renderMapperRows();
+}
+function renderParsedState(){
+  const bar=document.getElementById('imp-file-bar');
+  if(bar){
+    bar.innerHTML=`<div class="file-bar">
+      <i data-lucide="file-check-2"></i>
+      <span class="file-bar-name">${IMP.file.name}</span>
+      <span class="file-bar-meta">${IMP.rawRows.length} filas · ${IMP.headers.length} columnas · ${(IMP.file.size/1024).toFixed(1)} KB</span>
+      <button class="btn btn-g btn-ico btn-sm" onclick="impReset()"><i data-lucide="x"></i></button>
+    </div>`;
+    lucide.createIcons({el:bar});
+  }
+  renderPreview();renderMapperRows();setImpEntity(IMP.entity);
+  impState('parsed');lucide.createIcons({el:document.getElementById('imp-card')});
+}
+function setImpEntity(e){
+  IMP.entity=e;
+  document.querySelectorAll('.entity-tab').forEach(t=>t.classList.toggle('sel',t.dataset.e===e));
+  renderMapperRows();
+}
+function renderPreview(){
+  const wrap=document.getElementById('imp-preview-wrap');if(!wrap)return;
+  const sample=IMP.rawRows.slice(0,5);
+  const th=IMP.headers.map(h=>`<th>${h}</th>`).join('');
+  const trs=sample.map(r=>`<tr>${IMP.headers.map(h=>`<td>${r[h]??''}</td>`).join('')}</tr>`).join('');
+  wrap.innerHTML=`<div class="preview-table-wrap"><table class="preview-table">
+    <thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table></div>`;
+}
+function renderMapperRows(){
+  const wrap=document.getElementById('imp-mapper-rows');if(!wrap)return;
+  const fields=IMP_FIELDS[IMP.entity]||IMP_FIELDS.products;
+  const opts=fields.map(f=>`<option value="${f.k}">${f.lbl}</option>`).join('');
+  wrap.innerHTML=IMP.headers.map(h=>{
+    const cur=IMP.mapping[h]||'';
+    const sel=opts.replace(`value="${cur}"`,`value="${cur}" selected`);
+    return `<div class="mapper-row">
+      <div><span class="mapper-src" title="${h}">${h}</span></div>
+      <div class="mapper-arr"><i data-lucide="arrow-right"></i></div>
+      <div class="mapper-dst"><select onchange="IMP.mapping['${h.replace(/'/g,"\\'")}'] = this.value">${sel}</select></div>
+    </div>`;
+  }).join('');
+  lucide.createIcons({el:wrap});
+}
+async function runImportValidation(){
+  if(IMP.entity==='products')await importProducts();else await importCustomers();
+}
+function setProgress(pct,lbl,detail=''){
+  const bar=document.getElementById('imp-prog-bar');
+  const l=document.getElementById('imp-prog-lbl');
+  const d=document.getElementById('imp-prog-detail');
+  if(bar)bar.style.width=pct+'%';if(l)l.textContent=lbl;if(d)d.textContent=detail;
+}
+
+async function importProducts(){
+  const rev={};
+  for(const [src,dst] of Object.entries(IMP.mapping))if(dst)rev[dst]=(rev[dst]||[]).concat(src);
+  if(!rev.name){toast('Debes mapear al menos la columna "Nombre"','err');return;}
+  impState('importing');setProgress(0,'Validando datos…','Cargando productos existentes…');
+  const existingSerials=new Set((await DB.serials.toArray()).map(s=>s.serial.toUpperCase()));
+  const existingProducts=await DB.products.toArray();
+  const ok=[],errors=[],now=Date.now();
+  let done=0;const total=IMP.rawRows.length;
+  const productMap={};
+  for(let i=0;i<total;i++){
+    const row=IMP.rawRows[i];const rowNum=i+2;
+    const get=(field)=>{const srcs=rev[field];if(!srcs)return'';return srcs.map(s=>String(row[s]??'').trim()).find(v=>v)||'';};
+    const name=get('name'),brand=get('brand')||'Sin marca',category=get('category')||'Otros';
+    if(!name){errors.push({row:rowNum,msg:'Nombre vacío — fila ignorada'});done++;continue;}
+    const rawCost=get('cost'),rawPrice=get('salePrice'),rawMin=get('minStock'),rawQty=get('qty');
+    const cost=parseFloat(rawCost)||0,salePrice=parseFloat(rawPrice)||0;
+    const minStock=parseInt(rawMin,10)||1,qty=parseInt(rawQty,10)||0;
+    if(rawCost&&isNaN(parseFloat(rawCost)))errors.push({row:rowNum,msg:`Costo inválido: "${rawCost}"`});
+    if(rawPrice&&isNaN(parseFloat(rawPrice)))errors.push({row:rowNum,msg:`Precio inválido: "${rawPrice}"`});
+    const serial=get('serial');const isSer=SER_CATS.includes(category)||!!serial;
+    const key=`${name}|||${brand}`;
+    if(!productMap[key]){
+      productMap[key]={name,brand,model:get('model'),category,minStock,serialized:isSer,
+        cost:isSer?0:cost,salePrice:isSer?0:salePrice,
+        qtyAvailable:isSer?0:qty,qtySold:0,variant:get('variant'),createdAt:now,serials:[]};
+    }
+    const pd=productMap[key];
+    if(!isSer&&qty>0)pd.qtyAvailable+=qty;
+    if(isSer&&serial){
+      const SU=serial.toUpperCase();
+      if(existingSerials.has(SU))errors.push({row:rowNum,msg:`Serial ya existe en BD: "${serial}"`});
+      else if(pd.serials.find(s=>s.serial.toUpperCase()===SU))errors.push({row:rowNum,msg:`Serial duplicado en archivo: "${serial}"`});
+      else{pd.serials.push({serial,cost,salePrice,status:'available',addedAt:now});existingSerials.add(SU);}
+    }
+    done++;if(done%50===0)setProgress(Math.round(done/total*60),'Validando…',`${done}/${total} filas procesadas`);
+  }
+  setProgress(70,'Insertando en base de datos…','');
+  const entries=Object.values(productMap);let inserted=0;
+  for(let i=0;i<entries.length;i++){
+    const pd=entries[i];
+    setProgress(70+Math.round(i/entries.length*28),'Insertando productos…',`${pd.name}`);
+    try{
+      const existing=existingProducts.find(ep=>ep.name.toLowerCase()===pd.name.toLowerCase()&&ep.brand.toLowerCase()===pd.brand.toLowerCase());
+      let pid;
+      if(existing){
+        pid=existing.id;
+        if(!pd.serialized)await DB.products.where('id').equals(pid).modify(p=>{p.qtyAvailable=(p.qtyAvailable||0)+pd.qtyAvailable;});
+        inserted++;
+      }else{
+        pid=await DB.products.add({name:pd.name,brand:pd.brand,model:pd.model||'',category:pd.category,
+          minStock:pd.minStock,serialized:pd.serialized,cost:pd.cost,salePrice:pd.salePrice,
+          qtyAvailable:pd.qtyAvailable,qtySold:0,createdAt:pd.createdAt});
+        inserted++;
+      }
+      if(pd.serials.length){await DB.serials.bulkAdd(pd.serials.map(s=>({...s,productId:pid})));ok.push({name:pd.name,serials:pd.serials.length});}
+      else ok.push({name:pd.name});
+    }catch(e){errors.push({row:'—',msg:`Error al insertar "${pd.name}": ${e.message}`});}
+  }
+  setProgress(100,'¡Importación completa!','');showImportReport(inserted,errors);
+}
+
+async function importCustomers(){
+  const rev={};
+  for(const [src,dst] of Object.entries(IMP.mapping))if(dst)rev[dst]=(rev[dst]||[]).concat(src);
+  if(!rev.idNumber&&!rev.lastName){toast('Mapea al menos "Cédula/ID" o "Apellido"','err');return;}
+  impState('importing');setProgress(0,'Validando clientes…','');
+  const existing=new Set((await DB.customers.toArray()).map(c=>c.idNumber.trim()));
+  const now=Date.now();let inserted=0;const errors=[];const total=IMP.rawRows.length;
+  const get=(row,field)=>{const srcs=rev[field];if(!srcs)return'';return srcs.map(s=>String(row[s]??'').trim()).find(v=>v)||'';};
+  for(let i=0;i<total;i++){
+    const row=IMP.rawRows[i];const rowNum=i+2;
+    if(i%30===0)setProgress(Math.round(i/total*90),'Importando…',`${i}/${total}`);
+    const fn=get(row,'firstName')||'—',ln=get(row,'lastName')||'—',id=get(row,'idNumber');
+    if(!id){errors.push({row:rowNum,msg:'Cédula/ID vacía — fila ignorada'});continue;}
+    if(existing.has(id)){errors.push({row:rowNum,msg:`Cédula ya existe: "${id}"`});continue;}
+    try{
+      await DB.customers.add({firstName:fn,lastName:ln,idNumber:id,phone:get(row,'phone'),address:get(row,'address'),createdAt:now});
+      existing.add(id);inserted++;
+    }catch(e){errors.push({row:rowNum,msg:`Error: ${e.message}`});}
+  }
+  setProgress(100,'¡Importación completa!','');showImportReport(inserted,errors);
+}
+
+function showImportReport(inserted,errors){
+  impState('done');
+  const wrap=document.getElementById('imp-report-wrap');if(!wrap)return;
+  const errRows=errors.slice(0,50).map(e=>`
+    <div class="imp-err-row">
+      <i data-lucide="x-circle"></i>
+      <span class="row-num">${e.row!=='—'?'Fila '+e.row:''}</span>
+      <span class="err-msg">${e.msg}</span>
+    </div>`).join('');
+  const overflowNote=errors.length>50?`<div style="padding:8px 13px;font-size:11px;color:var(--txt3)">…y ${errors.length-50} errores más</div>`:'';
+  wrap.innerHTML=`
+    <div class="imp-report">
+      <div class="imp-report-hdr">
+        <div class="imp-stat" style="color:var(--ok)"><i data-lucide="check-circle"></i><span>${inserted} registro(s) importado(s) con éxito</span></div>
+        ${errors.length?`<div class="imp-stat" style="color:var(--err)"><i data-lucide="alert-triangle"></i><span>${errors.length} error(es)</span></div>`
+          :`<div class="imp-stat" style="color:var(--ok)"><i data-lucide="check-circle"></i><span>Sin errores</span></div>`}
+      </div>
+      ${errors.length?`<div class="imp-errors">${errRows}${overflowNote}</div>`:''}
+    </div>`;
+  lucide.createIcons({el:wrap});
+  if(inserted>0)toast(`${inserted} registros importados ✓`,'ok');
+  if(errors.length)toast(`${errors.length} errores — revisa el reporte`,'warn');
+  refreshBadge();
+}
+
+/* ── UI UTILITIES ── */
 function openModal(html,lg=false){
   const mr=document.getElementById('mr');
   mr.innerHTML=`<div class="mo-bg" id="mobg"><div class="mo ${lg?'mo-lg':''}">${html}</div></div>`;
@@ -2988,7 +3153,6 @@ function setRole(r){
   toast('Rol: '+c.nm,'info');
 }
 
-/* ─ SIDEBAR RESPONSIVE ─ */
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
   const ov=document.getElementById('sb-overlay');
@@ -3000,34 +3164,27 @@ function closeSidebar(){
   document.getElementById('sb-overlay').classList.remove('on');
 }
 
-/* ─ EASTER EGG ─ */
 let _eggTimer=null;
 function easterEgg(el){
-  if(_eggTimer) return;
-  el.textContent='🥚';
-  el.classList.add('egg');
+  if(_eggTimer)return;
+  el.textContent='🥚';el.classList.add('egg');
   _eggTimer=setTimeout(()=>{el.textContent='Ø';el.classList.remove('egg');_eggTimer=null;},1800);
 }
 
-/* ─ MARGIN HELPERS ─ */
 function calcMargin(cost,price){
-  if(!price||price<=0) return 0;
-  return ((price-cost)/price)*100;
+  if(!price||price<=0)return 0;
+  return((price-cost)/price)*100;
 }
 function marginClass(cost,price){
   const m=calcMargin(cost,price);
-  if(m<0) return 'c-err';
-  if(m>35) return 'c-warn';
-  return 'c-ok';
+  if(m<0)return'c-err';if(m>35)return'c-warn';return'c-ok';
 }
 
-/* ─ FORMATTERS ─ */
 const fmt=(n,d=2)=>parseFloat(n||0).toLocaleString('es-VE',{minimumFractionDigits:d,maximumFractionDigits:d});
 const fmtDT=ts=>ts?new Date(ts).toLocaleDateString('es-VE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
 const fmtD=ts=>ts?new Date(ts).toLocaleDateString('es-VE',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
 const esc=s=>(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-/* ─ OFFLINE ─ */
 function updOnline(){
   const ob=document.getElementById('ob'),dot=document.getElementById('sdot'),txt=document.getElementById('stxt');
   const off=!navigator.onLine;
@@ -3038,659 +3195,111 @@ function updOnline(){
 window.addEventListener('online',updOnline);
 window.addEventListener('offline',updOnline);
 
-// Close autocomplete and customer drop on outside click
 document.addEventListener('click',e=>{
   if(!e.target.closest('.ac-wrap'))
     document.querySelectorAll('.ac-list').forEach(l=>l.classList.remove('open'));
   if(!e.target.closest('#cust-combo-wrap')){
     const drop=document.getElementById('cust-drop');
-    if(drop) drop.classList.remove('open');
+    if(drop)drop.classList.remove('open');
   }
 });
 
-/* ═══════════════════════════════════════════════
-   § 16 — IMPORT ENGINE
-   State machine: idle → parsed → importing → done
-═══════════════════════════════════════════════ */
-
-/* ZeroStock target fields per entity */
-const IMP_FIELDS = {
-  products: [
-    {k:'',        lbl:'— Ignorar columna —'},
-    {k:'name',    lbl:'Nombre *'},
-    {k:'brand',   lbl:'Marca *'},
-    {k:'model',   lbl:'Modelo'},
-    {k:'category',lbl:'Categoría'},
-    {k:'cost',    lbl:'Costo (USD)'},
-    {k:'salePrice',lbl:'Precio de Venta (USD)'},
-    {k:'minStock',lbl:'Stock Mínimo'},
-    {k:'qty',     lbl:'Cantidad (Masivo)'},
-    {k:'serial',  lbl:'Serial / IMEI (Serializado)'},
-    {k:'variant', lbl:'Variante'},
-  ],
-  customers: [
-    {k:'',          lbl:'— Ignorar columna —'},
-    {k:'firstName', lbl:'Nombre *'},
-    {k:'lastName',  lbl:'Apellido *'},
-    {k:'idNumber',  lbl:'Cédula / ID *'},
-    {k:'phone',     lbl:'Teléfono'},
-    {k:'address',   lbl:'Dirección'},
-  ],
-};
-
-/* Auto-map heuristics: common column names → ZeroStock field */
-const IMP_AUTOMAP = {
-  // Products
-  nombre:'name', name:'name', producto:'name', product:'name', item:'name', descripcion:'name',
-  marca:'brand', brand:'brand', fabricante:'brand', manufacturer:'brand',
-  modelo:'model', model:'model', referencia:'model', ref:'model', sku:'model',
-  categoria:'category', category:'category', tipo:'category', type:'category',
-  costo:'cost', cost:'cost', precio_costo:'cost', costo_unitario:'cost',
-  precio:'salePrice', precio_venta:'salePrice', sale_price:'salePrice', price:'salePrice', pvp:'salePrice',
-  stock_minimo:'minStock', min_stock:'minStock', minstock:'minStock', minimum:'minStock',
-  cantidad:'qty', qty:'qty', stock:'qty', quantity:'qty', existencia:'qty',
-  serial:'serial', imei:'serial', serie:'serial', sn:'serial', numero_serie:'serial', serial_number:'serial',
-  variante:'variant', variant:'variant', color:'variant',
-  // Customers
-  nombre_completo:'firstName',
-  nombre_pila:'firstName', first_name:'firstName', firstname:'firstName',
-  apellido:'lastName', last_name:'lastName', lastname:'lastName',
-  cedula:'idNumber', ci:'idNumber', rif:'idNumber', id_number:'idNumber', documento:'idNumber',
-  telefono:'phone', phone:'phone', celular:'phone', movil:'phone',
-  direccion:'address', address:'address', domicilio:'address',
-};
-
-/* Module state */
-const IMP = {
-  file: null,
-  rawRows: [],      // [{col: val, ...}, ...]
-  headers: [],
-  entity: 'products',
-  mapping: {},      // {sourceCol: zsField}
-  reset(){
-    this.file=null; this.rawRows=[]; this.headers=[]; this.mapping={};
-    this.entity='products';
-  }
-};
-
-/* ── State transitions ── */
-function impState(s){
-  ['idle','parsed','importing','done'].forEach(st=>{
-    const el=document.getElementById('imp-'+st);
-    if(el) el.style.display = st===s?'block':'none';
-  });
-}
-
-function impReset(){
-  IMP.reset();
-  impState('idle');
-  const fi=document.getElementById('imp-file-inp');
-  if(fi) fi.value='';
-  lucide.createIcons({el:document.getElementById('imp-card')});
-}
-
-/* ── File entry points ── */
-function handleImportDrop(e){
-  const file=e.dataTransfer?.files?.[0];
-  if(file) handleImportFile(file);
-}
-
-async function handleImportFile(file){
-  if(!file) return;
-  IMP.file=file;
-  const ext=file.name.split('.').pop().toLowerCase();
-
-  toast(`Leyendo ${file.name}…`, 'info');
-
-  try {
-    let rows=[];
-    if(ext==='csv')       rows=await parseCSV(file);
-    else if(ext==='json') rows=await parseJSON(file);
-    else if(ext==='xlsx'||ext==='xls') rows=await parseExcel(file);
-    else if(ext==='accdb') rows=await parseAccdb(file);
-    else { toast('Formato no soportado: .'+ext, 'err'); return; }
-
-    if(!rows.length){ toast('El archivo no contiene datos legibles','warn'); return; }
-
-    IMP.rawRows = rows;
-    IMP.headers = Object.keys(rows[0]);
-    autoMapColumns();    // populate default mapping
-    renderParsedState();
-    toast(`${rows.length} filas detectadas ✓`, 'ok');
-  } catch(e) {
-    toast('Error al leer archivo: '+e.message, 'err');
-    console.error(e);
-  }
-}
-
-/* ── Parsers ── */
-function parseCSV(file){
-  return new Promise((res,rej)=>{
-    if(!window.Papa){ rej(new Error('PapaParse no disponible')); return; }
-    Papa.parse(file,{
-      header:true, skipEmptyLines:true, dynamicTyping:false,
-      complete: r => {
-        if(r.errors.length && !r.data.length) rej(new Error(r.errors[0].message));
-        else res(r.data);
-      },
-      error: e => rej(new Error(e.message))
-    });
-  });
-}
-
-function parseJSON(file){
-  return new Promise((res,rej)=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      try {
-        let data=JSON.parse(e.target.result);
-        if(Array.isArray(data)) res(data);
-        else if(typeof data==='object'){
-          // Handle {products:[...]} or {data:[...]} wrappers
-          const key=Object.keys(data).find(k=>Array.isArray(data[k]));
-          if(key) res(data[key]);
-          else rej(new Error('JSON no contiene un array de objetos'));
-        } else rej(new Error('Formato JSON inválido'));
-      } catch(err){ rej(new Error('JSON inválido: '+err.message)); }
-    };
-    reader.onerror=()=>rej(new Error('Error al leer el archivo'));
-    reader.readAsText(file,'UTF-8');
-  });
-}
-
-function parseExcel(file){
-  return new Promise((res,rej)=>{
-    if(!window.XLSX){ rej(new Error('SheetJS no disponible')); return; }
-    const reader=new FileReader();
-    reader.onload=e=>{
-      try {
-        const wb=XLSX.read(e.target.result,{type:'array'});
-        const sheetName=wb.SheetNames[0];
-        const ws=wb.Sheets[sheetName];
-        const data=XLSX.utils.sheet_to_json(ws,{defval:''});
-        res(data);
-      } catch(err){ rej(new Error('Error al parsear Excel: '+err.message)); }
-    };
-    reader.onerror=()=>rej(new Error('Error al leer el archivo'));
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-function parseAccdb(file){
-  // .accdb is a proprietary binary format (Jet/ACE engine).
-  // True parsing requires a server-side Mdb Tools / libmdb or a C/Rust WASM module.
-  // Best-effort: attempt binary scan for printable ASCII text tables.
-  return new Promise((res,rej)=>{
-    toast('⚠️ Formato .accdb tiene soporte limitado en el navegador. Se intentará extraer datos legibles.','warn');
-    const reader=new FileReader();
-    reader.onload=e=>{
-      try {
-        const buf=e.target.result;
-        const bytes=new Uint8Array(buf);
-        // Scan for null-separated ASCII strings of length > 3
-        let cur='', strings=[];
-        for(let i=0;i<bytes.length;i++){
-          const b=bytes[i];
-          if(b>=32&&b<127) cur+=String.fromCharCode(b);
-          else { if(cur.length>3) strings.push(cur); cur=''; }
-        }
-        if(cur.length>3) strings.push(cur);
-
-        // Try to find rows that look like data (contain tabs or pipe separators)
-        const dataLines=strings.filter(s=>s.includes('\t')||s.includes('|'));
-        if(dataLines.length){
-          const parsed=dataLines.map(l=>{
-            const parts=l.split(/\t|\|/);
-            return parts.reduce((o,v,i)=>({...o,['Col'+i]:v.trim()}),{});
-          });
-          res(parsed);
-        } else {
-          // Fallback: return extracted strings as single-column data
-          const rows=strings.slice(0,200).map(s=>({extracted_value:s}));
-          if(!rows.length) rej(new Error('No se pudo extraer datos del archivo .accdb. Exporta desde Access a CSV primero.'));
-          else {
-            toast('Extracción parcial de .accdb — revisa el mapeo de columnas cuidadosamente','warn');
-            res(rows);
-          }
-        }
-      } catch(err){ rej(new Error('No se pudo leer .accdb: '+err.message)); }
-    };
-    reader.onerror=()=>rej(new Error('Error al leer el archivo'));
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-/* ── Column auto-mapper ── */
-function autoMapColumns(){
-  IMP.mapping={};
-  for(const h of IMP.headers){
-    const key=h.toLowerCase().trim().replace(/\s+/g,'_').replace(/[^\w]/g,'');
-    if(IMP_AUTOMAP[key]) IMP.mapping[h]=IMP_AUTOMAP[key];
-    else IMP.mapping[h]='';
-  }
-  renderMapperRows();
-}
-
-/* ── Render state: parsed ── */
-function renderParsedState(){
-  // File info bar
-  const bar=document.getElementById('imp-file-bar');
-  if(bar){
-    bar.innerHTML=`<div class="file-bar">
-      <i data-lucide="file-check-2"></i>
-      <span class="file-bar-name">${IMP.file.name}</span>
-      <span class="file-bar-meta">${IMP.rawRows.length} filas · ${IMP.headers.length} columnas · ${(IMP.file.size/1024).toFixed(1)} KB</span>
-      <button class="btn btn-g btn-ico btn-sm" onclick="impReset()"><i data-lucide="x"></i></button>
-    </div>`;
-    lucide.createIcons({el:bar});
-  }
-  renderPreview();
-  renderMapperRows();
-  setImpEntity(IMP.entity);
-  impState('parsed');
-  lucide.createIcons({el:document.getElementById('imp-card')});
-}
-
-function setImpEntity(e){
-  IMP.entity=e;
-  document.querySelectorAll('.entity-tab').forEach(t=>{
-    t.classList.toggle('sel', t.dataset.e===e);
-  });
-  renderMapperRows();
-}
-
-function renderPreview(){
-  const wrap=document.getElementById('imp-preview-wrap');
-  if(!wrap) return;
-  const sample=IMP.rawRows.slice(0,5);
-  const th=IMP.headers.map(h=>`<th>${h}</th>`).join('');
-  const trs=sample.map(r=>`<tr>${IMP.headers.map(h=>`<td>${r[h]??''}</td>`).join('')}</tr>`).join('');
-  wrap.innerHTML=`<div class="preview-table-wrap"><table class="preview-table">
-    <thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table></div>`;
-}
-
-function renderMapperRows(){
-  const wrap=document.getElementById('imp-mapper-rows');
-  if(!wrap) return;
-  const fields=IMP_FIELDS[IMP.entity]||IMP_FIELDS.products;
-  const opts=fields.map(f=>`<option value="${f.k}">${f.lbl}</option>`).join('');
-  wrap.innerHTML=IMP.headers.map(h=>{
-    const cur=IMP.mapping[h]||'';
-    const sel=opts.replace(`value="${cur}"`,`value="${cur}" selected`);
-    return `<div class="mapper-row">
-      <div><span class="mapper-src" title="${h}">${h}</span></div>
-      <div class="mapper-arr"><i data-lucide="arrow-right"></i></div>
-      <div class="mapper-dst"><select onchange="IMP.mapping['${h.replace(/'/g,"\\'")}'] = this.value">${sel}</select></div>
-    </div>`;
-  }).join('');
-  lucide.createIcons({el:wrap});
-}
-
-/* ── Validation + Import ── */
-async function runImportValidation(){
-  if(IMP.entity==='products') await importProducts();
-  else await importCustomers();
-}
-
-/* Progress helper */
-function setProgress(pct, lbl, detail=''){
-  const bar=document.getElementById('imp-prog-bar');
-  const l=document.getElementById('imp-prog-lbl');
-  const d=document.getElementById('imp-prog-detail');
-  if(bar) bar.style.width=pct+'%';
-  if(l) l.textContent=lbl;
-  if(d) d.textContent=detail;
-}
-
-/* ─ PRODUCTS IMPORT ─ */
-async function importProducts(){
-  // Check mapping has at least name
-  const rev={};
-  for(const [src,dst] of Object.entries(IMP.mapping)) if(dst) rev[dst]=(rev[dst]||[]).concat(src);
-  if(!rev.name){ toast('Debes mapear al menos la columna "Nombre"','err'); return; }
-
-  impState('importing');
-  setProgress(0,'Validando datos…','Cargando productos existentes…');
-
-  // Existing serials set
-  const existingSerials=new Set((await DB.serials.toArray()).map(s=>s.serial.toUpperCase()));
-  const existingProducts=await DB.products.toArray();
-
-  const ok=[], errors=[], now=Date.now();
-  let done=0;
-  const total=IMP.rawRows.length;
-
-  /* First pass: group rows with same product name+brand into one product object.
-     Rows with a serial column → serialized; rows with qty → batch */
-  const productMap={}; // key: name|brand → {productData, serials:[]}
-
-  for(let i=0;i<total;i++){
-    const row=IMP.rawRows[i];
-    const rowNum=i+2; // 1-indexed + header row
-
-    // Extract mapped values
-    const get=(field)=>{
-      const srcs=rev[field];
-      if(!srcs) return '';
-      return srcs.map(s=>String(row[s]??'').trim()).find(v=>v)||'';
-    };
-
-    const name=get('name'), brand=get('brand')||'Sin marca', category=get('category')||'Otros';
-
-    if(!name){ errors.push({row:rowNum, msg:'Nombre vacío — fila ignorada'}); done++; continue; }
-
-    // Numeric validation
-    const rawCost=get('cost'), rawPrice=get('salePrice'), rawMin=get('minStock'), rawQty=get('qty');
-    const cost=parseFloat(rawCost)||0;
-    const salePrice=parseFloat(rawPrice)||0;
-    const minStock=parseInt(rawMin,10)||1;
-    const qty=parseInt(rawQty,10)||0;
-
-    if(rawCost&&isNaN(parseFloat(rawCost))){ errors.push({row:rowNum,msg:`Costo inválido: "${rawCost}"`}); }
-    if(rawPrice&&isNaN(parseFloat(rawPrice))){ errors.push({row:rowNum,msg:`Precio inválido: "${rawPrice}"`}); }
-
-    const serial=get('serial');
-    const isSer=SER_CATS.includes(category)||!!serial;
-
-    const key=`${name}|||${brand}`;
-
-    if(!productMap[key]){
-      productMap[key]={
-        name, brand, model:get('model'), category,
-        minStock, serialized:isSer,
-        cost:isSer?0:cost, salePrice:isSer?0:salePrice,
-        qtyAvailable:isSer?0:qty, qtySold:0,
-        variant:get('variant'),
-        createdAt:now, serials:[]
-      };
-    }
-
-    const pd=productMap[key];
-    // Accumulate qty for batch products
-    if(!isSer&&qty>0) pd.qtyAvailable+=qty;
-
-    // Handle serial
-    if(isSer && serial){
-      const SU=serial.toUpperCase();
-      if(existingSerials.has(SU)){
-        errors.push({row:rowNum, msg:`Serial ya existe en BD: "${serial}"`});
-      } else if(pd.serials.find(s=>s.serial.toUpperCase()===SU)){
-        errors.push({row:rowNum, msg:`Serial duplicado en archivo: "${serial}"`});
-      } else {
-        pd.serials.push({serial, cost, salePrice, status:'available', addedAt:now});
-        existingSerials.add(SU);
-      }
-    }
-
-    done++;
-    if(done%50===0) setProgress(Math.round(done/total*60), 'Validando…', `${done}/${total} filas procesadas`);
-  }
-
-  setProgress(70,'Insertando en base de datos…','');
-
-  // Second pass: insert products
-  let inserted=0, skipped=0;
-  const entries=Object.values(productMap);
-
-  for(let i=0;i<entries.length;i++){
-    const pd=entries[i];
-    setProgress(70+Math.round(i/entries.length*28), 'Insertando productos…', `${pd.name}`);
-
-    try {
-      // Find or create category — auto-create if not in ALL_CATS
-      // (ZeroStock uses free-form categories stored on products, no separate category table)
-      // Just ensure category value is a non-empty string (already handled above)
-
-      const pdata={
-        name:pd.name, brand:pd.brand, model:pd.model||'',
-        category:pd.category, minStock:pd.minStock,
-        serialized:pd.serialized,
-        cost:pd.cost, salePrice:pd.salePrice,
-        qtyAvailable:pd.qtyAvailable, qtySold:0,
-        createdAt:pd.createdAt
-      };
-
-      // Check if product with same name+brand already exists → update qty/info
-      const existing=existingProducts.find(ep=>ep.name.toLowerCase()===pd.name.toLowerCase()&&ep.brand.toLowerCase()===pd.brand.toLowerCase());
-      let pid;
-      if(existing){
-        pid=existing.id;
-        if(!pd.serialized) await DB.products.where('id').equals(pid).modify(p=>{p.qtyAvailable=(p.qtyAvailable||0)+pd.qtyAvailable;});
-        skipped++; // counted as "updated" not new
-        inserted++; // still a success
-      } else {
-        pid=await DB.products.add(pdata);
-        inserted++;
-      }
-
-      // Insert serials
-      if(pd.serials.length){
-        await DB.serials.bulkAdd(pd.serials.map(s=>({...s,productId:pid})));
-        ok.push({name:pd.name, serials:pd.serials.length});
-      } else {
-        ok.push({name:pd.name});
-      }
-    } catch(e){
-      errors.push({row:'—', msg:`Error al insertar "${pd.name}": ${e.message}`});
-    }
-  }
-
-  setProgress(100,'¡Importación completa!','');
-  showImportReport(inserted, errors);
-}
-
-/* ─ CUSTOMERS IMPORT ─ */
-async function importCustomers(){
-  const rev={};
-  for(const [src,dst] of Object.entries(IMP.mapping)) if(dst) rev[dst]=(rev[dst]||[]).concat(src);
-  if(!rev.idNumber && !rev.lastName){ toast('Mapea al menos "Cédula/ID" o "Apellido"','err'); return; }
-
-  impState('importing');
-  setProgress(0,'Validando clientes…','');
-
-  const existing=new Set((await DB.customers.toArray()).map(c=>c.idNumber.trim()));
-  const now=Date.now();
-  let inserted=0;
-  const errors=[];
-  const total=IMP.rawRows.length;
-
-  const get=(row,field)=>{
-    const srcs=rev[field];
-    if(!srcs) return '';
-    return srcs.map(s=>String(row[s]??'').trim()).find(v=>v)||'';
-  };
-
-  for(let i=0;i<total;i++){
-    const row=IMP.rawRows[i];
-    const rowNum=i+2;
-    if(i%30===0) setProgress(Math.round(i/total*90),'Importando…',`${i}/${total}`);
-
-    const fn=get(row,'firstName')||'—', ln=get(row,'lastName')||'—', id=get(row,'idNumber');
-
-    if(!id){ errors.push({row:rowNum,msg:'Cédula/ID vacía — fila ignorada'}); continue; }
-    if(existing.has(id)){ errors.push({row:rowNum,msg:`Cédula ya existe: "${id}"`}); continue; }
-
-    try{
-      await DB.customers.add({
-        firstName:fn, lastName:ln, idNumber:id,
-        phone:get(row,'phone'), address:get(row,'address'), createdAt:now
-      });
-      existing.add(id);
-      inserted++;
-    } catch(e){ errors.push({row:rowNum,msg:`Error: ${e.message}`}); }
-  }
-
-  setProgress(100,'¡Importación completa!','');
-  showImportReport(inserted, errors);
-}
-
-/* ─ REPORT RENDERER ─ */
-function showImportReport(inserted, errors){
-  impState('done');
-  const wrap=document.getElementById('imp-report-wrap');
-  if(!wrap) return;
-
-  const errRows=errors.slice(0,50).map(e=>`
-    <div class="imp-err-row">
-      <i data-lucide="x-circle"></i>
-      <span class="row-num">${e.row!=='—'?'Fila '+e.row:''}</span>
-      <span class="err-msg">${e.msg}</span>
-    </div>`).join('');
-
-  const overflowNote=errors.length>50?`<div style="padding:8px 13px;font-size:11px;color:var(--txt3)">…y ${errors.length-50} errores más</div>`:'';
-
-  wrap.innerHTML=`
-    <div class="imp-report">
-      <div class="imp-report-hdr">
-        <div class="imp-stat" style="color:var(--ok)">
-          <i data-lucide="check-circle"></i>
-          <span>${inserted} registro(s) importado(s) con éxito</span>
-        </div>
-        ${errors.length?`<div class="imp-stat" style="color:var(--err)">
-          <i data-lucide="alert-triangle"></i>
-          <span>${errors.length} error(es)</span>
-        </div>`:`<div class="imp-stat" style="color:var(--ok)"><i data-lucide="party-popper"></i><span>Sin errores</span></div>`}
-      </div>
-      ${errors.length?`<div class="imp-errors">${errRows}${overflowNote}</div>`:''}
-    </div>`;
-  lucide.createIcons({el:wrap});
-
-  if(inserted>0) toast(`${inserted} registros importados ✓`,'ok');
-  if(errors.length) toast(`${errors.length} errores — revisa el reporte`,'warn');
-  refreshBadge();
-}
-/* ═══════════════════════════════════════════════
-   § CLOUD — Firebase Auth + API Sync Engine
-═══════════════════════════════════════════════ */
-
-// ── Firebase config (public keys — safe to expose) ──
-const FB_CONFIG = {
-  apiKey:    "AIzaSyCj7xGE-9M1tsWbj6uQ_VcyUiyjNLulvUY",
+/* ── CLOUD / FIREBASE ── */
+const FB_CONFIG={
+  apiKey:"AIzaSyCj7xGE-9M1tsWbj6uQ_VcyUiyjNLulvUY",
   authDomain:"zerostock-0204.firebaseapp.com",
-  projectId: "zerostock-0204",
+  projectId:"zerostock-0204",
 };
+const API_BASE=window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'
+  ?'http://localhost:3001':'';
 
-// ── API base URL — auto-detects local vs Vercel ──
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3001'
-  : '';   // same origin on Vercel
+const CLOUD={user:null,token:null,syncing:false,lastSync:null,queue:[]};
 
-// ── Cloud state ──
-const CLOUD = {
-  user:    null,   // Firebase user object
-  token:   null,   // Firebase ID token (JWT)
-  syncing: false,
-  lastSync: null,
-  queue:   [],     // offline pending operations
-};
-
-// Initialize Firebase
 firebase.initializeApp(FB_CONFIG);
-const fbAuth = firebase.auth();
-const fbProvider = new firebase.auth.GoogleAuthProvider();
-fbProvider.addScope('email');
-fbProvider.addScope('profile');
+const fbAuth=firebase.auth();
+const fbProvider=new firebase.auth.GoogleAuthProvider();
+fbProvider.addScope('email');fbProvider.addScope('profile');
 
-/* ── Google Sign-In ── */
-async function signInWithGoogle() {
-  const btn = document.getElementById('btn-google-signin');
-  const loading = document.getElementById('auth-loading');
-  try {
-    btn.disabled = true;
-    btn.style.opacity = '0.6';
-    loading.style.display = 'flex';
-    document.getElementById('auth-loading-txt').textContent = 'Abriendo Google…';
+async function signInWithGoogle(){
+  const btn=document.getElementById('btn-google-signin');
+  const loading=document.getElementById('auth-loading');
+  try{
+    btn.disabled=true;btn.style.opacity='0.6';
+    loading.style.display='flex';
+    document.getElementById('auth-loading-txt').textContent='Abriendo Google…';
     await fbAuth.signInWithPopup(fbProvider);
-    // onAuthStateChanged handles the rest
-  } catch (e) {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    loading.style.display = 'none';
-    if (e.code !== 'auth/popup-closed-by-user') {
-      alert('Error al iniciar sesión: ' + e.message);
-    }
+  }catch(e){
+    btn.disabled=false;btn.style.opacity='1';loading.style.display='none';
+    if(e.code!=='auth/popup-closed-by-user')alert('Error al iniciar sesión: '+e.message);
   }
 }
 
-/* ── Auth State Listener ── */
-fbAuth.onAuthStateChanged(async (fbUser) => {
-  if (fbUser) {
-    // Logged in
-    document.getElementById('auth-loading').style.display = 'flex';
-    document.getElementById('auth-loading-txt').textContent = 'Cargando tu ZeroStock…';
-
-    CLOUD.user  = fbUser;
-    CLOUD.token = await fbUser.getIdToken();
-
-    // Register/fetch user in backend
-    try {
-      await cloudPost('/api/auth/login', {});
-    } catch(e) {
-      console.warn('Backend login failed, continuing offline', e);
-    }
-
-    // Update UI
-    updateUserChip(fbUser);
-    setSyncBadge('syncing', 'Sincronizando…');
-
-    // Launch app
-    await initApp();
-
-    // Full sync on first load
-    await fullSync();
-
-    // Auto-refresh token every 50 min
-    setInterval(async () => {
-      CLOUD.token = await fbUser.getIdToken(true);
-    }, 50 * 60 * 1000);
-
-  } else {
-    // Logged out — show auth screen
-    CLOUD.user  = null;
-    CLOUD.token = null;
-    showAuthScreen();
+fbAuth.onAuthStateChanged(async(fbUser)=>{
+  if(fbUser){
+    document.getElementById('auth-loading').style.display='flex';
+    document.getElementById('auth-loading-txt').textContent='Cargando tu ZeroStock…';
+    CLOUD.user=fbUser;CLOUD.token=await fbUser.getIdToken();
+    try{await cloudPost('/api/auth/login',{});}catch(e){console.warn('Backend login failed, continuing offline',e);}
+    updateUserChip(fbUser);setSyncBadge('syncing','Sincronizando…');
+    await initApp();await fullSync();
+    setInterval(async()=>{CLOUD.token=await fbUser.getIdToken(true);},50*60*1000);
+  }else{
+    CLOUD.user=null;CLOUD.token=null;showAuthScreen();
   }
 });
 
-/* ── Show / Hide auth screen ── */
-function showAuthScreen() {
-  const scr = document.getElementById('auth-screen');
-  if (scr) {
-    scr.style.display = 'flex';
-    const btn = document.getElementById('btn-google-signin');
-    const loading = document.getElementById('auth-loading');
-    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
-    if (loading) loading.style.display = 'none';
+function showAuthScreen(){
+  const scr=document.getElementById('auth-screen');
+  if(scr){
+    scr.style.display='flex';
+    const btn=document.getElementById('btn-google-signin');
+    const loading=document.getElementById('auth-loading');
+    if(btn){btn.disabled=false;btn.style.opacity='1';}
+    if(loading)loading.style.display='none';
   }
-  document.getElementById('app').style.display = 'none';
+  document.getElementById('app').style.display='none';
 }
 
-function hideAuthScreen() {
-  const scr = document.getElementById('auth-screen');
-  if (scr) scr.style.display = 'none';
-  document.getElementById('app').style.display = '';
-}
-
-/* ── User chip in sidebar ── */
-function updateUserChip(fbUser) {
-  const chip   = document.getElementById('user-chip');
-  const avatar = document.getElementById('user-avatar-el');
-  const name   = document.getElementById('user-name-el');
-  const email  = document.getElementById('user-email-el');
-  if (!chip) return;
-  chip.style.display = 'flex';
-  const initials = (fbUser.displayName || fbUser.email || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  if (fbUser.photoURL) {
-    avatar.innerHTML = `<img src="${fbUser.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`;
-  } else {
-    avatar.textContent = initials;
+async function enterGuestMode(){
+  CLOUD.user=null;CLOUD.token=null;
+  hideAuthScreen();
+  // Show guest indicator in sidebar
+  const chip=document.getElementById('user-chip');
+  const avatar=document.getElementById('user-avatar-el');
+  const name=document.getElementById('user-name-el');
+  const email=document.getElementById('user-email-el');
+  if(chip){
+    chip.style.display='flex';
+    avatar.textContent='👤';
+    name.textContent='Modo Invitado';
+    email.textContent='Sin cuenta — datos locales';
   }
-  name.textContent  = fbUser.displayName || 'Usuario';
-  email.textContent = fbUser.email || '';
+  setSyncBadge('offline','Sin cuenta');
+  await initApp();
+  toast('Modo invitado — sin sincronización en la nube','warn');
+}
+function hideAuthScreen(){
+  const scr=document.getElementById('auth-screen');
+  if(scr)scr.style.display='none';
+  document.getElementById('app').style.display='';
 }
 
-/* ── User menu (logout) ── */
-function showUserMenu() {
+function updateUserChip(fbUser){
+  const chip=document.getElementById('user-chip');
+  const avatar=document.getElementById('user-avatar-el');
+  const name=document.getElementById('user-name-el');
+  const email=document.getElementById('user-email-el');
+  if(!chip)return;
+  chip.style.display='flex';
+  const initials=(fbUser.displayName||fbUser.email||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  if(fbUser.photoURL){
+    avatar.innerHTML=`<img src="${fbUser.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`;
+  }else{avatar.textContent=initials;}
+  name.textContent=fbUser.displayName||'Usuario';
+  email.textContent=fbUser.email||'';
+}
+
+function showUserMenu(){
   openModal(`
     <div class="mo-hdr">
       <span class="mo-ttl">Mi Cuenta</span>
@@ -3698,164 +3307,105 @@ function showUserMenu() {
     </div>
     <div class="mo-body" style="text-align:center;padding:20px">
       <div style="font-size:40px;margin-bottom:8px">
-        ${CLOUD.user?.photoURL
-          ? `<img src="${CLOUD.user.photoURL}" style="width:64px;height:64px;border-radius:50%;object-fit:cover">`
-          : '👤'}
+        ${CLOUD.user?.photoURL?`<img src="${CLOUD.user.photoURL}" style="width:64px;height:64px;border-radius:50%;object-fit:cover">`:'👤'}
       </div>
-      <div class="fw8" style="font-size:15px;margin-bottom:4px">${CLOUD.user?.displayName || '—'}</div>
-      <div class="muted sm">${CLOUD.user?.email || '—'}</div>
+      <div class="fw8" style="font-size:15px;margin-bottom:4px">${CLOUD.user?.displayName||'—'}</div>
+      <div class="muted sm">${CLOUD.user?.email||'—'}</div>
       <div style="margin-top:16px;padding:10px;background:var(--s2);border-radius:var(--r2);font-size:11px;color:var(--txt2)">
-        Última sincronización: ${CLOUD.lastSync ? new Date(CLOUD.lastSync).toLocaleTimeString() : 'Nunca'}
+        Última sincronización: ${CLOUD.lastSync?new Date(CLOUD.lastSync).toLocaleTimeString():'Nunca'}
       </div>
     </div>
     <div class="mo-foot">
       <button class="btn btn-o" onclick="manualSync();closeModal()"><i data-lucide="refresh-cw"></i>Sincronizar ahora</button>
-      <button class="btn btn-err" onclick="signOut()"><i data-lucide="log-out"></i>Cerrar sesión</button>
+      <button class="btn btn-d" onclick="signOut()"><i data-lucide="log-out"></i>Cerrar sesión</button>
     </div>
   `);
 }
+async function signOut(){closeModal();await fbAuth.signOut();toast('Sesión cerrada','info');}
 
-async function signOut() {
-  closeModal();
-  await fbAuth.signOut();
-  toast('Sesión cerrada', 'info');
+function setSyncBadge(state,label){
+  const el=document.getElementById('sync-badge');
+  const lbl=document.getElementById('sync-lbl');
+  if(!el)return;
+  el.className=`sync-badge ${state}`;
+  if(lbl)lbl.textContent=label;
 }
 
-/* ── Sync badge ── */
-function setSyncBadge(state, label) {
-  const el = document.getElementById('sync-badge');
-  const lbl = document.getElementById('sync-lbl');
-  if (!el) return;
-  el.className = `sync-badge ${state}`;
-  if (lbl) lbl.textContent = label;
+async function cloudGet(path){
+  if(!CLOUD.token)throw new Error('No autenticado');
+  const r=await fetch(API_BASE+path,{headers:{'Authorization':`Bearer ${CLOUD.token}`}});
+  if(!r.ok)throw new Error(`API error ${r.status}: ${await r.text()}`);
+  return r.json();
 }
-
-/* ── Authenticated API calls ── */
-async function cloudGet(path) {
-  if (!CLOUD.token) throw new Error('No autenticado');
-  const r = await fetch(API_BASE + path, {
-    headers: { 'Authorization': `Bearer ${CLOUD.token}` }
-  });
-  if (!r.ok) throw new Error(`API error ${r.status}: ${await r.text()}`);
+async function cloudPost(path,body){
+  if(!CLOUD.token)throw new Error('No autenticado');
+  const r=await fetch(API_BASE+path,{method:'POST',
+    headers:{'Authorization':`Bearer ${CLOUD.token}`,'Content-Type':'application/json'},
+    body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(`API error ${r.status}: ${await r.text()}`);
+  return r.json();
+}
+async function cloudDelete(path){
+  if(!CLOUD.token)throw new Error('No autenticado');
+  const r=await fetch(API_BASE+path,{method:'DELETE',
+    headers:{'Authorization':`Bearer ${CLOUD.token}`}});
+  if(!r.ok)throw new Error(`API error ${r.status}: ${await r.text()}`);
   return r.json();
 }
 
-async function cloudPost(path, body) {
-  if (!CLOUD.token) throw new Error('No autenticado');
-  const r = await fetch(API_BASE + path, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${CLOUD.token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
+/* ── pullFromCloud: descarga la nube y reemplaza local (pull-only) ── */
+async function pullFromCloud(){
+  const cloudData=await cloudGet('/api/sync');
+  await DB.transaction('rw',DB.products,DB.customers,DB.serials,DB.sales,DB.saleItems,DB.settings,async()=>{
+    await DB.products.clear();await DB.customers.clear();await DB.serials.clear();
+    await DB.sales.clear();await DB.saleItems.clear();await DB.settings.clear();
+    if(cloudData.products?.length)await DB.products.bulkAdd(cloudData.products);
+    if(cloudData.customers?.length)await DB.customers.bulkAdd(cloudData.customers);
+    if(cloudData.serials?.length)await DB.serials.bulkAdd(cloudData.serials);
+    if(cloudData.sales?.length)await DB.sales.bulkAdd(cloudData.sales);
+    if(cloudData.saleItems?.length)await DB.saleItems.bulkAdd(cloudData.saleItems);
+    if(cloudData.settings?.length)await DB.settings.bulkAdd(cloudData.settings);
   });
-  if (!r.ok) throw new Error(`API error ${r.status}: ${await r.text()}`);
-  return r.json();
+  CLOUD.lastSync=Date.now();
 }
 
-async function cloudDelete(path) {
-  if (!CLOUD.token) throw new Error('No autenticado');
-  const r = await fetch(API_BASE + path, {
-    method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${CLOUD.token}` }
-  });
-  if (!r.ok) throw new Error(`API error ${r.status}: ${await r.text()}`);
-  return r.json();
+/* ── fullSync: solo pull (la nube es la fuente de verdad) ── */
+async function fullSync(){
+  if(!CLOUD.token||!navigator.onLine||CLOUD.syncing)return;
+  CLOUD.syncing=true;setSyncBadge('syncing','Sincronizando…');
+  try{
+    await pullFromCloud();
+    setSyncBadge('synced','Sincronizado');
+    go(A.view,A.params);
+  }catch(e){
+    setSyncBadge('error','Error sync');
+    console.warn('[ZeroStock Cloud] Sync failed:',e.message);
+    toast('Error de sincronización — operando localmente','warn');
+  }finally{CLOUD.syncing=false;}
 }
 
-/* ── Full sync: upload local → download cloud → update local ── */
-async function fullSync() {
-  if (!CLOUD.token || !navigator.onLine || CLOUD.syncing) return;
-  CLOUD.syncing = true;
-  setSyncBadge('syncing', 'Sincronizando…');
-  try {
-    // 1. PUSH: Enviar datos locales pendientes a la nube
-    const [products, customers, serials, sales, saleItems] = await Promise.all([
-      DB.products.toArray(), DB.customers.toArray(), DB.serials.toArray(),
-      DB.sales.toArray(), DB.saleItems.toArray(),
-    ]);
-    const settingsArr = await DB.settings.toArray();
-    const settings = settingsArr.map(s => ({ key: s.key, value: s.value }));
-
-    await cloudPost('/api/sync', {
-      products, customers, serials, sales, saleItems, settings
-    });
-
-    // 2. PULL: Descargar la base de datos unificada de la nube
-    const cloudData = await cloudGet('/api/sync');
-
-    // 3. REEMPLAZAR: Limpiar base de datos local y llenarla con los datos de la nube
-    await DB.transaction('rw', DB.products, DB.customers, DB.serials, DB.sales, DB.saleItems, DB.settings, async () => {
-      await DB.products.clear();
-      await DB.customers.clear();
-      await DB.serials.clear();
-      await DB.sales.clear();
-      await DB.saleItems.clear();
-      await DB.settings.clear();
-
-      if(cloudData.products?.length) await DB.products.bulkAdd(cloudData.products);
-      if(cloudData.customers?.length) await DB.customers.bulkAdd(cloudData.customers);
-      if(cloudData.serials?.length) await DB.serials.bulkAdd(cloudData.serials);
-      if(cloudData.sales?.length) await DB.sales.bulkAdd(cloudData.sales);
-      if(cloudData.saleItems?.length) await DB.saleItems.bulkAdd(cloudData.saleItems);
-      if(cloudData.settings?.length) await DB.settings.bulkAdd(cloudData.settings);
-    });
-
-    CLOUD.lastSync = Date.now();
-    setSyncBadge('synced', 'Sincronizado');
-    toast('✅ Datos sincronizados', 'ok');
-    
-    // 4. ACTUALIZAR UI: Refrescar la pantalla actual para mostrar los datos nuevos
-    go(A.view, A.params);
-
-  } catch (e) {
-    setSyncBadge('error', 'Error sync');
-    console.warn('[ZeroStock Cloud] Sync failed:', e.message);
-    toast('Error de sincronización — operando localmente', 'warn');
-  } finally {
-    CLOUD.syncing = false;
-  }
-}
-
-/* ── Manual sync button ── */
-async function manualSync() {
-  if (!CLOUD.token) { toast('Inicia sesión para sincronizar', 'warn'); return; }
-  if (!navigator.onLine) { toast('Sin conexión — sincronizará cuando vuelva internet', 'warn'); return; }
+async function manualSync(){
+  if(!CLOUD.token){toast('Inicia sesión para sincronizar','warn');return;}
+  if(!navigator.onLine){toast('Sin conexión — sincronizará cuando vuelva internet','warn');return;}
   await fullSync();
 }
 
-/* ── Online/offline handler — auto sync when back online ── */
-window.addEventListener('online',  () => { updOnline(); fullSync(); });
-window.addEventListener('offline', () => { updOnline(); setSyncBadge('offline', 'Sin conexión'); });
+window.addEventListener('online',()=>{updOnline();fullSync();});
+window.addEventListener('offline',()=>{updOnline();setSyncBadge('offline','Sin conexión');});
 
-/* ═══════════════════════════════════════════════
-   § 15 — BOOTSTRAP
-═══════════════════════════════════════════════ */
-async function initApp() {
-  applyTheme();
-  updOnline();
-  lucide.createIcons();
-  await DB.open();
-  await DL.syncRates();
-  await go('dashboard');
+/* ── BOOTSTRAP ── */
+async function initApp(){
+  applyTheme();updOnline();lucide.createIcons();
+  await DB.open();await DL.syncRates();await go('dashboard');
   hideAuthScreen();
   console.log('%cØ ZeroStock Cloud v4.0','color:#1A56DB;font-size:16px;font-weight:800');
-  console.log('%cFirebase Auth · Supabase · Offline-First','color:#64748B');
-  
-  // Auto-sync loop — sincroniza cada 10 segundos si hay cambios
-  setInterval(async () => {
-    if(navigator.onLine && CLOUD.token && !CLOUD.syncing){
-      await fullSync();
-    }
-  }, 100000000000000000000);
+  console.log('%cFirebase Auth · Supabase · Offline-First · Precio Editable en POS','color:#64748B');
 }
 
-async function init() {
+async function init(){
   applyTheme();
-  // Show auth screen immediately — Firebase onAuthStateChanged handles the rest
-  document.getElementById('app').style.display = 'none';
-  lucide.createIcons({ el: document.getElementById('auth-screen') });
+  document.getElementById('app').style.display='none';
+  lucide.createIcons({el:document.getElementById('auth-screen')});
 }
 init().catch(console.error);
 </script>

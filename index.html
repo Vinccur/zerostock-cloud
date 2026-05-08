@@ -782,6 +782,7 @@ const DL = {
       minStock:parseInt(d.minStock,10)||1, serialized: isSer,
       cost: isSer ? 0 : (parseFloat(d.cost)||0),
       salePrice: isSer ? 0 : (parseFloat(d.salePrice)||0),
+      updatedAt: Date.now(),
     };
     if(!r.name) throw new Error('El nombre es obligatorio.');
     if(!r.brand) throw new Error('La marca es obligatoria.');
@@ -801,9 +802,11 @@ const DL = {
     if(sold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
     const p=await DB.products.get(id);
     if(p&&!p.serialized&&p.qtySold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
+    // Marcar como eliminado (soft delete) para que se sincronice
+    await DB.products.update(id, {_deleted: true, updatedAt: Date.now()});
     // 1. Eliminar en la nube
     await DL._cloudOp(()=>cloudDelete('/api/products/'+id));
-    // 2. Eliminar localmente
+    // 2. Eliminar localmente (después de sincronizar)
     await DB.serials.where('productId').equals(id).delete();
     await DB.products.delete(id);
   },
@@ -817,11 +820,12 @@ const DL = {
     if(!items.length) throw new Error('Sin seriales para agregar.');
     const exist=new Set((await DB.serials.where('productId').equals(pid).toArray()).map(s=>s.serial.toUpperCase()));
     const toAdd=[],dupes=[],seen=new Set();
+    const now = Date.now();
     for(const it of items){
       const k=it.serial.toUpperCase();
       if(seen.has(k)||exist.has(k)){dupes.push(it.serial);continue;}
       toAdd.push({productId:pid,serial:it.serial,status:'available',
-        cost:parseFloat(it.cost)||0,salePrice:parseFloat(it.salePrice)||0,addedAt:Date.now()});
+        cost:parseFloat(it.cost)||0,salePrice:parseFloat(it.salePrice)||0,addedAt:now, createdAt:now, updatedAt:now});
       seen.add(k);
     }
     if(!toAdd.length) return {added:0,dupes};
@@ -836,6 +840,7 @@ const DL = {
 
   async addBulkQty(pid,{qty,cost,salePrice,variant}){
     const q=parseInt(qty,10)||0;
+    const now = Date.now();
     if(q<=0) throw new Error('Cantidad inválida.');
     const p=await DB.products.get(pid);
     // 1. Actualizar en la nube
@@ -853,6 +858,7 @@ const DL = {
       p.cost=parseFloat(cost)||0;
       p.salePrice=parseFloat(salePrice)||0;
       if(variant)p.lastVariant=variant;
+      p.updatedAt=now;
     });
     return q;
   },
@@ -861,9 +867,11 @@ const DL = {
     const s=await DB.serials.get(id);
     if(!s) throw new Error('Serial no encontrado.');
     if(s.status==='sold') throw new Error('No se puede eliminar un serial vendido.');
+    // Marcar como eliminado (soft delete) para sincronización
+    await DB.serials.update(id, {_deleted: true, updatedAt: Date.now()});
     // 1. Eliminar en la nube
     await DL._cloudOp(()=>cloudDelete('/api/serials/'+id));
-    // 2. Eliminar localmente
+    // 2. Eliminar localmente (después de sincronizar)
     await DB.serials.delete(id);
   },
 
@@ -875,7 +883,8 @@ const DL = {
 
   async saveCustomer(d){
     const r={firstName:(d.firstName||'').trim(),lastName:(d.lastName||'').trim(),
-      idNumber:(d.idNumber||'').trim(),phone:(d.phone||'').trim(),address:(d.address||'').trim()};
+      idNumber:(d.idNumber||'').trim(),phone:(d.phone||'').trim(),address:(d.address||'').trim(),
+      updatedAt:Date.now()};
     if(!r.idNumber) throw new Error('La Cédula/ID es obligatoria.');
     if(!r.firstName||!r.lastName) throw new Error('Nombre y Apellido son obligatorios.');
     // 1. Persistir en la nube
@@ -892,9 +901,11 @@ const DL = {
   async delCustomer(id){
     const cnt=await DB.sales.where('customerId').equals(id).count();
     if(cnt>0) throw new Error('Tiene ventas asociadas. No se puede eliminar.');
+    // Marcar como eliminado (soft delete) para sincronización
+    await DB.customers.update(id, {_deleted: true, updatedAt: Date.now()});
     // 1. Eliminar en la nube
     await DL._cloudOp(()=>cloudDelete('/api/customers/'+id));
-    // 2. Eliminar localmente
+    // 2. Eliminar localmente (después de sincronizar)
     await DB.customers.delete(id);
   },
   async getSales(){
@@ -907,6 +918,7 @@ const DL = {
   },
   async processSale({customerId,items,rateOff,rateCus,paymentMethod,paymentCurrency}){
     const total=items.reduce((s,i)=>s+(i.unitPrice*(i.qty||1)),0);
+    const now = Date.now();
     // 1. Intentar procesar en la nube directamente (fuente de verdad)
     const cloudRes=await DL._cloudOp(()=>cloudPost('/api/sales',{
       customerId,items,rateOff,rateCus,paymentMethod,paymentCurrency
@@ -920,16 +932,17 @@ const DL = {
     const sid=await DB.sales.add({customerId:customerId||null,total,rateOff,rateCus,
       paymentMethod:paymentMethod||'div-elec',
       paymentCurrency:paymentCurrency||'usd',
-      createdAt:Date.now()});
+      createdAt:now, updatedAt:now});
     for(const it of items){
       await DB.saleItems.add({saleId:sid,productId:it.productId,productName:it.productName,
         serialId:it.serialId||null,serial:it.serial||'',
-        qty:it.qty||1,unitPrice:it.unitPrice});
-      if(it.serialId) await DB.serials.update(it.serialId,{status:'sold',saleId:sid,soldAt:Date.now()});
+        qty:it.qty||1,unitPrice:it.unitPrice, createdAt:now, updatedAt:now});
+      if(it.serialId) await DB.serials.update(it.serialId,{status:'sold',saleId:sid,soldAt:now,updatedAt:now});
       if(!it.serialized){
         await DB.products.where('id').equals(it.productId).modify(p=>{
           p.qtyAvailable=Math.max(0,(p.qtyAvailable||0)-(it.qty||1));
           p.qtySold=(p.qtySold||0)+(it.qty||1);
+          p.updatedAt=now;
         });
       }
     }
@@ -3404,7 +3417,31 @@ async function cloudDelete(path){
   }
 }
 
-/* ── pullFromCloud: descarga la nube y reemplaza local (pull-only) ── */
+/* ── mergeRecords: merge inteligente con timestamps ── */
+async function mergeRecords(table, cloudRecords){
+  if(!cloudRecords?.length) return;
+  
+  for(const cloudRec of cloudRecords){
+    const localRec = await table.get(cloudRec.id);
+    
+    if(!localRec){
+      // Nuevo en la nube → agregar localmente
+      await table.put(cloudRec);
+    } else {
+      // Ambos existen → comparar timestamps
+      const cloudTime = cloudRec.updatedAt || cloudRec.createdAt || 0;
+      const localTime = localRec.updatedAt || localRec.createdAt || 0;
+      
+      if(cloudTime > localTime){
+        // Nube es más reciente → actualizar
+        await table.put(cloudRec);
+      }
+      // Si local es más reciente, lo dejamos como está
+    }
+  }
+}
+
+/* ── pullFromCloud: descarga y merge (preserva cambios locales recientes) ── */
 async function pullFromCloud(){
   if(!CLOUD.token){
     console.warn('[Sync] Sin token, saltando pull');
@@ -3413,19 +3450,57 @@ async function pullFromCloud(){
   try{
     const cloudData=await cloudGet('/api/sync');
     await DB.transaction('rw',DB.products,DB.customers,DB.serials,DB.sales,DB.saleItems,DB.settings,async()=>{
-      await DB.products.clear();await DB.customers.clear();await DB.serials.clear();
-      await DB.sales.clear();await DB.saleItems.clear();await DB.settings.clear();
-      if(cloudData.products?.length)await DB.products.bulkAdd(cloudData.products);
-      if(cloudData.customers?.length)await DB.customers.bulkAdd(cloudData.customers);
-      if(cloudData.serials?.length)await DB.serials.bulkAdd(cloudData.serials);
-      if(cloudData.sales?.length)await DB.sales.bulkAdd(cloudData.sales);
-      if(cloudData.saleItems?.length)await DB.saleItems.bulkAdd(cloudData.saleItems);
-      if(cloudData.settings?.length)await DB.settings.bulkAdd(cloudData.settings);
+      // Merge inteligente en lugar de borrar y reemplazar
+      if(cloudData.products?.length) await mergeRecords(DB.products, cloudData.products);
+      if(cloudData.customers?.length) await mergeRecords(DB.customers, cloudData.customers);
+      if(cloudData.serials?.length) await mergeRecords(DB.serials, cloudData.serials);
+      if(cloudData.sales?.length) await mergeRecords(DB.sales, cloudData.sales);
+      if(cloudData.saleItems?.length) await mergeRecords(DB.saleItems, cloudData.saleItems);
+      if(cloudData.settings?.length) await mergeRecords(DB.settings, cloudData.settings);
     });
+    
+    // Ahora envía cambios locales a la nube
+    await pushLocalChanges();
+    
     CLOUD.lastSync=Date.now();
+    console.log('[Sync] Merge completado → cambios locales sincronizados');
   }catch(e){
     console.warn('[Sync] Pull falló (backend no disponible):',e.message);
     throw e;
+  }
+}
+
+/* ── pushLocalChanges: envía cambios locales a la nube ── */
+async function pushLocalChanges(){
+  if(!CLOUD.token || !navigator.onLine) return;
+  
+  try{
+    const localChanges = {
+      products: await DB.products.toArray(),
+      customers: await DB.customers.toArray(),
+      serials: await DB.serials.toArray(),
+      sales: await DB.sales.toArray(),
+      saleItems: await DB.saleItems.toArray(),
+    };
+    
+    // Envía solo los cambios desde el último sync
+    const lastSync = CLOUD.lastSync || 0;
+    const changes = {
+      products: localChanges.products.filter(p => (p.updatedAt || p.createdAt || 0) > lastSync),
+      customers: localChanges.customers.filter(c => (c.updatedAt || c.createdAt || 0) > lastSync),
+      serials: localChanges.serials.filter(s => (s.updatedAt || s.createdAt || 0) > lastSync),
+      sales: localChanges.sales.filter(s => (s.updatedAt || s.createdAt || 0) > lastSync),
+      saleItems: localChanges.saleItems.filter(s => (s.updatedAt || s.createdAt || 0) > lastSync),
+    };
+    
+    if(changes.products.length || changes.customers.length || changes.serials.length || 
+       changes.sales.length || changes.saleItems.length){
+      await cloudPost('/api/sync/push', changes);
+      console.log('[Sync] Cambios locales enviados a la nube');
+    }
+  }catch(e){
+    console.warn('[Sync Push] Error:',e.message);
+    // No fallar por errores de push — el data local sigue válido
   }
 }
 

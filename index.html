@@ -707,14 +707,13 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 <script>
 'use strict';
 const DB = new Dexie('ZeroStockDB_v3');
-// Busca donde creas la base de datos y asegúrate que se vea así:
-DB.version(3).stores({ // Sube la versión a 3 para que Dexie aplique los cambios
-  products: '++id, user_id, name, brand, category, updatedAt, _deleted',
-  customers: '++id, user_id, id_number, updatedAt, _deleted',
-  serials: '++id, user_id, product_id, serial, updatedAt, _deleted',
-  sales: '++id, user_id, customer_id, updatedAt, _deleted',
-  saleItems: '++id, sale_id, product_id, updatedAt, _deleted',
-  settings: 'key, user_id, updatedAt, _deleted'
+DB.version(1).stores({
+  products:  '++id, name, brand, category, createdAt',
+  serials:   '++id, productId, serial, status, saleId',
+  customers: '++id, idNumber, lastName',
+  sales:     '++id, customerId, createdAt',
+  saleItems: '++id, saleId, productId, serialId',
+  settings:  '&key'
 });
 
 const A = {

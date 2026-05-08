@@ -602,7 +602,7 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
   <div class="auth-card">
     <div class="auth-logo">Ø</div>
     <div class="auth-title">ZeroStock</div>
-    <div class="auth-sub">Inventario y Facturación<br>Inicia sesión para sincronizar tus datos en la nube</div>
+    <div class="auth-sub">Inventario y Facturación · Offline-First<br>Inicia sesión para sincronizar tus datos en la nube</div>
     <button class="auth-btn-google" onclick="signInWithGoogle()" id="btn-google-signin">
       <svg viewBox="0 0 24 24" width="20" height="20">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -3329,88 +3329,113 @@ function setSyncBadge(state,label){
   if(!el)return;
   el.className=`sync-badge ${state}`;
   if(lbl)lbl.textContent=label;
+  console.log('[Sync Badge]',state,':',label);
 }
 
 async function cloudGet(path){
   if(!CLOUD.token)throw new Error('No autenticado');
-  const r=await fetch(API_BASE+path,{headers:{'Authorization':`Bearer ${CLOUD.token}`}});
-  if(!r.ok)throw new Error(`API error ${r.status}: ${await r.text()}`);
-  return r.json();
+  try{
+    const controller=new AbortController();
+    const timeoutId=setTimeout(()=>controller.abort(),5000); // 5s timeout
+    const r=await fetch(API_BASE+path,{
+      headers:{'Authorization':`Bearer ${CLOUD.token}`},
+      signal:controller.signal
+    });
+    clearTimeout(timeoutId);
+    if(!r.ok)throw new Error(`API error ${r.status}`);
+    return r.json();
+  }catch(e){
+    console.warn('[Cloud GET]',path,'-',e.message);
+    throw e;
+  }
 }
 async function cloudPost(path,body){
   if(!CLOUD.token)throw new Error('No autenticado');
-  const r=await fetch(API_BASE+path,{method:'POST',
-    headers:{'Authorization':`Bearer ${CLOUD.token}`,'Content-Type':'application/json'},
-    body:JSON.stringify(body)});
-  if(!r.ok)throw new Error(`API error ${r.status}: ${await r.text()}`);
-  return r.json();
+  try{
+    const controller=new AbortController();
+    const timeoutId=setTimeout(()=>controller.abort(),5000); // 5s timeout
+    const r=await fetch(API_BASE+path,{method:'POST',
+      headers:{'Authorization':`Bearer ${CLOUD.token}`,'Content-Type':'application/json'},
+      body:JSON.stringify(body),
+      signal:controller.signal
+    });
+    clearTimeout(timeoutId);
+    if(!r.ok)throw new Error(`API error ${r.status}`);
+    return r.json();
+  }catch(e){
+    console.warn('[Cloud POST]',path,'-',e.message);
+    throw e;
+  }
 }
 async function cloudDelete(path){
   if(!CLOUD.token)throw new Error('No autenticado');
-  const r=await fetch(API_BASE+path,{method:'DELETE',
-    headers:{'Authorization':`Bearer ${CLOUD.token}`}});
-  if(!r.ok)throw new Error(`API error ${r.status}: ${await r.text()}`);
-  return r.json();
-}
-
-/* ── pullFromCloud: Sincronización inteligente (Compara timestamps) ── */
-async function pullFromCloud(){
-  const cloudData = await cloudGet('/api/sync');
-  
-  // Tablas a procesar
-  const tables = ['products', 'customers', 'serials', 'sales', 'saleItems', 'settings'];
-
-  await DB.transaction('rw', tables.map(t => DB[t]), async () => {
-    for (const table of tables) {
-      const remoteItems = cloudData[table] || [];
-      
-      for (const remoteItem of remoteItems) {
-        // En settings usamos 'key', en las demás usamos 'id'
-        const primaryKey = table === 'settings' ? remoteItem.key : remoteItem.id;
-        const localItem = await DB[table].get(primaryKey);
-
-        // REGLA DE ORO:
-        // Si el item no existe localmente O el de la nube es más nuevo (_mod mayor)
-        // entonces actualizamos el local.
-        if (!localItem || (remoteItem._mod > (localItem._mod || 0))) {
-          await DB[table].put(remoteItem);
-        }
-      }
-
-      // OPCIONAL: Eliminar localmente lo que ya no existe en la nube y no está marcado como borrado local
-      // (Si manejas borrado total desde el panel de Supabase directamente)
-    }
-  });
-
-  CLOUD.lastSync = Date.now();
-  localStorage.setItem('zs_last_sync', CLOUD.lastSync);
-}
-
-async function fullSync() {
-  if (!CLOUD.token || !navigator.onLine || CLOUD.syncing) return;
-  CLOUD.syncing = true;
-  setSyncBadge('syncing', 'Sincronizando...');
-
-  try {
-    // 1. Enviamos lo que borraste o cambiaste
-    // Es vital el 'await' para que no empiece el pull hasta que el push termine
-    await pushToCloud(); 
-
-    // 2. Ahora que Supabase ya sabe que borraste cosas, descargamos
-    await pullFromCloud();
-
-    localStorage.setItem('zs_last_sync', Date.now());
-    setSyncBadge('synced', 'Sincronizado');
-    
-    // Refrescar la vista actual para ocultar lo borrado
-    go(A.view, A.params); 
-    
-  } catch (e) {
-    setSyncBadge('error', 'Error sync');
-    console.error('Fallo de sincronización:', e);
-  } finally {
-    CLOUD.syncing = false;
+  try{
+    const controller=new AbortController();
+    const timeoutId=setTimeout(()=>controller.abort(),5000); // 5s timeout
+    const r=await fetch(API_BASE+path,{method:'DELETE',
+      headers:{'Authorization':`Bearer ${CLOUD.token}`},
+      signal:controller.signal
+    });
+    clearTimeout(timeoutId);
+    if(!r.ok)throw new Error(`API error ${r.status}`);
+    return r.json();
+  }catch(e){
+    console.warn('[Cloud DELETE]',path,'-',e.message);
+    throw e;
   }
+}
+
+/* ── pullFromCloud: descarga la nube y reemplaza local (pull-only) ── */
+async function pullFromCloud(){
+  if(!CLOUD.token){
+    console.warn('[Sync] Sin token, saltando pull');
+    return;
+  }
+  try{
+    const cloudData=await cloudGet('/api/sync');
+    await DB.transaction('rw',DB.products,DB.customers,DB.serials,DB.sales,DB.saleItems,DB.settings,async()=>{
+      await DB.products.clear();await DB.customers.clear();await DB.serials.clear();
+      await DB.sales.clear();await DB.saleItems.clear();await DB.settings.clear();
+      if(cloudData.products?.length)await DB.products.bulkAdd(cloudData.products);
+      if(cloudData.customers?.length)await DB.customers.bulkAdd(cloudData.customers);
+      if(cloudData.serials?.length)await DB.serials.bulkAdd(cloudData.serials);
+      if(cloudData.sales?.length)await DB.sales.bulkAdd(cloudData.sales);
+      if(cloudData.saleItems?.length)await DB.saleItems.bulkAdd(cloudData.saleItems);
+      if(cloudData.settings?.length)await DB.settings.bulkAdd(cloudData.settings);
+    });
+    CLOUD.lastSync=Date.now();
+  }catch(e){
+    console.warn('[Sync] Pull falló (backend no disponible):',e.message);
+    throw e;
+  }
+}
+
+/* ── fullSync: solo pull (la nube es la fuente de verdad) ── */
+async function fullSync(){
+  // Si es modo guest o sin token, NO sincroniza
+  if(A.guestMode||!CLOUD.token){
+    setSyncBadge('offline','Modo local');
+    return;
+  }
+  // Si no hay internet, espera a que vuelva
+  if(!navigator.onLine){
+    setSyncBadge('offline','Sin conexión');
+    return;
+  }
+  // Ya se está sincronizando
+  if(CLOUD.syncing)return;
+  
+  CLOUD.syncing=true;
+  setSyncBadge('syncing','Sincronizando…');
+  try{
+    await pullFromCloud();
+    setSyncBadge('synced','Sincronizado');
+    go(A.view,A.params);
+  }catch(e){
+    setSyncBadge('offline','Backend no disponible');
+    console.warn('[ZeroStock Cloud] Sync failed:',e.message);
+    toast('Backend no disponible — operando localmente','warn');
+  }finally{CLOUD.syncing=false;}
 }
 
 async function manualSync(){
@@ -3425,7 +3450,28 @@ window.addEventListener('offline',()=>{updOnline();setSyncBadge('offline','Sin c
 /* ── BOOTSTRAP ── */
 async function initApp(){
   applyTheme();updOnline();lucide.createIcons();
-  await DB.open();await DL.syncRates();await go('dashboard');
+  await DB.open();await DL.syncRates();
+  
+  // Determinar estado de sincronización
+  if(A.guestMode){
+    setSyncBadge('offline','Modo local');
+  }else if(!CLOUD.token){
+    setSyncBadge('offline','Sin cuenta');
+  }else if(!navigator.onLine){
+    setSyncBadge('offline','Sin conexión');
+  }else{
+    // Intenta sincronizar si hay token y conexión
+    setSyncBadge('syncing','Sincronizando…');
+    try{
+      await pullFromCloud();
+      setSyncBadge('synced','Sincronizado');
+    }catch(e){
+      setSyncBadge('offline','Backend no disponible');
+      console.warn('[Init Sync]',e.message);
+    }
+  }
+  
+  await go('dashboard');
   hideAuthScreen();
   console.log('%cØ ZeroStock Cloud v4.0','color:#1A56DB;font-size:16px;font-weight:800');
   console.log('%cFirebase Auth · Supabase · Offline-First · Precio Editable en POS','color:#64748B');

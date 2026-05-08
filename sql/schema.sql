@@ -130,7 +130,7 @@ BEGIN
   SET
     qty_available = GREATEST(0, qty_available - p_qty),
     qty_sold      = qty_sold + p_qty,
-    updated_at    = NOW()
+    updated_at    = NOW(),
      _mod          = (extract(epoch from now()) * 1000)
   WHERE id = p_product_id
     AND user_id = p_user_id;

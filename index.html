@@ -1550,7 +1550,7 @@ async function pickProd(pid){
         </div>
         <div style="max-height:340px;overflow-y:auto">
           ${avail.map(s=>`
-            <div class="srl-item" onclick="confirmSerialPrice(${p.id},'${esc(p.name)}',${s.id},'${esc(s.serial)}',${s.salePrice||0},${s.cost||0})">
+            <div class="srl-item" onclick="addToCart(${p.id},'${esc(p.name)}',${s.id},'${esc(s.serial)}',${s.salePrice||0},true)">
               <div><div class="srl-nm">${s.serial}</div><div class="srl-dt">Ingresado: ${fmtDT(s.addedAt)}</div></div>
               <div style="text-align:right">
                 <div class="srl-price">$${fmt(s.salePrice||0)}</div>
@@ -1706,6 +1706,16 @@ function addBatchToCart(pid,pname,cost,maxQty){
 
 function removeFromCart(idx){A.cart.splice(idx,1);renderCart();}
 
+function cartQtyAdj(idx, delta){
+  const it=A.cart[idx];
+  if(!it||it.serialized!==false) return;
+  const newQty=it.qty+delta;
+  if(newQty<1){removeFromCart(idx);return;}
+  // Cap at available stock — need to check asynchronously but keep it snappy
+  it.qty=newQty;
+  renderCart();
+}
+
 /* ── editCartPrice — edición inline de precio en carrito ── */
 function editCartPrice(idx){
   const row=document.querySelector(`#cart-row-${idx}`);
@@ -1756,8 +1766,17 @@ function renderCart(){
   body.innerHTML=A.cart.map((it,i)=>`
     <div class="cart-row" id="cart-row-${i}">
       <div class="cart-info">
-        <div class="cart-pname">${it.productName}${it.qty>1?` <span class="chip c-neu">×${it.qty}</span>`:''}</div>
-        ${it.serial?`<div class="cart-serial">SN: ${it.serial}</div>`:`<div class="cart-serial">Masivo · ${it.qty} uds.</div>`}
+        <div class="cart-pname">${it.productName}</div>
+        ${it.serialized!==false
+          ? `<div class="cart-serial">SN: ${it.serial}</div>`
+          : `<div style="display:flex;align-items:center;gap:5px;margin-top:4px">
+               <button class="btn btn-g btn-ico" style="width:22px;height:22px;border:1px solid var(--bdr2)"
+                 onclick="cartQtyAdj(${i},-1)"><i data-lucide="minus" style="width:11px;height:11px"></i></button>
+               <span style="min-width:24px;text-align:center;font-size:12px;font-weight:800">${it.qty}</span>
+               <button class="btn btn-g btn-ico" style="width:22px;height:22px;border:1px solid var(--bdr2)"
+                 onclick="cartQtyAdj(${i},+1)"><i data-lucide="plus" style="width:11px;height:11px"></i></button>
+               <span class="sm muted">uds.</span>
+             </div>`}
       </div>
       <span class="cart-usd">$${fmt(it.unitPrice*(it.qty||1))}</span>
       <button class="btn btn-g btn-ico" style="color:var(--brand);flex-shrink:0"

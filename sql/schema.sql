@@ -131,11 +131,37 @@ BEGIN
     qty_available = GREATEST(0, qty_available - p_qty),
     qty_sold      = qty_sold + p_qty,
     updated_at    = NOW()
+     _mod          = (extract(epoch from now()) * 1000)
   WHERE id = p_product_id
     AND user_id = p_user_id;
 END;
 $$;
  
+-- 1. Agregar columnas de control a PRODUCTS
+ALTER TABLE products 
+ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
+ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
+
+-- 2. Agregar columnas de control a SERIALS
+ALTER TABLE serials 
+ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
+ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
+
+-- 3. Agregar columnas de control a CUSTOMERS
+ALTER TABLE customers 
+ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
+ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
+
+-- 4. Agregar columnas de control a SALES
+ALTER TABLE sales 
+ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
+ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
+
+-- 5. Agregar columnas de control a SALE_ITEMS
+ALTER TABLE sale_items 
+ADD COLUMN IF NOT EXISTS _mod BIGINT DEFAULT (extract(epoch from now()) * 1000),
+ADD COLUMN IF NOT EXISTS _del INT DEFAULT 0;
+
 -- ================================================================
 --  ROW LEVEL SECURITY (RLS)
 --  Cada usuario solo puede ver y modificar SUS propios datos

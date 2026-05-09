@@ -3417,11 +3417,16 @@ async function cloudDelete(path){
   }
 }
 
-/* ── mergeRecords: merge inteligente con timestamps ── */
 async function mergeRecords(table, cloudRecords){
-  if(!cloudRecords?.length) return;
+  if(!cloudRecords?.length || !Array.isArray(cloudRecords)) return;
   
   for(const cloudRec of cloudRecords){
+    // ESCUDO: Si el registro no es válido o no tiene ID, lo saltamos para evitar el crasheo
+    if (!cloudRec || cloudRec.id === undefined || cloudRec.id === null) {
+      console.warn(`[Sync] Registro ignorado en tabla ${table.name} por falta de ID:`, cloudRec);
+      continue;
+    }
+
     const localRec = await table.get(cloudRec.id);
     
     if(!localRec){
@@ -3436,7 +3441,6 @@ async function mergeRecords(table, cloudRecords){
         // Nube es más reciente → actualizar
         await table.put(cloudRec);
       }
-      // Si local es más reciente, lo dejamos como está
     }
   }
 }

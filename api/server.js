@@ -603,6 +603,46 @@ app.get('/api/sync', authMiddleware, async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════
+//  USER DATA — DELETE /api/user/clear
+//  Borra TODOS los datos del usuario en Supabase (usado por clearAll)
+// ════════════════════════════════════════════════════════════
+app.post('/api/user/clear', authMiddleware, async (req, res) => {
+  try {
+    const user = await getOrCreateUser(req.firebaseUser);
+    const uid = user.id;
+
+    // Borrar en orden correcto respetando FK constraints:
+    // 1. sale_items (depende de sales, products, serials)
+    // 2. serials (depende de products)
+    // 3. sales (depende de customers)
+    // 4. products, customers, settings (independientes)
+    await supabase.from('sale_items')
+      .delete()
+      .in('sale_id',
+        supabase.from('sales').select('id').eq('user_id', uid)
+      );
+
+    // sale_items via join no está disponible directo — borrar con subquery manual
+    const { data: salesIds } = await supabase.from('sales').select('id').eq('user_id', uid);
+    if (salesIds?.length) {
+      await supabase.from('sale_items').delete()
+        .in('sale_id', salesIds.map(s => s.id));
+    }
+
+    await supabase.from('sales').delete().eq('user_id', uid);
+    await supabase.from('serials').delete().eq('user_id', uid);
+    await supabase.from('products').delete().eq('user_id', uid);
+    await supabase.from('customers').delete().eq('user_id', uid);
+    await supabase.from('settings').delete().eq('user_id', uid);
+
+    console.log(`[ZeroStock] User ${uid} data cleared`);
+    res.json({ ok: true });
+  } catch (e) {
+    dbError(res, e, 'user/clear');
+  }
+});
+
+// ════════════════════════════════════════════════════════════
 //  START (dev local)
 // ════════════════════════════════════════════════════════════
 const PORT = process.env.PORT || 3001;

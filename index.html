@@ -707,14 +707,12 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 <script>
 'use strict';
 const DB = new Dexie('ZeroStockDB_v3');
-// v11: agrega índice updatedAt a todas las tablas para que pushLocalChanges
-// pueda filtrar correctamente los cambios pendientes de sincronizar
-DB.version(11).stores({
-  products:  '++id, name, brand, category, createdAt, updatedAt',
-  serials:   '++id, productId, serial, status, saleId, updatedAt',
-  customers: '++id, idNumber, lastName, updatedAt',
-  sales:     '++id, customerId, createdAt, updatedAt',
-  saleItems: '++id, saleId, productId, serialId, updatedAt',
+DB.version(10).stores({
+  products:  '++id, name, brand, category, createdAt',
+  serials:   '++id, productId, serial, status, saleId',
+  customers: '++id, idNumber, lastName',
+  sales:     '++id, customerId, createdAt',
+  saleItems: '++id, saleId, productId, serialId',
   settings:  '&key'
 });
 
@@ -737,9 +735,7 @@ const ALL_CATS  = [...SER_CATS, ...BATCH_CATS];
 const DL = {
   async cfg(k,def=null){ try{const r=await DB.settings.get(k);return r?r.value:def;}catch{return def;}},
   async setCfg(k,v){
-    // Incluir updatedAt para que pushLocalChanges detecte el cambio
-    await DB.settings.put({key:k, value:v, updatedAt:Date.now()});
-    // Sincronizar inmediatamente a la nube
+    await DB.settings.put({key:k,value:v});
     await DL._cloudOp(()=>cloudPost('/api/settings',{key:k,value:v}));
   },
   async syncRates(){
@@ -780,46 +776,42 @@ const DL = {
 
   async saveProduct(d){
     const isSer = SER_CATS.includes(d.category);
-    const now = Date.now();
     const r={
       name:(d.name||'').trim(), brand:(d.brand||'').trim(),
       model:(d.model||'').trim(), category:d.category||'Otros',
       minStock:parseInt(d.minStock,10)||1, serialized: isSer,
       cost: isSer ? 0 : (parseFloat(d.cost)||0),
       salePrice: isSer ? 0 : (parseFloat(d.salePrice)||0),
-      updatedAt: now,
+      updatedAt: Date.now(),
     };
     if(!r.name) throw new Error('El nombre es obligatorio.');
     if(!r.brand) throw new Error('La marca es obligatoria.');
     // 1. Persistir en la nube
-    const cloudPayload={
-      name:r.name, brand:r.brand, model:r.model, category:r.category,
-      min_stock:r.minStock, serialized:r.serialized,
-      cost:r.cost, sale_price:r.salePrice,
-      qty_available:d.id ? undefined : 0,
-      qty_sold:d.id ? undefined : 0,
-    };
+    const cloudPayload={...r, sale_price:r.salePrice, min_stock:r.minStock,
+      qty_available:0, qty_sold:0};
     if(d.id) cloudPayload.id=String(d.id);
     const cloudRes=await DL._cloudOp(()=>cloudPost('/api/products',cloudPayload));
     // 2. Persistir localmente
-    // Al editar: actualizar registro existente
     if(d.id){ await DB.products.update(d.id,r); return d.id; }
-    // Al crear: usar ID de nube para mantener coherencia entre dispositivos
-    // Si backend offline, Dexie autoincrementa (id:undefined = autoincrement)
-    const newId = cloudRes?.data?.id ?? undefined;
-    return DB.products.add({...r, id:newId, qtyAvailable:0, qtySold:0, createdAt:now});
+    const newId=cloudRes?.data?.id||undefined;
+    return DB.products.add({...r, id:newId, qtyAvailable:0, qtySold:0, createdAt:Date.now()});
   },
 
   async deleteProduct(id){
     const sold=await DB.serials.where({productId:id,status:'sold'}).count();
     if(sold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
     const p=await DB.products.get(id);
+    if(!p) throw new Error('Producto no encontrado.');
     if(p&&!p.serialized&&p.qtySold>0) throw new Error('Tiene unidades vendidas. No se puede eliminar.');
-    // Marcar como eliminado (soft delete) para que se sincronice
-    await DB.products.update(id, {_deleted: true, updatedAt: Date.now()});
-    // 1. Eliminar en la nube
-    await DL._cloudOp(()=>cloudDelete('/api/products/'+id));
-    // 2. Eliminar localmente (después de sincronizar)
+    // Registrar ID borrado para que mergeRecords no lo restaure en el siguiente pull
+    CLOUD.deletedIds.products.add(id);
+    if(p.id) CLOUD.deletedIds.products.add(p.id);
+    // 1. Eliminar en la nube (usar el ID tal como está — ya es el Supabase BIGINT si fue sincronizado)
+    const cloudOk = await DL._cloudOp(()=>cloudDelete('/api/products/'+id));
+    if(!cloudOk && navigator.onLine){
+      console.warn('[Delete] Producto no encontrado en nube con id='+id+' — puede ser id local');
+    }
+    // 2. Eliminar localmente
     await DB.serials.where('productId').equals(id).delete();
     await DB.products.delete(id);
   },
@@ -838,33 +830,16 @@ const DL = {
       const k=it.serial.toUpperCase();
       if(seen.has(k)||exist.has(k)){dupes.push(it.serial);continue;}
       toAdd.push({productId:pid,serial:it.serial,status:'available',
-        cost:parseFloat(it.cost)||0,salePrice:parseFloat(it.salePrice)||0,addedAt:now,createdAt:now,updatedAt:now});
+        cost:parseFloat(it.cost)||0,salePrice:parseFloat(it.salePrice)||0,addedAt:now, createdAt:now, updatedAt:now});
       seen.add(k);
     }
     if(!toAdd.length) return {added:0,dupes};
-    // 1. Enviar a la nube (usa el pid como string para Supabase BIGINT)
-    const cloudResult = await DL._cloudOp(()=>cloudPost('/api/serials/bulk',{
-      product_id: String(pid),
-      items: toAdd.map(s=>({serial:s.serial,cost:s.cost,salePrice:s.salePrice}))
+    // 1. Enviar a la nube
+    await DL._cloudOp(()=>cloudPost('/api/serials/bulk',{
+      product_id:pid, items:toAdd.map(s=>({serial:s.serial,cost:s.cost,salePrice:s.salePrice}))
     }));
-    if(cloudResult?.data?.length){
-      // Nube devolvió IDs reales → guardar con IDs de Supabase para coherencia
-      const withCloudIds = cloudResult.data.map(cs=>({
-        id: cs.id,
-        productId: cs.product_id || pid,
-        serial: cs.serial,
-        status: cs.status || 'available',
-        cost: parseFloat(cs.cost)||0,
-        salePrice: parseFloat(cs.sale_price)||0,
-        addedAt: cs.created_at ? new Date(cs.created_at).getTime() : now,
-        createdAt: cs.created_at ? new Date(cs.created_at).getTime() : now,
-        updatedAt: now,
-      }));
-      await DB.serials.bulkPut(withCloudIds);
-    } else {
-      // Offline: guardar localmente sin ID de nube (se sincronizará después)
-      await DB.serials.bulkAdd(toAdd);
-    }
+    // 2. Guardar localmente
+    await DB.serials.bulkAdd(toAdd);
     return {added:toAdd.length,dupes};
   },
 
@@ -876,9 +851,8 @@ const DL = {
     // 1. Actualizar en la nube
     if(p){
       await DL._cloudOp(()=>cloudPost('/api/products',{
-        id: p.id ? String(p.id) : undefined,
-        name:p.name, brand:p.brand, model:p.model||'',
-        category:p.category, min_stock:p.minStock||1, serialized:p.serialized,
+        id:String(pid), name:p.name, brand:p.brand, model:p.model||'',
+        category:p.category, min_stock:p.minStock, serialized:p.serialized,
         cost:parseFloat(cost)||0, sale_price:parseFloat(salePrice)||0,
         qty_available:(p.qtyAvailable||0)+q, qty_sold:p.qtySold||0,
       }));
@@ -898,11 +872,11 @@ const DL = {
     const s=await DB.serials.get(id);
     if(!s) throw new Error('Serial no encontrado.');
     if(s.status==='sold') throw new Error('No se puede eliminar un serial vendido.');
-    // Marcar como eliminado (soft delete) para sincronización
-    await DB.serials.update(id, {_deleted: true, updatedAt: Date.now()});
+    // Registrar como borrado para que mergeRecords no lo restaure
+    CLOUD.deletedIds.serials.add(id);
     // 1. Eliminar en la nube
     await DL._cloudOp(()=>cloudDelete('/api/serials/'+id));
-    // 2. Eliminar localmente (después de sincronizar)
+    // 2. Eliminar localmente
     await DB.serials.delete(id);
   },
 
@@ -925,19 +899,18 @@ const DL = {
     const cloudRes=await DL._cloudOp(()=>cloudPost('/api/customers',cloudPayload));
     // 2. Persistir localmente
     if(d.id){await DB.customers.update(d.id,r);return d.id;}
-    // Usar ID de nube para coherencia entre dispositivos; offline = Dexie autoincrementa
-    const newId=cloudRes?.data?.id ?? undefined;
+    const newId=cloudRes?.data?.id||undefined;
     return DB.customers.add({...r,id:newId,createdAt:Date.now()});
   },
 
   async delCustomer(id){
     const cnt=await DB.sales.where('customerId').equals(id).count();
     if(cnt>0) throw new Error('Tiene ventas asociadas. No se puede eliminar.');
-    // Marcar como eliminado (soft delete) para sincronización
-    await DB.customers.update(id, {_deleted: true, updatedAt: Date.now()});
+    // Registrar como borrado para que mergeRecords no lo restaure
+    CLOUD.deletedIds.customers.add(id);
     // 1. Eliminar en la nube
     await DL._cloudOp(()=>cloudDelete('/api/customers/'+id));
-    // 2. Eliminar localmente (después de sincronizar)
+    // 2. Eliminar localmente
     await DB.customers.delete(id);
   },
   async getSales(){
@@ -956,8 +929,34 @@ const DL = {
       customerId,items,rateOff,rateCus,paymentMethod,paymentCurrency
     }));
     if(cloudRes?.data?.id){
-      // Pull para sincronizar estado local con la nube
-      try{await pullFromCloud();}catch(e){console.warn('Pull after sale:',e);}
+      // Guardar la venta localmente con el ID real de Supabase (sin pull completo)
+      // Un pull completo aquí reenviaría ventas previas y causaría duplicados
+      const now2 = Date.now();
+      await DB.sales.put({
+        id: cloudRes.data.id,
+        customerId: customerId||null, total: cloudRes.data.total||total,
+        rateOff, rateCus, paymentMethod:paymentMethod||'div-elec',
+        paymentCurrency:paymentCurrency||'usd',
+        createdAt: now2, updatedAt: now2,
+      });
+      // Guardar items localmente referenciando el ID de Supabase
+      for(const it of items){
+        await DB.saleItems.put({
+          saleId: cloudRes.data.id,
+          productId: it.productId, productName: it.productName,
+          serialId: it.serialId||null, serial: it.serial||'',
+          qty: it.qty||1, unitPrice: it.unitPrice,
+          createdAt: now2, updatedAt: now2,
+        });
+        if(it.serialId) await DB.serials.update(it.serialId,{status:'sold',saleId:cloudRes.data.id,soldAt:now2,updatedAt:now2});
+        if(!it.serialized){
+          await DB.products.where('id').equals(it.productId).modify(p=>{
+            p.qtyAvailable=Math.max(0,(p.qtyAvailable||0)-(it.qty||1));
+            p.qtySold=(p.qtySold||0)+(it.qty||1);
+            p.updatedAt=now2;
+          });
+        }
+      }
       return cloudRes.data.id;
     }
     // 2. Fallback offline: solo local
@@ -1018,8 +1017,7 @@ const DL = {
         name:p.name,brand:p.brand,model:p.model||'',category:p.category,
         minStock:p.minStock,serialized:isSer,
         cost:isSer?0:(p.cost||0),salePrice:isSer?0:(p.salePrice||0),
-        qtyAvailable:isSer?0:(p.qty||0),qtySold:0,
-        createdAt:now, updatedAt:now
+        qtyAvailable:isSer?0:(p.qty||0),qtySold:0,createdAt:now
       });
       if(isSer&&p.serials){
         await DB.serials.bulkAdd(p.serials.map((s,i)=>({
@@ -1031,9 +1029,9 @@ const DL = {
       }
     }
     await DB.customers.bulkAdd([
-      {firstName:'Carlos',lastName:'Ramírez',idNumber:'V-12345678',phone:'0412-5551234',address:'Av. Principal, Caracas',createdAt:now,updatedAt:now},
-      {firstName:'María',lastName:'González',idNumber:'V-23456789',phone:'0414-6667890',address:'Calle 5, Valencia',createdAt:now,updatedAt:now},
-      {firstName:'Luis',lastName:'Pérez',idNumber:'V-34567890',phone:'0416-7778901',address:'Urb. Los Pinos, Maracay',createdAt:now,updatedAt:now},
+      {firstName:'Carlos',lastName:'Ramírez',idNumber:'V-12345678',phone:'0412-5551234',address:'Av. Principal, Caracas',createdAt:now},
+      {firstName:'María',lastName:'González',idNumber:'V-23456789',phone:'0414-6667890',address:'Calle 5, Valencia',createdAt:now},
+      {firstName:'Luis',lastName:'Pérez',idNumber:'V-34567890',phone:'0416-7778901',address:'Urb. Los Pinos, Maracay',createdAt:now},
     ]);
     await DL.setCfg('rate_off','36.50');
     await DL.setCfg('rate_cus','42.00');
@@ -2873,8 +2871,33 @@ async function seedData(){
   catch(e){toast(e.message,'warn');}
 }
 async function clearAll(){
+  setSyncBadge('syncing','Borrando datos…');
+  // 1. Limpiar base de datos local PRIMERO (respuesta inmediata al usuario)
   await Promise.all([DB.products,DB.serials,DB.customers,DB.sales,DB.saleItems,DB.settings].map(t=>t.clear()));
-  A.adminAuth=false;toast('Base de datos borrada','warn');go('dashboard');
+  // Limpiar sets de IDs borrados (ya no son relevantes)
+  CLOUD.deletedIds.products.clear();
+  CLOUD.deletedIds.serials.clear();
+  CLOUD.deletedIds.customers.clear();
+  // Marcar timestamp del borrado — mergeRecords ignorará registros anteriores a este momento
+  CLOUD.lastClearAt = Date.now();
+  CLOUD.syncing = false;
+  A.adminAuth = false;
+  toast('Base de datos local borrada ✓','ok');
+  go('dashboard');
+  // 2. Borrar en Supabase en background (no bloquea la UI)
+  if(CLOUD.token && navigator.onLine){
+    // Llamar al endpoint de borrado masivo del usuario
+    cloudPost('/api/user/clear', {}).then(()=>{
+      toast('Datos eliminados de la nube ✓','ok');
+      setSyncBadge('synced','Sincronizado');
+    }).catch(e=>{
+      console.warn('[ClearAll] Error borrando en nube:',e.message);
+      toast('Datos locales borrados. La nube se limpiará en el próximo sync.','warn');
+      setSyncBadge('synced','Sincronizado');
+    });
+  } else {
+    setSyncBadge('synced','Sincronizado');
+  }
 }
 
 /* ── IMPORT ENGINE ── */
@@ -3123,7 +3146,7 @@ async function importProducts(){
       }else{
         pid=await DB.products.add({name:pd.name,brand:pd.brand,model:pd.model||'',category:pd.category,
           minStock:pd.minStock,serialized:pd.serialized,cost:pd.cost,salePrice:pd.salePrice,
-          qtyAvailable:pd.qtyAvailable,qtySold:0,createdAt:pd.createdAt,updatedAt:Date.now()});
+          qtyAvailable:pd.qtyAvailable,qtySold:0,createdAt:pd.createdAt});
         inserted++;
       }
       if(pd.serials.length){await DB.serials.bulkAdd(pd.serials.map(s=>({...s,productId:pid})));ok.push({name:pd.name,serials:pd.serials.length});}
@@ -3148,7 +3171,7 @@ async function importCustomers(){
     if(!id){errors.push({row:rowNum,msg:'Cédula/ID vacía — fila ignorada'});continue;}
     if(existing.has(id)){errors.push({row:rowNum,msg:`Cédula ya existe: "${id}"`});continue;}
     try{
-      await DB.customers.add({firstName:fn,lastName:ln,idNumber:id,phone:get(row,'phone'),address:get(row,'address'),createdAt:now,updatedAt:now});
+      await DB.customers.add({firstName:fn,lastName:ln,idNumber:id,phone:get(row,'phone'),address:get(row,'address'),createdAt:now});
       existing.add(id);inserted++;
     }catch(e){errors.push({row:rowNum,msg:`Error: ${e.message}`});}
   }
@@ -3278,7 +3301,12 @@ const FB_CONFIG={
 const API_BASE=window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'
   ?'http://localhost:3001':'';
 
-const CLOUD={user:null,token:null,syncing:false,lastSync:null,queue:[]};
+const CLOUD={
+  user:null, token:null, syncing:false, lastSync:null, lastClearAt:null,
+  queue:[],
+  // IDs borrados localmente — mergeRecords los ignora para evitar que el pull los restaure
+  deletedIds:{ products:new Set(), serials:new Set(), customers:new Set() },
+};
 
 firebase.initializeApp(FB_CONFIG);
 const fbAuth=firebase.auth();
@@ -3451,27 +3479,43 @@ async function cloudDelete(path){
 }
 
 async function mergeRecords(table, cloudRecords){
-  if(!cloudRecords?.length || !Array.isArray(cloudRecords)) return;
-  
-  // Settings usa 'key' como PK (string), el resto usa 'id' (número)
+  if(!Array.isArray(cloudRecords)) return;
+
+  // Settings usa 'key' como PK (string), el resto usa 'id' numérico
   const isSettings = table.name === 'settings';
-  
+
+  // Mapa de tabla → set de IDs borrados localmente
+  const deletedSet = CLOUD.deletedIds[table.name] || new Set();
+
   for(const cloudRec of cloudRecords){
-    // ESCUDO: registros sin identificador se ignoran para evitar crasheos de Dexie
-    const pkValue = isSettings ? cloudRec?.key : cloudRec?.id;
-    if(pkValue === undefined || pkValue === null){
-      console.warn(`[Sync] Registro ignorado en '${table.name}' sin PK:`, cloudRec);
+    // ESCUDO: registros sin identificador se ignoran
+    if(isSettings){
+      if(!cloudRec?.key) continue;
+      // Settings: last-write-wins desde la nube
+      await table.put({key:cloudRec.key, value:cloudRec.value, updatedAt:Date.now()});
       continue;
     }
 
-    // Settings: el servidor devuelve {key, value} — put directamente (last-write-wins)
-    if(isSettings){
-      await table.put({key: cloudRec.key, value: cloudRec.value, updatedAt: Date.now()});
+    if(cloudRec?.id === undefined || cloudRec?.id === null){
+      console.warn(`[Sync] Registro sin ID ignorado en '${table.name}':`, cloudRec);
       continue;
+    }
+
+    // Si este ID fue borrado localmente en esta sesión, NO restaurar
+    if(deletedSet.has(cloudRec.id)){
+      console.log(`[Sync] ID ${cloudRec.id} ignorado (borrado localmente) en '${table.name}'`);
+      continue;
+    }
+
+    // Si se ejecutó clearAll después de que este registro fue creado en la nube, ignorar
+    if(CLOUD.lastClearAt){
+      const recTime = cloudRec.updatedAt || cloudRec.createdAt || 0;
+      if(recTime < CLOUD.lastClearAt){
+        continue; // registro es anterior al último borrado total — no restaurar
+      }
     }
 
     const localRec = await table.get(cloudRec.id);
-    
     if(!localRec){
       // Nuevo en la nube → agregar localmente
       await table.put(cloudRec);
@@ -3495,14 +3539,23 @@ async function pullFromCloud(){
   try{
     const cloudData=await cloudGet('/api/sync');
     await DB.transaction('rw',DB.products,DB.customers,DB.serials,DB.sales,DB.saleItems,DB.settings,async()=>{
-      // Merge inteligente: la nube gana sobre local si es más reciente
+      // Productos, clientes, seriales: merge inteligente (se pueden editar)
       if(cloudData.products?.length)  await mergeRecords(DB.products,  cloudData.products);
       if(cloudData.customers?.length) await mergeRecords(DB.customers, cloudData.customers);
       if(cloudData.serials?.length)   await mergeRecords(DB.serials,   cloudData.serials);
-      if(cloudData.sales?.length)     await mergeRecords(DB.sales,     cloudData.sales);
-      if(cloudData.saleItems?.length) await mergeRecords(DB.saleItems, cloudData.saleItems);
-      // Settings: siempre procesar aunque el array sea vacío (para limpiar o inicializar)
+      // Settings: merge (maneja PK='key')
       if(Array.isArray(cloudData.settings)) await mergeRecords(DB.settings, cloudData.settings);
+
+      // Ventas y sale_items: REEMPLAZAR COMPLETAMENTE (inmutables, no se editan)
+      // Esto elimina duplicados entre IDs locales de Dexie e IDs de Supabase
+      if(Array.isArray(cloudData.sales) && cloudData.sales.length > 0){
+        await DB.sales.clear();
+        await DB.sales.bulkPut(cloudData.sales);
+      }
+      if(Array.isArray(cloudData.saleItems) && cloudData.saleItems.length > 0){
+        await DB.saleItems.clear();
+        await DB.saleItems.bulkPut(cloudData.saleItems);
+      }
     });
     
     // Ahora envía cambios locales a la nube
@@ -3517,54 +3570,41 @@ async function pullFromCloud(){
 }
 
 /* ── pushLocalChanges: envía cambios locales a la nube ── */
+// ⚠️  IMPORTANTE: Las VENTAS y SALE_ITEMS nunca se envían desde aquí.
+//    Cada venta se crea una sola vez en el backend vía DL.processSale()
+//    → cloudPost('/api/sales'). Re-enviarlas causaría duplicados masivos
+//    porque el endpoint /api/sync POST las inserta sin verificar existencia.
+//    Solo se sincronizan: productos, clientes, seriales y settings.
 async function pushLocalChanges(){
   if(!CLOUD.token || !navigator.onLine) return;
-  
   try{
-    const lastSync = CLOUD.lastSync || 0;
-    // Obtener todos los datos locales
-    const [products, customers, serials, sales, saleItems, settingsArr] = await Promise.all([
+    const [products, customers, serials, settingsArr] = await Promise.all([
       DB.products.toArray(),
       DB.customers.toArray(),
       DB.serials.toArray(),
-      DB.sales.toArray(),
-      DB.saleItems.toArray(),
       DB.settings.toArray(),
     ]);
-    
-    // Filtrar solo cambios desde el último sync
-    // Para settings: siempre enviar todas (son pocas y no tienen updatedAt fiable)
-    const changes = {
-      products:  products.filter(p  => (p.updatedAt  || p.createdAt  || 0) > lastSync),
-      customers: customers.filter(c  => (c.updatedAt  || c.createdAt  || 0) > lastSync),
-      serials:   serials.filter(s   => (s.updatedAt  || s.createdAt  || 0) > lastSync || s.addedAt > lastSync),
-      sales:     sales.filter(s     => (s.updatedAt  || s.createdAt  || 0) > lastSync),
-      saleItems: saleItems.filter(s => (s.updatedAt  || s.createdAt  || 0) > lastSync),
-      settings:  settingsArr,   // settings siempre se sincronizan (son pocas)
-    };
-    
-    const hasChanges = changes.products.length || changes.customers.length ||
-      changes.serials.length || changes.sales.length ||
-      changes.saleItems.length || changes.settings.length;
-
-    if(hasChanges){
-      // Usar /api/sync (POST) que es el endpoint que acepta todos los datos
-      await cloudPost('/api/sync', {
-        products:  changes.products,
-        customers: changes.customers,
-        serials:   changes.serials,
-        sales:     changes.sales,
-        saleItems: changes.saleItems,
-        settings:  changes.settings,
-      });
-      console.log('[Sync Push] Enviados →',
-        `${changes.products.length}p ${changes.customers.length}c`,
-        `${changes.serials.length}s ${changes.sales.length}v`,
-        `${changes.settings.length}cfg`);
-    }
+    // Solo enviar registros SIN id numérico de Supabase (creados offline)
+    // o con id local pequeño (autoincrement de Dexie, no BIGINT de Supabase)
+    const isLocalId = (id) => !id || (typeof id === 'number' && id < 1000000);
+    const offlineProds = products.filter(p => isLocalId(p.id));
+    const offlineCusts = customers.filter(c => isLocalId(c.id));
+    const offlineSers  = serials.filter(s => isLocalId(s.id));
+    // Settings siempre se sincronizan (son pocas y tienen solo key/value)
+    if(!offlineProds.length && !offlineCusts.length && !offlineSers.length && !settingsArr.length) return;
+    await cloudPost('/api/sync', {
+      products:  offlineProds,
+      customers: offlineCusts,
+      serials:   offlineSers,
+      sales:     [],    // nunca re-enviar ventas desde aquí
+      saleItems: [],    // nunca re-enviar items desde aquí
+      settings:  settingsArr,
+    });
+    console.log('[Sync Push] Offline items →',
+      offlineProds.length+'p', offlineCusts.length+'c',
+      offlineSers.length+'s', settingsArr.length+'cfg');
   }catch(e){
     console.warn('[Sync Push] Error:',e.message);
-    // No fallar por errores de push — el data local sigue válido
   }
 }
 

@@ -707,7 +707,7 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 <script>
 'use strict';
 const DB = new Dexie('ZeroStockDB_v3');
-DB.version(10).stores({
+DB.version(15).stores({
   products:  '++id, name, brand, category, createdAt',
   serials:   '++id, productId, serial, status, saleId',
   customers: '++id, idNumber, lastName',

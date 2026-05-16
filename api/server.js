@@ -513,11 +513,38 @@ app.post('/api/sync', authMiddleware, async (req, res) => {
         qty: item.qty || 1
       });
     }
-
+    
     res.json({ ok: true, results });
   } catch (e) {
     dbError(res, e, 'sync/push');
   }
+});
+
+    app.post('/api/products/add-qty', authMiddleware, async (req, res) => {
+  const user = await getOrCreateUser(req.firebaseUser);
+  const { product_id, qty, cost, sale_price, variant } = req.body;
+
+  const { data: current } = await supabase
+    .from('products').select('qty_available')
+    .eq('id', product_id).eq('user_id', user.id).single();
+
+  if (!current) return res.status(404).json({ error: 'Producto no encontrado' });
+
+  const updates = {
+    cost: parseFloat(cost) || 0,
+    sale_price: parseFloat(sale_price) || 0,
+    qty_available: (current.qty_available || 0) + (parseInt(qty) || 0),
+    updated_at: new Date().toISOString(),
+  };
+  if (variant) updates.last_variant = variant;
+
+  const { data, error } = await supabase
+    .from('products').update(updates)
+    .eq('id', product_id).eq('user_id', user.id)
+    .select().single();
+
+  if (error) return dbError(res, error, 'products/add-qty');
+  res.json({ data });
 });
 
 // ════════════════════════════════════════════════════════════

@@ -229,6 +229,8 @@ CREATE POLICY "settings_owner" ON settings
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
  
+
+
 -- ================================================================
 --  Confirmación
 -- ================================================================

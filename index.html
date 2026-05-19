@@ -382,6 +382,25 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 .imp-err-row i{width:12px;height:12px;color:var(--err);flex-shrink:0;margin-top:1px}
 .imp-err-row .row-num{font-weight:800;color:var(--txt2);white-space:nowrap}
 .imp-err-row .err-msg{color:var(--err)}
+
+/* ═══ CATEGORY MANAGER ═══ */
+.cat-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1.5px solid var(--bdr);border-radius:var(--r2);margin-bottom:6px;transition:all var(--t);background:var(--surface)}
+.cat-item:hover{border-color:var(--bdr2)}
+.cat-item-name{flex:1;font-size:12px;font-weight:700;color:var(--txt)}
+.cat-item-type{font-size:10px;font-weight:800;padding:2px 7px;border-radius:var(--r5);flex-shrink:0}
+.cat-type-ser{background:#EDE9FE;color:#7C3AED}
+.cat-type-bat{background:#FEF3C7;color:#92400E}
+[data-theme="dark"] .cat-type-ser{background:#2D1B69;color:#C4B5FD}
+[data-theme="dark"] .cat-type-bat{background:#292000;color:#FBBF24}
+.cat-group-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--txt3);padding:7px 0 4px;margin-top:4px}
+.type-selector{display:flex;gap:7px;margin-bottom:11px}
+.type-btn{flex:1;padding:9px 8px;border-radius:var(--r2);border:2px solid var(--bdr);cursor:pointer;text-align:center;transition:all .15s ease;background:var(--surface);font-size:12px;font-weight:700;font-family:var(--font)}
+.type-btn:hover{border-color:var(--brand)}
+.type-btn.sel-ser{border-color:#7C3AED;background:#EDE9FE;color:#7C3AED}
+.type-btn.sel-bat{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+[data-theme="dark"] .type-btn.sel-ser{background:#2D1B69;color:#C4B5FD}
+[data-theme="dark"] .type-btn.sel-bat{background:#292000;color:#FBBF24}
+
 </style>
 </head>
 <body>
@@ -467,9 +486,36 @@ textarea.fc{resize:vertical;min-height:75px;line-height:1.5}
 <div id="tc"></div>
 <script>
 'use strict';
-const SER_CATS=['Smartphones','Laptops','Tablets','Electrónica','Monitores','Gaming'];
-const BATCH_CATS=['Accesorios','Fundas','Cables','Cargadores','Audio','Redes','Otros'];
-const ALL_CATS=[...SER_CATS,...BATCH_CATS];
+// Default categories (fallback when no custom ones are saved)
+const DEFAULT_SER_CATS=['Smartphones','Laptops','Tablets','Electrónica','Monitores','Gaming'];
+const DEFAULT_BATCH_CATS=['Accesorios','Fundas','Cables','Cargadores','Audio','Redes','Otros'];
+
+// Runtime arrays — populated from API on load, updated when user edits
+let SER_CATS=[...DEFAULT_SER_CATS];
+let BATCH_CATS=[...DEFAULT_BATCH_CATS];
+let ALL_CATS=[...SER_CATS,...BATCH_CATS];
+
+// Load categories from settings (called on initApp and after edits)
+async function loadCategories(){
+  try{
+    const serRaw=await DL.cfg('custom_ser_cats','');
+    const batRaw=await DL.cfg('custom_bat_cats','');
+    SER_CATS  = serRaw  ? JSON.parse(serRaw)  : [...DEFAULT_SER_CATS];
+    BATCH_CATS= batRaw  ? JSON.parse(batRaw)  : [...DEFAULT_BATCH_CATS];
+    ALL_CATS  = [...SER_CATS,...BATCH_CATS];
+  }catch(e){
+    SER_CATS=[...DEFAULT_SER_CATS];
+    BATCH_CATS=[...DEFAULT_BATCH_CATS];
+    ALL_CATS=[...SER_CATS,...BATCH_CATS];
+  }
+}
+
+async function saveCategories(){
+  DL._settingsCache=null;
+  await DL.setCfg('custom_ser_cats', JSON.stringify(SER_CATS));
+  await DL.setCfg('custom_bat_cats', JSON.stringify(BATCH_CATS));
+  ALL_CATS=[...SER_CATS,...BATCH_CATS];
+}
 const A={view:'dashboard',params:{},role:'admin',theme:localStorage.getItem('zs_theme')||'light',rates:{off:36.50,cus:42.00},cart:[],selCust:null,guestMode:false,adminAuth:false,dashPeriod:'month',dashCustomStart:'',dashCustomEnd:''};
 const FB_CONFIG={apiKey:"AIzaSyCj7xGE-9M1tsWbj6uQ_VcyUiyjNLulvUY",authDomain:"zerostock-0204.firebaseapp.com",projectId:"zerostock-0204"};
 const API_BASE=(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')?'http://localhost:3001':'';
@@ -1351,6 +1397,7 @@ async function vSettings(){
   const dm=await DL.cfg('default_margin','20'),ap=await DL.cfg('admin_pass','admin');
   const waPhone=await DL.cfg('wa_phone',''),waAuto=await DL.cfg('wa_auto','0');
   const WA_SVG=`<svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:#25D366;margin-right:4px;flex-shrink:0">${WA_PATH_SVG}</svg>`;
+  const catsHtml=await buildCatsListHTML();
   return`<div class="page">
   <div class="ph"><div><div class="ph-ttl">Configuración</div><div class="ph-sub">Administración del sistema</div></div>
     <button class="btn btn-g btn-sm" onclick="A.adminAuth=false;DL._settingsCache=null;go('dashboard')"><i data-lucide="log-out"></i>Cerrar sesión admin</button></div>
@@ -1410,6 +1457,20 @@ async function vSettings(){
         <li><strong style="color:rgba(255,255,255,.8)">Monedas:</strong> USD · Bs. Oficial · Bs. Custom</li>
         <li><strong style="color:rgba(255,255,255,.8)">Facturas:</strong> Copiar · Imagen · WhatsApp</li>
       </ul>
+    </div>
+    <!-- CATEGORIES CARD -->
+    <div class="card" id="cats-card">
+      <div class="card-hdr">
+        <span class="card-ttl"><i data-lucide="tag"></i>Categorías de Productos</span>
+        <button class="btn btn-p btn-sm" onclick="moAddCat()"><i data-lucide="plus"></i>Nueva Categoría</button>
+      </div>
+      <div class="infobox ib-p" style="margin-bottom:11px">
+        <i data-lucide="info"></i>
+        <span>Las categorías <strong>Serializadas</strong> requieren serial/IMEI por unidad. Las <strong>Masivas</strong> usan stock por cantidad. Solo puedes eliminar categorías que no tengan productos con ventas.</span>
+      </div>
+      <div id="cats-list-wrap">
+        ${catsHtml}
+      </div>
     </div>
   </div>
   <div style="max-width:960px;margin-top:13px">
@@ -1542,11 +1603,16 @@ async function moProd(id=null){
   <div class="mo-body">
     <input type="hidden" id="fp-id" value="${p?.id||''}">
     <div class="fg"><label class="fl">📂 Categoría <span style="color:var(--err)">*</span></label>
-      <select class="fc" id="fp-cat" onchange="adaptProdForm(this.value)" style="height:38px;font-weight:700">
-        <option value="">— Selecciona una categoría —</option>
-        <optgroup label="Productos Serializados (por unidad)">${SER_CATS.map(c=>`<option value="${c}" ${p?.category===c?'selected':''}>${c}</option>`).join('')}</optgroup>
-        <optgroup label="Productos Masivos (por cantidad)">${BATCH_CATS.map(c=>`<option value="${c}" ${p?.category===c?'selected':''}>${c}</option>`).join('')}</optgroup>
-      </select>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <select class="fc" id="fp-cat" onchange="adaptProdForm(this.value)" style="height:38px;font-weight:700;flex:1">
+          <option value="">— Selecciona una categoría —</option>
+          <optgroup label="Productos Serializados (por unidad)">${SER_CATS.map(c=>`<option value="${c}" ${p?.category===c?'selected':''}>${c}</option>`).join('')}</optgroup>
+          <optgroup label="Productos Masivos (por cantidad)">${BATCH_CATS.map(c=>`<option value="${c}" ${p?.category===c?'selected':''}>${c}</option>`).join('')}</optgroup>
+        </select>
+        <button class="btn btn-o btn-sm" style="height:38px;flex-shrink:0;white-space:nowrap" onclick="moNewCatFromProd()" title="Agregar nueva categoría">
+          <i data-lucide="plus"></i>Nueva
+        </button>
+      </div>
       <div id="cat-badge" style="margin-top:6px"></div>
     </div>
     <div id="fp-rest" style="${p?'':'display:none'}"><hr class="divider" style="margin-bottom:11px"><div id="fp-fields"></div></div>
@@ -2052,10 +2118,309 @@ const esc=s=>(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&l
 async function initApp(){
   applyTheme();updOnline();lucide.createIcons();
   await DL.syncRates();
+  await loadCategories();
   await go('dashboard');
   hideAuthScreen();
   console.log('%cØ ZeroStock Online v5.0','color:#1A56DB;font-size:16px;font-weight:800');
   console.log('%cFirebase Auth · Supabase PostgreSQL · 100% Online','color:#64748B');
+}
+
+
+/* ═══════════════════════════════════════════════
+   § CATEGORY MANAGER
+═══════════════════════════════════════════════ */
+
+/* Build the HTML list for settings page */
+async function buildCatsListHTML(){
+  await loadCategories();
+  const serRows=SER_CATS.map((c,i)=>`
+    <div class="cat-item">
+      <span class="cat-item-type cat-type-ser">Serializado</span>
+      <span class="cat-item-name">${c}</span>
+      <button class="btn btn-g btn-ico btn-sm" onclick="moEditCat('ser',${i})" title="Editar"><i data-lucide="pencil"></i></button>
+      <button class="btn btn-g btn-ico btn-sm" style="color:var(--err)" onclick="cfDeleteCat('ser',${i},'${c.replace(/'/g,"\\'")}')"><i data-lucide="trash-2"></i></button>
+    </div>`).join('');
+  const batRows=BATCH_CATS.map((c,i)=>`
+    <div class="cat-item">
+      <span class="cat-item-type cat-type-bat">Masivo</span>
+      <span class="cat-item-name">${c}</span>
+      <button class="btn btn-g btn-ico btn-sm" onclick="moEditCat('bat',${i})" title="Editar"><i data-lucide="pencil"></i></button>
+      <button class="btn btn-g btn-ico btn-sm" style="color:var(--err)" onclick="cfDeleteCat('bat',${i},'${c.replace(/'/g,"\\'")}')"><i data-lucide="trash-2"></i></button>
+    </div>`).join('');
+  return`<div class="cat-group-lbl">📱 Serializados (${SER_CATS.length})</div>
+    ${serRows||'<div class="sm muted" style="padding:7px 0">Sin categorías serializadas</div>'}
+    <div class="cat-group-lbl" style="margin-top:6px">📦 Masivos (${BATCH_CATS.length})</div>
+    ${batRows||'<div class="sm muted" style="padding:7px 0">Sin categorías masivas</div>'}`;
+}
+
+/* Refresh only the cats list inside settings without full reload */
+async function refreshCatsList(){
+  const wrap=document.getElementById('cats-list-wrap');
+  if(!wrap)return;
+  wrap.innerHTML=await buildCatsListHTML();
+  lucide.createIcons({el:wrap});
+}
+
+/* ── Add new category (from product modal) ── */
+async function moNewCatFromProd(){
+  // Save current product form state
+  const currentCat=document.getElementById('fp-cat')?.value||'';
+  openModal(`
+    <div class="mo-hdr">
+      <span class="mo-ttl"><i data-lucide="tag" style="width:15px;height:15px;color:var(--brand);margin-right:4px"></i>Nueva Categoría</span>
+      <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="mo-body">
+      <div class="fg">
+        <label class="fl">Nombre de la categoría *</label>
+        <input type="text" class="fc" id="nc-name" placeholder="ej: Drones, Consolas, Impresoras…" maxlength="40" autofocus
+          onkeydown="if(event.key==='Enter')saveNewCatFromProd()">
+        <div class="fhint">Máximo 40 caracteres</div>
+      </div>
+      <div class="fl" style="margin-bottom:7px">Tipo de categoría *</div>
+      <div class="type-selector">
+        <button class="type-btn sel-ser" id="nc-type-ser" onclick="selectNewCatType('ser')">
+          📱 Serializado<br><span style="font-size:10px;font-weight:500;opacity:.8">Serial/IMEI por unidad</span>
+        </button>
+        <button class="type-btn" id="nc-type-bat" onclick="selectNewCatType('bat')">
+          📦 Masivo<br><span style="font-size:10px;font-weight:500;opacity:.8">Stock por cantidad</span>
+        </button>
+      </div>
+      <div id="nc-type-preview" style="padding:8px 10px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bdr);font-size:11px;color:var(--txt2)">
+        Esta categoría será <strong>Serializada</strong> — cada producto necesitará serial/IMEI individual.
+      </div>
+    </div>
+    <div class="mo-foot">
+      <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveNewCatFromProd()"><i data-lucide="plus"></i>Crear y seleccionar</button>
+    </div>
+  `);
+  window._ncType='ser';
+  setTimeout(()=>document.getElementById('nc-name')?.focus(),100);
+}
+
+function selectNewCatType(t){
+  window._ncType=t;
+  const serBtn=document.getElementById('nc-type-ser'),batBtn=document.getElementById('nc-type-bat');
+  const prev=document.getElementById('nc-type-preview');
+  if(serBtn&&batBtn){
+    serBtn.className=`type-btn ${t==='ser'?'sel-ser':''}`;
+    batBtn.className=`type-btn ${t==='bat'?'sel-bat':''}`;
+  }
+  if(prev){
+    prev.innerHTML=t==='ser'
+      ?'Esta categoría será <strong>Serializada</strong> — cada producto necesitará serial/IMEI individual.'
+      :'Esta categoría será <strong>Masiva</strong> — maneja stock por cantidad sin seriales.';
+  }
+}
+
+async function saveNewCatFromProd(){
+  const name=(document.getElementById('nc-name')?.value||'').trim();
+  const t=window._ncType||'ser';
+  if(!name){toast('Escribe el nombre de la categoría','err');return;}
+  await loadCategories();
+  // Check duplicate
+  if(ALL_CATS.map(c=>c.toLowerCase()).includes(name.toLowerCase())){
+    toast('Ya existe una categoría con ese nombre','warn');return;
+  }
+  if(t==='ser') SER_CATS.push(name);
+  else BATCH_CATS.push(name);
+  await saveCategories();
+  closeModal();
+  toast(`Categoría "${name}" creada ✓`,'ok');
+  // Refresh the select in the product form
+  const sel=document.getElementById('fp-cat');
+  if(sel){
+    // Rebuild options
+    const serOpts=SER_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+    const batOpts=BATCH_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+    sel.innerHTML=`<option value="">— Selecciona una categoría —</option>
+      <optgroup label="Productos Serializados (por unidad)">${serOpts}</optgroup>
+      <optgroup label="Productos Masivos (por cantidad)">${batOpts}</optgroup>`;
+    sel.value=name;
+    adaptProdForm(name);
+  }
+}
+
+/* ── Add new category (from Settings page) ── */
+async function moAddCat(){
+  openModal(`
+    <div class="mo-hdr">
+      <span class="mo-ttl"><i data-lucide="tag" style="width:15px;height:15px;color:var(--brand);margin-right:4px"></i>Nueva Categoría</span>
+      <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="mo-body">
+      <div class="fg">
+        <label class="fl">Nombre de la categoría *</label>
+        <input type="text" class="fc" id="nc-name" placeholder="ej: Drones, Consolas, Impresoras…" maxlength="40"
+          onkeydown="if(event.key==='Enter')saveNewCat()">
+        <div class="fhint">Máximo 40 caracteres</div>
+      </div>
+      <div class="fl" style="margin-bottom:7px">Tipo *</div>
+      <div class="type-selector">
+        <button class="type-btn sel-ser" id="nc-type-ser" onclick="selectNewCatType('ser')">
+          📱 Serializado<br><span style="font-size:10px;font-weight:500;opacity:.8">Serial/IMEI por unidad</span>
+        </button>
+        <button class="type-btn" id="nc-type-bat" onclick="selectNewCatType('bat')">
+          📦 Masivo<br><span style="font-size:10px;font-weight:500;opacity:.8">Stock por cantidad</span>
+        </button>
+      </div>
+      <div id="nc-type-preview" style="padding:8px 10px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bdr);font-size:11px;color:var(--txt2)">
+        Esta categoría será <strong>Serializada</strong> — cada producto necesitará serial/IMEI individual.
+      </div>
+    </div>
+    <div class="mo-foot">
+      <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveNewCat()"><i data-lucide="plus"></i>Crear Categoría</button>
+    </div>
+  `);
+  window._ncType='ser';
+  setTimeout(()=>document.getElementById('nc-name')?.focus(),100);
+}
+
+async function saveNewCat(){
+  const name=(document.getElementById('nc-name')?.value||'').trim();
+  const t=window._ncType||'ser';
+  if(!name){toast('Escribe el nombre de la categoría','err');return;}
+  await loadCategories();
+  if(ALL_CATS.map(c=>c.toLowerCase()).includes(name.toLowerCase())){
+    toast('Ya existe una categoría con ese nombre','warn');return;
+  }
+  if(t==='ser') SER_CATS.push(name);
+  else BATCH_CATS.push(name);
+  await saveCategories();
+  closeModal();
+  toast(`Categoría "${name}" creada ✓`,'ok');
+  await refreshCatsList();
+}
+
+/* ── Edit category ── */
+async function moEditCat(type,index){
+  const cat=type==='ser'?SER_CATS[index]:BATCH_CATS[index];
+  if(!cat){toast('Categoría no encontrada','err');return;}
+  const currentType=type;
+  openModal(`
+    <div class="mo-hdr">
+      <span class="mo-ttl"><i data-lucide="pencil" style="width:15px;height:15px;color:var(--brand);margin-right:4px"></i>Editar Categoría</span>
+      <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="mo-body">
+      <div class="infobox ib-w">
+        <i data-lucide="alert-triangle"></i>
+        <span>Cambiar el nombre actualizará los productos existentes con esta categoría. Cambiar el tipo puede afectar cómo se muestran los productos.</span>
+      </div>
+      <div class="fg">
+        <label class="fl">Nombre de la categoría *</label>
+        <input type="text" class="fc" id="ec-name" value="${esc(cat)}" maxlength="40"
+          onkeydown="if(event.key==='Enter')saveEditCat('${type}',${index},'${esc(cat)}')">
+      </div>
+      <div class="fl" style="margin-bottom:7px">Tipo</div>
+      <div class="type-selector">
+        <button class="type-btn ${currentType==='ser'?'sel-ser':''}" id="ec-type-ser" onclick="selectEditCatType('ser')">
+          📱 Serializado
+        </button>
+        <button class="type-btn ${currentType==='bat'?'sel-bat':''}" id="ec-type-bat" onclick="selectEditCatType('bat')">
+          📦 Masivo
+        </button>
+      </div>
+    </div>
+    <div class="mo-foot">
+      <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveEditCat('${type}',${index},'${esc(cat)}')"><i data-lucide="save"></i>Guardar</button>
+    </div>
+  `);
+  window._ecType=currentType;
+}
+
+function selectEditCatType(t){
+  window._ecType=t;
+  const serBtn=document.getElementById('ec-type-ser'),batBtn=document.getElementById('ec-type-bat');
+  if(serBtn) serBtn.className=`type-btn ${t==='ser'?'sel-ser':''}`;
+  if(batBtn) batBtn.className=`type-btn ${t==='bat'?'sel-bat':''}`;
+}
+
+async function saveEditCat(origType,origIndex,origName){
+  const newName=(document.getElementById('ec-name')?.value||'').trim();
+  const newType=window._ecType||origType;
+  if(!newName){toast('El nombre no puede estar vacío','err');return;}
+  // Check duplicate (excluding itself)
+  const others=ALL_CATS.filter((_,i)=>{
+    if(origType==='ser'&&SER_CATS[origIndex]===origName) return SER_CATS.indexOf(origName)!==origIndex||false;
+    return true;
+  });
+  const dupeCheck=[...SER_CATS,...BATCH_CATS].filter(c=>c!==origName);
+  if(dupeCheck.map(c=>c.toLowerCase()).includes(newName.toLowerCase())&&newName.toLowerCase()!==origName.toLowerCase()){
+    toast('Ya existe una categoría con ese nombre','warn');return;
+  }
+  await loadCategories();
+  // Remove from original position
+  if(origType==='ser') SER_CATS.splice(origIndex,1);
+  else BATCH_CATS.splice(origIndex,1);
+  // Add to new type list
+  if(newType==='ser') SER_CATS.push(newName);
+  else BATCH_CATS.push(newName);
+  await saveCategories();
+  // Also update products in Supabase that had the old category name
+  // (best effort — API doesn't have a bulk update endpoint but we notify the user)
+  if(newName!==origName){
+    toast(`Categoría renombrada a "${newName}". Los productos con la categoría anterior conservarán su nombre hasta que los edites.`,'warn');
+  } else {
+    toast('Categoría actualizada ✓','ok');
+  }
+  closeModal();
+  await refreshCatsList();
+}
+
+/* ── Delete category ── */
+async function cfDeleteCat(type,index,name){
+  // Check if any products use this category
+  try{
+    const prods=await DL.getProducts();
+    const using=prods.filter(p=>p.category===name);
+    if(using.length>0){
+      // Check if any have sales
+      const withSales=using.filter(p=>(p.qtySold||p.qty_sold||0)>0||(p.serialized&&(p._sd||0)>0));
+      if(withSales.length>0){
+        openModal(`
+          <div class="mo-hdr"><span class="mo-ttl">❌ No se puede eliminar</span>
+            <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
+          <div class="mo-body">
+            <div class="infobox ib-e"><i data-lucide="alert-triangle"></i>
+              <span>La categoría <strong>"${name}"</strong> tiene <strong>${withSales.length} producto(s) con ventas</strong> registradas. No se puede eliminar.</span>
+            </div>
+            <div style="padding:9px 11px;background:var(--s2);border-radius:var(--r2);font-size:12px;color:var(--txt2)">
+              Productos con ventas:<br>
+              ${withSales.slice(0,5).map(p=>`<strong>${p.name}</strong>`).join(', ')}${withSales.length>5?` y ${withSales.length-5} más…`:''}
+            </div>
+          </div>
+          <div class="mo-foot"><button class="btn btn-o" onclick="closeModal()">Entendido</button></div>
+        `);
+        return;
+      }
+      // Products exist but no sales — warn but allow
+      dblConfirm(
+        'Eliminar categoría',
+        `¿Eliminar <strong>"${name}"</strong>? Hay <strong>${using.length} producto(s)</strong> con esta categoría. Quedarán con categoría inválida hasta que los edites.`,
+        ()=>doDeleteCat(type,index,name)
+      );
+    } else {
+      // No products — safe delete
+      dblConfirm('Eliminar categoría',`¿Eliminar la categoría <strong>"${name}"</strong>?`,()=>doDeleteCat(type,index,name));
+    }
+  }catch(e){
+    // If we can't check, just confirm
+    dblConfirm('Eliminar categoría',`¿Eliminar la categoría <strong>"${name}"</strong>?`,()=>doDeleteCat(type,index,name));
+  }
+}
+
+async function doDeleteCat(type,index,name){
+  await loadCategories();
+  if(type==='ser') SER_CATS.splice(SER_CATS.indexOf(name),1);
+  else BATCH_CATS.splice(BATCH_CATS.indexOf(name),1);
+  await saveCategories();
+  closeModal();
+  toast(`Categoría "${name}" eliminada`,'ok');
+  await refreshCatsList();
 }
 
 async function init(){

@@ -2283,7 +2283,7 @@ async function buildCatsListHTML(){
 }
 
 /* Refresh only the cats list inside settings without full reload */
-async funcasync function refreshCatsList(){
+async function refreshCatsList(){
   const wrap=document.getElementById('cats-list-wrap');
   if(!wrap)return;
   wrap.innerHTML=await buildCatsListHTML();

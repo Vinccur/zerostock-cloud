@@ -1274,7 +1274,7 @@ async function confirmAndProcessSale(total){
     const sid=await DL.processSale({customerId:cust?.id||null,items:snap,rateOff:A.rates.off,rateCus:A.rates.cus,paymentMethod:payMethod,paymentCurrency:payCur});
     A.cart=[];A.selCust=null;A.guestMode=false;window._selPayMethod=null;window._selPayCur=null;
     const saleData={id:sid,customerId:cust?.id||null,total,rateOff:A.rates.off,rateCus:A.rates.cus,paymentMethod:payMethod,paymentCurrency:payCur,createdAt:Date.now(),_cust:cust,_items:snap.map(it=>({...it}))};
-    showReceiptModal(saleData,true);
+    await showReceiptModal(saleData,true);
     const waAuto=await DL.cfg('wa_auto','0');
     if(waAuto==='1')await sendInvoiceToWhatsApp(saleData);
   }catch(e){
@@ -1330,9 +1330,9 @@ async function buildReceiptHTML(s){
   let rcptHeader='';
   if(rcptMode==='branded'){
     const bizN=(await DL.cfg('prof_biz_name',''))||(await DL.cfg('prof_display_name',''))||CLOUD.user?.displayName||'ZeroStock';
-    const rif2=await DL.cfg('prof_rif','');
+    const rif2=(await DL.cfg('prof_biz_rif',''))||(await DL.cfg('prof_rif',''));
     const addr2=await DL.cfg('prof_address','');
-    const ph2=await DL.cfg('prof_phone','');
+    const ph2=(await DL.cfg('prof_biz_phone',''))||(await DL.cfg('prof_phone',''));
     rcptHeader=`<div class="rcpt-branded-header"><div class="rcpt-biz-name">${bizN}</div>${rif2?`<div class="rcpt-biz-sub">${rif2}</div>`:''} ${addr2?`<div class="rcpt-biz-sub">${addr2}</div>`:''} ${ph2?`<div class="rcpt-biz-sub">Tel: ${ph2}</div>`:''}</div><div style="text-align:center;margin-bottom:8px"><div style="font-size:11px;color:#475569">Nota de Entrega #${String(s.id).padStart(4,'0')}</div><div style="font-size:10px;color:#94A3B8">${fmtDT(s.createdAt)}</div></div>`;
   } else {
     rcptHeader=`<div class="rcpt-hd"><div class="rcpt-store">ZeroStock</div><div class="rcpt-sub">Nota de Entrega #${String(s.id).padStart(4,'0')} - ${fmtDT(s.createdAt)}</div></div>`;
@@ -1404,7 +1404,7 @@ async function exportReceiptImg(id){
 async function showInvoice(id){
   const sales=await DL.getSales();
   const s=sales.find(x=>String(x.id)===String(id));
-  if(s)showReceiptModal(s,false);else toast('Venta no encontrada','err');
+  if(s)await showReceiptModal(s,false);else toast('Venta no encontrada','err');
 }
 async function vSales(){
   const sales=await DL.getSales();
@@ -2244,6 +2244,12 @@ const fmtDT=ts=>ts?new Date(ts).toLocaleDateString('es-VE',{day:'2-digit',month:
 const fmtD=ts=>ts?new Date(ts).toLocaleDateString('es-VE',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
 const esc=s=>(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+async function setReceiptMode(mode){
+  await DL.setCfg('receipt_mode',mode);
+  toast('Modo de nota actualizado ✓','ok');
+  await go('settings');
+}
+
 async function initApp(){
   applyTheme();updOnline();lucide.createIcons();
   await DL.syncRates();
@@ -2519,7 +2525,7 @@ async function cfDeleteCat(type,index,name){
     const using=prods.filter(p=>p.category===name);
     if(using.length>0){
       // Check if any have sales
-      const withSales=using.filter(p=>(p.qtySold||p.qty_sold||0)>0||(p.serialized&&(p._sd||0)>0));
+      const withSales=using.filter(p=>(p.qtySold||p.qty_sold||0)>0||p.qty_sold>0);
       if(withSales.length>0){
         openModal(`
           <div class="mo-hdr"><span class="mo-ttl">❌ No se puede eliminar</span>
@@ -2628,6 +2634,16 @@ async function vInfo(){
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px">
       ${costoItems.map(mkCost).join('')}
     </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl"><i data-lucide="link"></i>Recursos</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="https://github.com/Vinccur/zerostock-cloud" target="_blank" rel="noopener" class="btn btn-o btn-sm"><i data-lucide="github"></i>GitHub</a>
+      <a href="https://vercel.com/dashboard" target="_blank" rel="noopener" class="btn btn-o btn-sm"><i data-lucide="triangle"></i>Vercel</a>
+      <a href="https://console.firebase.google.com" target="_blank" rel="noopener" class="btn btn-o btn-sm"><i data-lucide="flame"></i>Firebase</a>
+      <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" class="btn btn-o btn-sm"><i data-lucide="database"></i>Supabase</a>
+    </div>
+  </div>
 </div>`;
 }
 
@@ -2636,10 +2652,11 @@ async function vInfo(){
    § PROFILE
 ═══════════════════════════════════════════════ */
 async function vProfile(){
-  const cfg=k=>DL.cfg(k,'');
-  const [dispName,bizName,rif,phone,addr,avatarUrl,photoCustom]= await Promise.all([
-    cfg('prof_display_name'), cfg('prof_biz_name'), cfg('prof_rif'),
-    cfg('prof_phone'), cfg('prof_address'), cfg('prof_avatar_url'), cfg('prof_photo_custom'),
+  const [dispName,bizName,personalRif,bizRif,phone,bizPhone,addr,photoCustom]= await Promise.all([
+    DL.cfg('prof_display_name',''), DL.cfg('prof_biz_name',''),
+    DL.cfg('prof_rif',''),         DL.cfg('prof_biz_rif',''),
+    DL.cfg('prof_phone',''),       DL.cfg('prof_biz_phone',''),
+    DL.cfg('prof_address',''),     DL.cfg('prof_photo_custom',''),
   ]);
   const fbName=CLOUD.user?.displayName||'';
   const fbEmail=CLOUD.user?.email||'';
@@ -2647,126 +2664,110 @@ async function vProfile(){
   const showName=dispName||fbName||'Usuario';
   const initials=(showName).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const avatarSrc=photoCustom||fbPhoto||'';
-
-  // Detect current device
   const ua=navigator.userAgent;
   const isMobile=/Android|iPhone|iPad|iPod/i.test(ua);
-  const deviceName=isMobile?'Dispositivo Móvil':'Computadora / Escritorio';
+  const deviceName=isMobile?'Dispositivo Móvil':'Computadora';
   const deviceIcon=isMobile?'smartphone':'monitor';
-  const browserMatch=ua.match(/(Chrome|Firefox|Safari|Edge|Opera)\/[\d.]+/);
+  const browserMatch=ua.match(/(Chrome|Firefox|Safari|Edge|Opera)\//);
   const browserName=browserMatch?browserMatch[1]:'Navegador';
-  const currentDevice={name:`${deviceName} · ${browserName}`,sub:'Este dispositivo · Activo ahora',icon:deviceIcon,current:true};
-
+  const avatarHtml=avatarSrc
+    ?`<img id="prof-av-img" src="${avatarSrc}" alt="Avatar" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid var(--brand)">`
+    :`<div id="prof-av-img" class="pa-initials">${initials}</div>`;
   return`<div class="page">
   <div class="ph">
     <div><div class="ph-ttl">Mi Perfil</div><div class="ph-sub">Información personal y del comercio</div></div>
     <button class="btn btn-p" onclick="saveProfile()"><i data-lucide="save"></i>Guardar Cambios</button>
   </div>
-
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px">
 
-    <!-- LEFT: Avatar + identity -->
+    <!-- LEFT: Personal -->
     <div>
       <div class="card" style="margin-bottom:13px">
         <div class="card-hdr"><span class="card-ttl"><i data-lucide="user"></i>Identidad Personal</span></div>
-        <!-- Avatar -->
         <div style="text-align:center;margin-bottom:14px">
           <div class="profile-avatar-wrap" id="prof-av-wrap">
-            ${avatarSrc
-              ?`<img id="prof-av-img" src="${avatarSrc}" alt="Avatar">`
-              :`<div class="pa-initials" id="prof-av-img">${initials}</div>`}
+            ${avatarHtml}
             <div class="profile-avatar-edit" onclick="document.getElementById('prof-photo-inp').click()" title="Cambiar foto">
               <i data-lucide="camera"></i>
             </div>
           </div>
           <input type="file" id="prof-photo-inp" accept="image/*" style="display:none" onchange="onProfilePhotoChange(this)">
-          <div style="font-size:13px;font-weight:800;color:var(--txt)">${showName}</div>
+          <div style="font-size:13px;font-weight:800;color:var(--txt);margin-top:6px">${showName}</div>
           <div style="font-size:11px;color:var(--txt2)">${fbEmail}</div>
           ${fbPhoto&&!photoCustom?`<button class="btn btn-g btn-sm" style="margin-top:6px" onclick="resetProfilePhoto()"><i data-lucide="refresh-cw"></i>Usar foto de Google</button>`:''}
         </div>
-
         <div class="fg">
           <label class="fl">Nombre para mostrar</label>
           <input type="text" class="fc" id="prof-display-name" value="${esc(dispName||fbName)}" placeholder="${esc(fbName)||'Tu nombre'}">
-          <div class="fhint">Aparece en notas de entrega y en el sistema</div>
+          <div class="fhint">Aparece en notas de entrega si no hay nombre de comercio</div>
         </div>
         <div class="fg">
-          <label class="fl">Cédula de Identidad (opcional)</label>
-          <input type="text" class="fc" id="prof-rif" value="${esc(rif)}" placeholder="ej: V-12345678">
+          <label class="fl">Cédula de Identidad <span class="chip c-neu" style="font-size:9px">Personal</span></label>
+          <input type="text" class="fc" id="prof-rif" value="${esc(personalRif)}" placeholder="ej: V-12345678">
         </div>
         <div class="fg">
-          <label class="fl">Número de Contacto</label>
+          <label class="fl">Teléfono Personal</label>
           <input type="tel" class="fc" id="prof-phone" value="${esc(phone)}" placeholder="ej: 0412-5551234">
         </div>
       </div>
 
-      <!-- Linked devices -->
+      <!-- Devices -->
       <div class="card">
-        <div class="card-hdr"><span class="card-ttl"><i data-lucide="monitor-smartphone"></i>Dispositivos Vinculados</span></div>
+        <div class="card-hdr"><span class="card-ttl"><i data-lucide="monitor-smartphone"></i>Dispositivos</span></div>
         <div class="infobox ib-p" style="margin-bottom:10px">
           <i data-lucide="info"></i>
-          <span>Tu cuenta ZeroStock está disponible en todos los dispositivos donde inicies sesión con la misma cuenta de Google.</span>
+          <span>Tu cuenta está disponible en cualquier dispositivo donde inicies sesión con la misma cuenta de Google.</span>
         </div>
         <div class="device-item">
-          <div class="device-item-icon"><i data-lucide="${currentDevice.icon}"></i></div>
+          <div class="device-item-icon"><i data-lucide="${deviceIcon}"></i></div>
           <div style="flex:1">
-            <div class="device-item-nm">${currentDevice.name}</div>
-            <div class="device-item-sub">${currentDevice.sub}</div>
+            <div class="device-item-nm">${deviceName} · ${browserName}</div>
+            <div class="device-item-sub">Este dispositivo · Activo ahora</div>
           </div>
           <span class="device-item-current">Activo</span>
         </div>
         <div style="font-size:11px;color:var(--txt3);padding:6px 2px">
-          Para desvincular un dispositivo, cierra sesión en ese dispositivo.
+          Para desvincular un dispositivo, cierra sesión en él.
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Business info -->
+    <!-- RIGHT: Business -->
     <div>
       <div class="card">
-        <div class="card-hdr"><span class="card-ttl"><i data-lucide="building-2"></i>Datos del Comercio</span>
+        <div class="card-hdr">
+          <span class="card-ttl"><i data-lucide="building-2"></i>Datos del Comercio</span>
           <span class="chip c-neu" style="font-size:9px">Opcional</span>
         </div>
         <div class="infobox ib-p" style="margin-bottom:11px">
           <i data-lucide="info"></i>
-          <span>Esta información aparece en el <strong>membrete</strong> de las notas de entrega personalizadas.</span>
+          <span>Esta información aparece en el <strong>membrete</strong> de notas de entrega personalizadas. Si no tienes comercio, deja estos campos vacíos.</span>
         </div>
         <div class="fg">
           <label class="fl">Nombre del Comercio</label>
-          <input type="text" class="fc" id="prof-biz-name" value="${esc(bizName)}" placeholder="ej: TechStore VE, Tienda XYZ…">
-          <div class="fhint">Deja vacío si eres persona natural</div>
+          <input type="text" class="fc" id="prof-biz-name" value="${esc(bizName)}" placeholder="ej: TechStore VE…">
+          <div class="fhint">Si está vacío, se usará tu nombre personal en el membrete</div>
         </div>
         <div class="fg">
-          <label class="fl">RIF del Comercio</label>
-          <input type="text" class="fc" id="prof-biz-rif" value="${esc(rif&&bizName?rif:'')}" placeholder="ej: J-12345678-9" id="prof-biz-rif-field">
-          <div class="fhint">Solo si tienes RIF registrado como empresa</div>
+          <label class="fl">RIF del Comercio <span class="chip c-neu" style="font-size:9px">Empresa</span></label>
+          <input type="text" class="fc" id="prof-biz-rif" value="${esc(bizRif)}" placeholder="ej: J-12345678-9">
         </div>
         <div class="fg">
           <label class="fl">Dirección del Comercio</label>
           <textarea class="fc" id="prof-address" rows="2" placeholder="ej: Av. Principal, Local 3, Caracas">${esc(addr)}</textarea>
-          <div class="fhint">Opcional — aparece en el membrete</div>
         </div>
         <div class="fg">
           <label class="fl">Teléfono del Comercio</label>
-          <input type="tel" class="fc" id="prof-biz-phone" value="${esc(phone&&bizName?phone:'')}" placeholder="ej: 0212-5551234">
+          <input type="tel" class="fc" id="prof-biz-phone" value="${esc(bizPhone)}" placeholder="ej: 0212-5551234">
         </div>
-
         <hr class="divider">
-
-        <!-- Preview -->
-        <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">
-          Vista previa del membrete
-        </div>
-        <div style="border:1.5px solid var(--bdr);border-radius:var(--r2);padding:14px;background:var(--s2);font-size:11px;font-family:'Courier New',monospace;line-height:1.8">
-          <div style="font-size:14px;font-weight:800;font-family:var(--font);text-align:center" id="prev-header-name">
-            ${bizName||dispName||fbName||'Nombre del Negocio / Persona'}
-          </div>
-          ${rif?`<div style="text-align:center;color:var(--txt2)">RIF: ${rif}</div>`:''}
+        <div class="sm fw8 muted" style="text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Preview del membrete</div>
+        <div style="border:1.5px solid var(--bdr);border-radius:var(--r2);padding:12px;background:var(--s2);font-size:11px;font-family:'Courier New',monospace;line-height:1.8">
+          <div style="font-size:13px;font-weight:800;font-family:var(--font);text-align:center">${bizName||dispName||fbName||'Nombre del Negocio / Persona'}</div>
+          ${bizRif?`<div style="text-align:center;color:var(--txt2)">RIF: ${bizRif}</div>`:''}
           ${addr?`<div style="text-align:center;color:var(--txt2)">${addr}</div>`:''}
-          ${phone?`<div style="text-align:center;color:var(--txt2)">Tel: ${phone}</div>`:''}
-          <div style="border-top:1px dashed var(--bdr2);margin-top:7px;padding-top:7px;text-align:center;color:var(--txt3)">
-            Nota de Entrega — preview
-          </div>
+          ${bizPhone||phone?`<div style="text-align:center;color:var(--txt2)">Tel: ${bizPhone||phone}</div>`:''}
+          <div style="border-top:1px dashed var(--bdr2);margin-top:6px;padding-top:6px;text-align:center;color:var(--txt3)">Nota de Entrega — preview</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap">
           <button class="btn btn-p" onclick="saveProfile()"><i data-lucide="save"></i>Guardar</button>
@@ -2778,42 +2779,21 @@ async function vProfile(){
 </div>`;
 }
 
-/* Photo preview */
-function onProfilePhotoChange(input){
-  const file=input.files?.[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    window._newProfilePhoto=e.target.result;
-    const wrap=document.getElementById('prof-av-wrap');
-    const img=document.getElementById('prof-av-img');
-    if(img&&wrap){
-      img.outerHTML=`<img id="prof-av-img" src="${e.target.result}" alt="Avatar" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid var(--brand)">`;
-    }
-    toast('Foto lista — haz click en Guardar Cambios para confirmar','info');
-  };
-  reader.readAsDataURL(file);
-}
-
-function resetProfilePhoto(){
-  window._newProfilePhoto=null;
-  DL.setCfg('prof_photo_custom','').then(()=>{
-    toast('Foto restablecida a la de Google','ok');
-    go('profile');
-  });
-}
-
 async function saveProfile(){
   const displayName=(document.getElementById('prof-display-name')?.value||'').trim();
   const bizName=(document.getElementById('prof-biz-name')?.value||'').trim();
-  const rif=(document.getElementById('prof-rif')?.value||document.getElementById('prof-biz-rif')?.value||'').trim();
-  const phone=(document.getElementById('prof-phone')?.value||document.getElementById('prof-biz-phone')?.value||'').trim();
+  const personalRif=(document.getElementById('prof-rif')?.value||'').trim();
+  const bizRif=(document.getElementById('prof-biz-rif')?.value||'').trim();
+  const phone=(document.getElementById('prof-phone')?.value||'').trim();
+  const bizPhone=(document.getElementById('prof-biz-phone')?.value||'').trim();
   const addr=(document.getElementById('prof-address')?.value||'').trim();
-
   const saves=[
     DL.setCfg('prof_display_name', displayName),
     DL.setCfg('prof_biz_name', bizName),
-    DL.setCfg('prof_rif', rif),
+    DL.setCfg('prof_rif', personalRif),
+    DL.setCfg('prof_biz_rif', bizRif),
     DL.setCfg('prof_phone', phone),
+    DL.setCfg('prof_biz_phone', bizPhone),
     DL.setCfg('prof_address', addr),
   ];
   if(window._newProfilePhoto){
@@ -2823,23 +2803,7 @@ async function saveProfile(){
     await Promise.all(saves);
     window._newProfilePhoto=null;
     toast('Perfil guardado ✓','ok');
-    go('profile');
+    await go('profile');
   }catch(e){toast('Error al guardar: '+e.message,'err');}
 }
 
-
-async function setReceiptMode(mode){
-  await DL.setCfg('receipt_mode',mode);
-  toast('Modo de nota actualizado ✓','ok');
-  go('settings');
-}
-
-async function init(){
-  applyTheme();
-  document.getElementById('app').style.display='none';
-  lucide.createIcons({el:document.getElementById('auth-screen')});
-}
-init().catch(console.error);
-</script>
-</body>
-</html>

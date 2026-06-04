@@ -700,6 +700,8 @@ const DL={
         mapped._av=avMap[pid]||0;
         mapped._tt=ttMap[pid]||0;
         mapped._sd=sdMap[pid]||0;
+        const avSer=serials.filter(s=>String(s.product_id??s.productId)===pid&&s.status==='available');
+        mapped._avgCost=avSer.length?avSer.reduce((sm,s)=>sm+(parseFloat(s.cost)||0),0)/avSer.length:0;
       } else {
         mapped._av=mapped.qtyAvailable;
         mapped._tt=mapped.qtyAvailable+mapped.qtySold;
@@ -816,8 +818,7 @@ function filterSalesByPeriod(sales,period,customStart,customEnd){
 
 async function vDash(){
   const[prods,allSales]=await Promise.all([DL.getProducts(),DL.getSales()]);
-  for(const p of prods){p._av=p.serialized?(p.qty_available||p.qtyAvailable||0):(p.qtyAvailable||0);p._sd=p.qty_sold||p.qtySold||0;p._tt=p._av+p._sd;}
-  const PERIODS=[{k:'all',l:'Todo'},{k:'year',l:'Año'},{k:'month',l:'Mes'},{k:'week',l:'Semana'},{k:'day',l:'Hoy'},{k:'custom',l:'Personalizado'}];
+    const PERIODS=[{k:'all',l:'Todo'},{k:'year',l:'Año'},{k:'month',l:'Mes'},{k:'week',l:'Semana'},{k:'day',l:'Hoy'},{k:'custom',l:'Personalizado'}];
   const tabHtml=PERIODS.map(p=>`<button class="tf-tab ${A.dashPeriod===p.k?'act':''}" onclick="setDashPeriod('${p.k}')">${p.l}</button>`).join('');
   const sales=filterSalesByPeriod(allSales,A.dashPeriod,A.dashCustomStart,A.dashCustomEnd);
   const rev=sales.reduce((s,x)=>s+(x.total||0),0);
@@ -867,7 +868,6 @@ async function vDash(){
 function setDashPeriod(p){A.dashPeriod=p;go('dashboard');}
 async function vInv(){
   const prods=await DL.getProducts();
-  for(const p of prods){p._av=p.serialized?(p.qty_available||p.qtyAvailable||0):(p.qtyAvailable||0);p._tt=p._av+(p.qty_sold||p.qtySold||0);}
   const adm=A.role==='admin';
   const rows=prods.map(p=>{
     const sc=p._av===0?'c-err':p._av<=(p.minStock||1)?'c-warn':'c-ok';
@@ -876,6 +876,7 @@ async function vInv(){
       <td><div class="fw8">${p.name}</div><div class="sm muted">${p.category}</div></td>
       <td>${p.brand}</td><td class="mono">${p.model||'—'}</td><td>${type}</td>
       <td class="fw8 c-brand">$${fmt(p.salePrice||0)}</td>
+      <td class="sm">${p.serialized?`<span class="c-brand fw7">~$${fmt(p._avgCost||0)}</span><br><span style="font-size:9px;color:var(--txt3)">prom.disp.</span>`:`<span class="muted">$${fmt(p.cost||0)}</span>`}</td>
       <td style="text-align:center"><span class="fw8">${p._av}</span><span class="muted">/${p._tt}</span></td>
       <td><span class="chip ${sc}">${p._av===0?'Agotado':p._av<=(p.minStock||1)?'Bajo':'OK'}</span></td>
       <td><div class="tacts">
@@ -892,15 +893,14 @@ async function vInv(){
       ${adm?`<button class="btn btn-p" onclick="moProd()"><i data-lucide="plus"></i>Nuevo Producto</button>`:''}
     </div></div>
   <div class="card" style="padding:0"><div class="tw">
-    ${rows?`<table id="itbl"><thead><tr><th>Producto</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Precio</th><th style="text-align:center">Disp/Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${rows}</tbody></table>`
+    ${rows?`<table id="itbl"><thead><tr><th>Producto</th><th>Marca</th><th>Modelo</th><th>Tipo</th><th>Precio</th><th>Costo</th><th style="text-align:center">Disp/Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${rows}</tbody></table>`
     :`<div class="empty"><i data-lucide="package-open"></i><div class="empty-ttl">Sin productos</div><div class="empty-sub">Crea tu primer producto.</div></div>`}
   </div></div></div>`;
 }
 
 async function filtInv(q){
   const prods=await DL.getProducts(q);
-  for(const p of prods){p._av=p.serialized?(p.qty_available||p.qtyAvailable||0):(p.qtyAvailable||0);p._tt=p._av+(p.qty_sold||p.qtySold||0);}
-  const adm=A.role==='admin';
+    const adm=A.role==='admin';
   const tb=document.querySelector('#itbl tbody');if(!tb)return;
   tb.innerHTML=prods.map(p=>{
     const sc=p._av===0?'c-err':p._av<=(p.minStock||1)?'c-warn':'c-ok';
@@ -929,20 +929,36 @@ async function vProd(){
   let content='';
   if(isSer){
     const sers=await DL.getSerials(id);
-    const rows=sers.map(s=>`<tr>
+    const availSers=sers.filter(s=>s.status==='available');
+    const soldSers=sers.filter(s=>s.status==='sold');
+    const mkSerRow=(s,showDel)=>`<tr>
       <td class="mono fw8">${s.serial}</td>
-      <td>${s.status==='available'?`<span class="chip c-ok"><i data-lucide="check-circle"></i>Disponible</span>`:`<span class="chip c-err"><i data-lucide="x-circle"></i>Vendido</span>`}</td>
       <td class="fw8 c-brand">$${fmt(s.salePrice||0)}</td>
-      <td class="sm muted">Costo: $${fmt(s.cost||0)}</td>
+      <td class="sm muted">$${fmt(s.cost||0)}</td>
       <td><span class="chip ${marginClass(s.cost,s.salePrice)}">${fmt(calcMargin(s.cost,s.salePrice),1)}%</span></td>
       <td class="sm muted">${fmtDT(s.addedAt)}</td>
-      <td>${s.status==='available'&&adm?`<button class="btn btn-g btn-ico" style="color:var(--err)" onclick="delSrl(${s.id},${id})"><i data-lucide="trash-2"></i></button>`:'—'}</td>
-    </tr>`).join('');
-    content=`<div class="card" style="padding:0">
-      <div class="card-hdr" style="padding:11px 14px 9px;margin:0"><span class="card-ttl"><i data-lucide="hash"></i>Seriales / IMEI (${sers.length})</span></div>
-      <div class="tw">${rows?`<table><thead><tr><th>Serial</th><th>Estado</th><th>Precio</th><th>Costo</th><th>Margen</th><th>Ingresado</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
-        :`<div class="empty"><i data-lucide="scan-barcode"></i><div class="empty-ttl">Sin seriales</div>${adm?`<div class="empty-cta"><button class="btn btn-p" onclick="moSerials(${id})"><i data-lucide="upload"></i>Agregar Seriales</button></div>`:''}</div>`}
-      </div></div>`;
+      <td>${showDel&&adm?`<button class="btn btn-g btn-ico" style="color:var(--err)" onclick="delSrl(${s.id},${id})"><i data-lucide="trash-2"></i></button>`:'—'}</td>
+    </tr>`;
+    const availRows=availSers.map(s=>mkSerRow(s,true)).join('');
+    const soldRows=soldSers.map(s=>mkSerRow(s,false)).join('');
+    const serHead=`<thead><tr><th>Serial</th><th>Precio</th><th>Costo</th><th>Margen</th><th>Ingresado</th><th></th></tr></thead>`;
+    content=`<div class="card" style="padding:0;margin-bottom:11px">
+      <div class="card-hdr" style="padding:11px 14px 9px;margin:0">
+        <span class="card-ttl"><i data-lucide="check-circle" style="color:var(--ok)"></i>Disponibles (${availSers.length})</span>
+        ${adm?`<button class="btn btn-p btn-sm" onclick="moSerials(${id})"><i data-lucide="upload"></i>Agregar</button>`:''}
+      </div>
+      <div class="tw">${availRows?`<table>${serHead}<tbody>${availRows}</tbody></table>`
+        :`<div class="empty" style="padding:22px"><i data-lucide="scan-barcode"></i><div class="empty-ttl">Sin unidades disponibles</div></div>`}
+      </div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="card-hdr" style="padding:11px 14px 9px;margin:0">
+        <span class="card-ttl" style="color:var(--txt2)"><i data-lucide="x-circle" style="color:var(--err)"></i>Vendidos (${soldSers.length})</span>
+      </div>
+      <div class="tw">${soldRows?`<table>${serHead}<tbody>${soldRows}</tbody></table>`
+        :`<div class="empty" style="padding:18px"><i data-lucide="package-check"></i><div class="empty-ttl" style="color:var(--txt3)">Sin unidades vendidas</div></div>`}
+      </div>
+    </div>`;
   }else{
     const margin=calcMargin(p.cost||0,p.salePrice||0);
     content=`<div class="card">
@@ -1206,7 +1222,7 @@ function addBatchToCart(pid,pname,price,maxQty){
   closeModal();
   const existing=A.cart.find(i=>i.productId===pid&&!i.serialized);
   if(existing){existing.qty=Math.min(existing.qty+qty,maxQty);renderCart();toast(`${pname}: ${existing.qty} uds. en carrito`,'ok');return;}
-  A.cart.push({productId:pid,productName:pname,serialId:null,serial:'',unitPrice:parseFloat(price),qty,serialized:false});
+  A.cart.push({productId:pid,productName:pname,serialId:null,serial:'',unitPrice:parseFloat(price),qty,serialized:false,maxQty:maxQty});
   renderCart();toast(`${pname} ×${qty} agregado ✓`,'ok');
 }
 function removeFromCart(idx){A.cart.splice(idx,1);renderCart();}
@@ -1223,7 +1239,7 @@ function renderCart(){
     const qtyControls=!it.serialized?`
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
         <button class="btn btn-g btn-ico btn-sm" onclick="cartQtyAdj(${i},-1)" style="width:24px;height:24px;border-radius:4px;font-size:14px;font-weight:800">−</button>
-        <span style="min-width:20px;text-align:center;font-size:12px;font-weight:800">${it.qty}</span>
+        <span style="min-width:26px;text-align:center;font-size:11px;font-weight:800">${it.qty}${it.maxQty?`<span style="font-size:9px;color:var(--txt3)">/${it.maxQty}</span>`:""}</span>
         <button class="btn btn-g btn-ico btn-sm" onclick="cartQtyAdj(${i},+1)" style="width:24px;height:24px;border-radius:4px;font-size:14px;font-weight:800">+</button>
       </div>`:'';
     return`<div class="cart-row" style="gap:6px">
@@ -1244,7 +1260,8 @@ function cartQtyAdj(idx,delta){
   if(!it||it.serialized)return;
   const newQty=(it.qty||1)+delta;
   if(newQty<=0){removeFromCart(idx);return;}
-  // Check max availability
+  const max=it.maxQty||9999;
+  if(newQty>max){toast(`Máximo disponible: ${max} uds.`,'warn');return;}
   A.cart[idx].qty=newQty;
   renderCart();
 }

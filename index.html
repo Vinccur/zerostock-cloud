@@ -2807,3 +2807,26 @@ async function saveProfile(){
   }catch(e){toast('Error al guardar: '+e.message,'err');}
 }
 
+
+
+/* ═══════════════════════════════════════════════
+   BOOTSTRAP — App entry point
+═══════════════════════════════════════════════ */
+function startApp(){
+  applyTheme();
+  // Hide app until authenticated
+  const appEl=document.getElementById('app');
+  if(appEl) appEl.style.display='none';
+  // Show auth screen
+  const authEl=document.getElementById('auth-screen');
+  if(authEl) authEl.style.display='flex';
+  // Init Lucide icons on auth screen
+  const authScreen=document.getElementById('auth-screen');
+  if(authScreen) lucide.createIcons({el:authScreen});
+}
+
+// Start immediately
+try{ startApp(); }catch(e){ console.error('Startup error:',e); }
+</script>
+</body>
+</html>

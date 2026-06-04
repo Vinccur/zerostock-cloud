@@ -678,8 +678,35 @@ const DL={
   },
   async getProducts(q=''){
     const url=q?`/api/products?q=${encodeURIComponent(q)}`:'/api/products';
-    const r=await cloudGet(url);
-    return(r.data||[]).map(p=>({...p,salePrice:p.sale_price??p.salePrice??0,minStock:p.min_stock??p.minStock??1,qtyAvailable:p.qty_available??p.qtyAvailable??0,qtySold:p.qty_sold??p.qtySold??0}));
+    const [pr,sr]=await Promise.all([cloudGet(url),cloudGet('/api/serials')]);
+    const serials=sr.data||[];
+    // Build serial count maps
+    const avMap={},ttMap={},sdMap={};
+    for(const s of serials){
+      const pid=String(s.product_id??s.productId);
+      ttMap[pid]=(ttMap[pid]||0)+1;
+      if(s.status==='available')avMap[pid]=(avMap[pid]||0)+1;
+      if(s.status==='sold')sdMap[pid]=(sdMap[pid]||0)+1;
+    }
+    return(pr.data||[]).map(p=>{
+      const pid=String(p.id);
+      const mapped={...p,
+        salePrice:p.sale_price??p.salePrice??0,
+        minStock:p.min_stock??p.minStock??1,
+        qtyAvailable:p.qty_available??p.qtyAvailable??0,
+        qtySold:p.qty_sold??p.qtySold??0,
+        serialized:p.serialized??false};
+      if(mapped.serialized){
+        mapped._av=avMap[pid]||0;
+        mapped._tt=ttMap[pid]||0;
+        mapped._sd=sdMap[pid]||0;
+      } else {
+        mapped._av=mapped.qtyAvailable;
+        mapped._tt=mapped.qtyAvailable+mapped.qtySold;
+        mapped._sd=mapped.qtySold;
+      }
+      return mapped;
+    });
   },
   async getProduct(id){
     const prods=await DL.getProducts();
@@ -1077,7 +1104,6 @@ function clearCust(){
 
 async function openProdPicker(){
   const allProds=await DL.getProducts('');
-  for(const p of allProds)p._av=p.serialized?(p.qty_available||p.qtyAvailable||0):(p.qtyAvailable||0);
   const avail=allProds.filter(p=>p._av>0);
   const catOpts=ALL_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
   openModal(`<div class="mo-hdr">
@@ -1193,15 +1219,34 @@ function renderCart(){
     body.innerHTML=`<div class="empty" style="padding:28px"><i data-lucide="shopping-cart"></i><div class="empty-ttl">Carrito vacío</div></div>`;
     lucide.createIcons({el:body});updateTotals();return;
   }
-  body.innerHTML=A.cart.map((it,i)=>`<div class="cart-row">
-    <div class="cart-info">
-      <div class="cart-pname">${it.productName}${it.qty>1?` <span class="chip c-neu">×${it.qty}</span>`:''}</div>
-      ${it.serial?`<div class="cart-serial">SN: ${it.serial}</div>`:`<div class="cart-serial">Masivo · ${it.qty} uds.</div>`}
-    </div>
-    <div class="cart-usd">$${fmt(it.unitPrice*(it.qty||1))}</div>
-    <button class="btn btn-g btn-ico" style="color:var(--err);flex-shrink:0" onclick="removeFromCart(${i})"><i data-lucide="x"></i></button>
-  </div>`).join('');
+  body.innerHTML=A.cart.map((it,i)=>{
+    const qtyControls=!it.serialized?`
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <button class="btn btn-g btn-ico btn-sm" onclick="cartQtyAdj(${i},-1)" style="width:24px;height:24px;border-radius:4px;font-size:14px;font-weight:800">−</button>
+        <span style="min-width:20px;text-align:center;font-size:12px;font-weight:800">${it.qty}</span>
+        <button class="btn btn-g btn-ico btn-sm" onclick="cartQtyAdj(${i},+1)" style="width:24px;height:24px;border-radius:4px;font-size:14px;font-weight:800">+</button>
+      </div>`:'';
+    return`<div class="cart-row" style="gap:6px">
+      <div class="cart-info" style="flex:1;min-width:0">
+        <div class="cart-pname">${it.productName}</div>
+        ${it.serial?`<div class="cart-serial">SN: ${it.serial}</div>`:`<div class="cart-serial">Masivo · ${it.qty} uds.</div>`}
+      </div>
+      ${qtyControls}
+      <div class="cart-usd" style="flex-shrink:0">$${fmt(it.unitPrice*(it.qty||1))}</div>
+      <button class="btn btn-g btn-ico" style="color:var(--err);flex-shrink:0;width:24px;height:24px" onclick="removeFromCart(${i})"><i data-lucide="x"></i></button>
+    </div>`;
+  }).join('');
   lucide.createIcons({el:body});updateTotals();
+}
+
+function cartQtyAdj(idx,delta){
+  const it=A.cart[idx];
+  if(!it||it.serialized)return;
+  const newQty=(it.qty||1)+delta;
+  if(newQty<=0){removeFromCart(idx);return;}
+  // Check max availability
+  A.cart[idx].qty=newQty;
+  renderCart();
 }
 function updateTotals(){
   const total=A.cart.reduce((s,i)=>s+(i.unitPrice*(i.qty||1)),0);
@@ -1272,7 +1317,8 @@ async function confirmAndProcessSale(total){
   if(btn){btn.disabled=true;btn.innerHTML='<i data-lucide="loader-2" class="spin"></i> Procesando…';lucide.createIcons({el:btn});}
   try{
     const sid=await DL.processSale({customerId:cust?.id||null,items:snap,rateOff:A.rates.off,rateCus:A.rates.cus,paymentMethod:payMethod,paymentCurrency:payCur});
-    A.cart=[];A.selCust=null;A.guestMode=false;window._selPayMethod=null;window._selPayCur=null;
+    A.cart=[];A.selCust=null;A.guestMode=false;window._selPayMethod=null;window._selPayCur=null;window._ppkAll=null;
+    refreshBadge();
     const saleData={id:sid,customerId:cust?.id||null,total,rateOff:A.rates.off,rateCus:A.rates.cus,paymentMethod:payMethod,paymentCurrency:payCur,createdAt:Date.now(),_cust:cust,_items:snap.map(it=>({...it}))};
     await showReceiptModal(saleData,true);
     const waAuto=await DL.cfg('wa_auto','0');
@@ -1287,8 +1333,7 @@ const WA_PATH_SVG=`<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-
 function buildWhatsAppText(s,bizName2=''){
   const sep='─'.repeat(28),items=s._items||[],{val:payVal,lbl:payLbl}=getPaymentTotal(s);
   const custName=s._cust?`${s._cust.firstName} ${s._cust.lastName}`:'Sin cliente (Guest)';
-  if(bizName2) t2=`*${bizName2}*\n`; else t2='';
-    let t=(bizName2?`*${bizName2}*\n`:'')+`🧾 *Nota de Entrega NE-${String(s.id).padStart(4,'0')}*\n📅 ${fmtDT(s.createdAt)}\n${sep}\n`;
+  let t=(bizName2?`*${bizName2}*\n`:'')+`🧾 *Nota de Entrega NE-${String(s.id).padStart(4,'0')}*\n📅 ${fmtDT(s.createdAt)}\n${sep}\n`;
   t+=`*Cliente:* ${custName}\n`;
   if(s._cust?.idNumber)t+=`*C.I.:* ${s._cust.idNumber}\n`;
   if(s._cust?.phone)t+=`*Tel:* ${s._cust.phone}\n`;
@@ -1962,15 +2007,19 @@ async function delCust(id){
 }
 
 function dblConfirm(title,msg,onConfirm){
+  window._dblCb=onConfirm;
+  window._dblTitle=title;
+  window._dblMsg=msg;
   openModal(`<div class="mo-hdr"><span class="mo-ttl">⚠️ ${title}</span><button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
   <div class="mo-body"><div class="infobox ib-e"><i data-lucide="alert-triangle"></i><span>${msg} Esta acción puede ser irreversible.</span></div></div>
   <div class="mo-foot">
     <button class="btn btn-g" onclick="closeModal()">No, cancelar</button>
-    <button class="btn btn-warn" onclick="dblConfirmStep2('${title}',\`${msg}\`)">Sí, continuar →</button>
+    <button class="btn btn-warn" onclick="dblConfirmStep2()">Sí, continuar →</button>
   </div>`);
-  window._dblCb=onConfirm;
 }
-function dblConfirmStep2(title,msg){
+function dblConfirmStep2(){
+  const title=window._dblTitle||'Confirmar';
+  const msg=window._dblMsg||'';
   openModal(`<div class="mo-hdr"><span class="mo-ttl">⚠️ ${title} — Confirma de nuevo</span><button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
   <div class="mo-body"><div class="infobox ib-e"><i data-lucide="alert-triangle"></i><span>${msg} Esta acción es <strong>irreversible</strong>.</span></div></div>
   <div class="mo-foot" style="justify-content:space-between">

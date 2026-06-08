@@ -678,8 +678,14 @@ const DL={
   },
   async getProducts(q=''){
     const url=q?`/api/products?q=${encodeURIComponent(q)}`:'/api/products';
-    const [pr,sr]=await Promise.all([cloudGet(url),cloudGet('/api/serials')]);
-    const serials=sr.data||[];
+    let pr,srData=[];
+    try{
+      const [prRes,srRes]=await Promise.all([cloudGet(url),cloudGet('/api/serials')]);
+      pr=prRes;srData=srRes.data||[];
+    }catch(e){
+      pr=await cloudGet(url);srData=[];
+    }
+    const serials=srData;
     // Build serial count maps
     const avMap={},ttMap={},sdMap={};
     for(const s of serials){
@@ -887,9 +893,10 @@ async function vInv(){
     </tr>`;
   }).join('');
   return`<div class="page">
-  <div class="ph"><div><div class="ph-ttl">Inventario</div><div class="ph-sub">${prods.length} modelos · ${prods.reduce((s,p)=>s+(p._av||0),0)} disponibles</div></div>
+  <div class="ph"><div><div class="ph-ttl">Inventario</div><div class="ph-sub">${prods.length} modelos · ${prods.reduce((s,p)=>s+(p._av||0),0)} disponibles · <span style="color:var(--txt3)">Actualizado: ${new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'})}</span></div></div>
     <div class="ph-r">
       <div class="sbar" style="min-width:210px"><i data-lucide="search"></i><input type="text" placeholder="Buscar producto…" oninput="filtInv(this.value)"></div>
+      <button class="btn btn-o btn-sm" onclick="go('inventory')" title="Actualizar inventario"><i data-lucide="refresh-cw"></i></button>
       ${adm?`<button class="btn btn-p" onclick="moProd()"><i data-lucide="plus"></i>Nuevo Producto</button>`:''}
     </div></div>
   <div class="card" style="padding:0"><div class="tw">
@@ -908,6 +915,7 @@ async function filtInv(q){
     return`<tr><td><div class="fw8">${p.name}</div><div class="sm muted">${p.category}</div></td>
       <td>${p.brand}</td><td class="mono">${p.model||'—'}</td><td>${type}</td>
       <td class="fw8 c-brand">$${fmt(p.salePrice||0)}</td>
+      <td class="sm">${p.serialized?`<span class="c-brand fw7">~$${fmt(p._avgCost||0)}</span>`:`<span class="muted">$${fmt(p.cost||0)}</span>`}</td>
       <td style="text-align:center"><span class="fw8">${p._av}</span><span class="muted">/${p._tt}</span></td>
       <td><span class="chip ${sc}">${p._av===0?'Agotado':p._av<=(p.minStock||1)?'Bajo':'OK'}</span></td>
       <td><div class="tacts">

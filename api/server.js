@@ -432,15 +432,20 @@ app.post('/api/sync', authMiddleware, async (req, res) => {
     const prodMap = {};
 
     // 1. PRODUCTOS
+    // IMPORTANT: Do NOT sync qty_available or qty_sold here.
+    // Those fields are managed exclusively by:
+    //   - decrement_qty RPC (after a sale)
+    //   - /api/products/add-qty endpoint (when restocking)
+    // Syncing them from the client would overwrite correct server values.
     for (const prod of products) {
       const row = {
         user_id: user.id,
         name: prod.name, brand: prod.brand, model: prod.model,
         category: prod.category, cost: prod.cost, sale_price: prod.salePrice,
-        min_stock: prod.minStock, qty_available: prod.qtyAvailable,
-        qty_sold: prod.qtySold, serialized: prod.serialized || false,
+        min_stock: prod.minStock, serialized: prod.serialized || false,
         created_at: prod.createdAt ? new Date(prod.createdAt).toISOString() : new Date().toISOString()
       };
+      // qty_available and qty_sold intentionally excluded — managed server-side only
       if (isUUID(prod.id)) row.id = prod.id;
       const { data, error } = await supabase.from('products')
         .upsert(row, { onConflict: row.id ? 'id' : 'user_id, name, brand' })

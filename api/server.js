@@ -380,9 +380,24 @@ app.post('/api/sales', authMiddleware, async (req, res) => {
     }
 
     for (const item of items.filter(i => !i.serialId && i.qty > 0)) {
-      await supabase.rpc('decrement_qty', {
+      // Try RPC first, fallback to direct UPDATE if RPC has issues
+      const { error: rpcErr } = await supabase.rpc('decrement_qty', {
         p_product_id: item.productId, p_qty: item.qty, p_user_id: user.id
       });
+      if (rpcErr) {
+        console.error('[ZeroStock] decrement_qty RPC failed, using direct UPDATE:', rpcErr.message);
+        // Direct UPDATE fallback — no dependency on "updatedAt" column
+        const { data: cur } = await supabase
+          .from('products').select('qty_available, qty_sold')
+          .eq('id', item.productId).eq('user_id', user.id).single();
+        if (cur) {
+          await supabase.from('products').update({
+            qty_available: Math.max(0, (cur.qty_available || 0) - (item.qty || 1)),
+            qty_sold:      (cur.qty_sold || 0) + (item.qty || 1),
+            updated_at:    new Date().toISOString(),
+          }).eq('id', item.productId).eq('user_id', user.id);
+        }
+      }
     }
 
     res.json({ data: { id: sale.id, total } });

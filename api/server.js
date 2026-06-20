@@ -195,15 +195,47 @@ app.get('/api/products', authMiddleware, async (req, res) => {
 app.post('/api/products', authMiddleware, async (req, res) => {
   try {
     const user = await getOrCreateUser(req.firebaseUser);
-    const body = { ...req.body, user_id: user.id };
-    delete body.id;
-    const { data, error } = await supabase
-      .from('products')
-      .upsert(body, { onConflict: 'id' })
-      .select()
-      .single();
-    if (error) return dbError(res, error, 'products/save');
-    res.json({ data });
+    const { id, ...fields } = req.body;
+
+    // Fields allowed to be set/updated via this endpoint
+    // qty_available and qty_sold are NEVER updated here — managed by RPC only
+    const safeFields = {
+      name:       fields.name,
+      brand:      fields.brand,
+      model:      fields.model       ?? null,
+      category:   fields.category    ?? null,
+      cost:       fields.cost        ?? 0,
+      sale_price: fields.salePrice   ?? fields.sale_price ?? 0,
+      min_stock:  fields.minStock    ?? fields.min_stock  ?? 1,
+      serialized: fields.serialized  ?? false,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (id) {
+      // EDIT: verify ownership, then UPDATE — never touch qty fields
+      const { data: existing } = await supabase
+        .from('products').select('id').eq('id', id).eq('user_id', user.id).single();
+      if (!existing) return res.status(404).json({ error: 'Producto no encontrado' });
+
+      const { data, error } = await supabase
+        .from('products')
+        .update(safeFields)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      if (error) return dbError(res, error, 'products/update');
+      return res.json({ data });
+    } else {
+      // CREATE: insert new product with qty_available=0
+      const { data, error } = await supabase
+        .from('products')
+        .insert({ ...safeFields, user_id: user.id, qty_available: 0, qty_sold: 0 })
+        .select()
+        .single();
+      if (error) return dbError(res, error, 'products/insert');
+      return res.json({ data });
+    }
   } catch (e) { dbError(res, e, 'products/post'); }
 });
 
@@ -287,12 +319,45 @@ app.get('/api/customers', authMiddleware, async (req, res) => {
 app.post('/api/customers', authMiddleware, async (req, res) => {
   try {
     const user = await getOrCreateUser(req.firebaseUser);
-    const body = { ...req.body, user_id: user.id };
-    delete body.id;
-    const { data, error } = await supabase
-      .from('customers').upsert(body, { onConflict: 'id' }).select().single();
-    if (error) return dbError(res, error, 'customers/save');
-    res.json({ data });
+    const { id, ...fields } = req.body;
+
+    const safeFields = {
+      first_name: fields.firstName ?? fields.first_name,
+      last_name:  fields.lastName  ?? fields.last_name,
+      id_number:  fields.idNumber  ?? fields.id_number,
+      phone:      fields.phone     ?? null,
+      address:    fields.address   ?? null,
+    };
+
+    if (!safeFields.first_name || !safeFields.last_name || !safeFields.id_number) {
+      return res.status(400).json({ error: 'Nombre, Apellido y Cédula son obligatorios' });
+    }
+
+    if (id) {
+      // EDIT: verify ownership, then UPDATE
+      const { data: existing } = await supabase
+        .from('customers').select('id').eq('id', id).eq('user_id', user.id).single();
+      if (!existing) return res.status(404).json({ error: 'Cliente no encontrado' });
+
+      const { data, error } = await supabase
+        .from('customers')
+        .update(safeFields)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      if (error) return dbError(res, error, 'customers/update');
+      return res.json({ data });
+    } else {
+      // CREATE: insert new customer
+      const { data, error } = await supabase
+        .from('customers')
+        .insert({ ...safeFields, user_id: user.id })
+        .select()
+        .single();
+      if (error) return dbError(res, error, 'customers/insert');
+      return res.json({ data });
+    }
   } catch (e) { dbError(res, e, 'customers/post'); }
 });
 

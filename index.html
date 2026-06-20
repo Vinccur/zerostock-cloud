@@ -1184,9 +1184,23 @@ async function pickProd(pid){
         <div class="fw8">${p.name}</div><div class="sm muted">${p.brand} · ${avail.length} disponibles</div>
       </div>
       <div style="max-height:340px;overflow-y:auto">
-        ${avail.map(s=>`<div class="srl-item" onclick="addToCart(${p.id},'${esc(p.name)}',${s.id},'${esc(s.serial)}',${s.salePrice||0},true)">
-          <div><div class="srl-nm">${s.serial}</div><div class="srl-dt">Ingresado: ${fmtDT(s.addedAt)}</div></div>
-          <div style="text-align:right"><div class="srl-price">$${fmt(s.salePrice||0)}</div><div class="srl-dt">Costo: $${fmt(s.cost||0)}</div></div>
+        ${avail.map(s=>`
+        <div class="srl-item" style="flex-direction:column;align-items:stretch;cursor:default">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <div><div class="srl-nm">${s.serial}</div><div class="srl-dt">Ingresado: ${fmtDT(s.addedAt)}</div></div>
+            <div style="text-align:right"><div class="srl-dt">Costo: $${fmt(s.cost||0)}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="flex:1">
+              <label style="font-size:10px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px">Precio USD</label>
+              <input type="number" class="fc" id="srl-price-${s.id}" value="${s.salePrice||0}" min="0" step="0.01"
+                style="height:36px;font-weight:800;font-size:14px" onclick="event.stopPropagation()">
+            </div>
+            <button class="btn btn-p btn-sm" style="margin-top:14px;white-space:nowrap"
+              onclick="addSerialToCartCustom(${p.id},'${esc(p.name)}',${s.id},'${esc(s.serial)}')">
+              <i data-lucide="plus"></i>Agregar
+            </button>
+          </div>
         </div>`).join('')}
       </div>
     </div>`);
@@ -1202,21 +1216,78 @@ async function pickProd(pid){
         <div class="fg"><label class="fl">Cantidad</label>
           <input type="number" class="fc" id="qty-inp" value="1" min="1" max="${max}" style="font-size:20px;text-align:center;height:48px;font-weight:800">
           <div class="fhint">Máx: ${max} unidades</div></div>
-        <div class="fg"><label class="fl">Total</label>
-          <div style="font-size:20px;font-weight:800;color:var(--brand);padding:10px 0" id="qty-total">$${fmt(p.salePrice||0)}</div>
-          <div class="fhint" id="qty-bs">Bs.${fmt((p.salePrice||0)*A.rates.off)}</div></div>
+        <div class="fg"><label class="fl">Precio unitario (USD)</label>
+          <input type="number" class="fc" id="price-inp" value="${p.salePrice||0}" min="0" step="0.01" style="font-size:18px;text-align:center;height:48px;font-weight:800">
+          <div class="fhint">Precio sugerido: $${fmt(p.salePrice||0)}</div></div>
+      </div>
+      <div style="padding:9px 11px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bdr);margin-top:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="sm muted fw7">TOTAL</span>
+          <span style="font-size:18px;font-weight:800;color:var(--brand)" id="qty-total">$${fmt(p.salePrice||0)}</span>
+        </div>
+        <div class="sm muted" id="qty-bs">Bs.${fmt((p.salePrice||0)*A.rates.off)} oficial</div>
       </div>
     </div>
     <div class="mo-foot">
       <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-p" onclick="addBatchToCart(${p.id},'${esc(p.name)}',${p.salePrice||0},${max})"><i data-lucide="plus"></i>Agregar</button>
+      <button class="btn btn-p" onclick="addBatchToCartCustom(${p.id},'${esc(p.name)}',${max})"><i data-lucide="plus"></i>Agregar</button>
     </div>`);
-    document.getElementById('qty-inp')?.addEventListener('input',function(){
-      const q=Math.min(parseInt(this.value)||1,max),t=(p.salePrice||0)*q;
+    const updBatchTotals=()=>{
+      const q=Math.min(parseInt(document.getElementById('qty-inp')?.value)||1,max);
+      const price=parseFloat(document.getElementById('price-inp')?.value)||0;
+      const t=price*q;
       document.getElementById('qty-total').textContent='$'+fmt(t);
-      document.getElementById('qty-bs').textContent='Bs.'+fmt(t*A.rates.off);
-    });
+      document.getElementById('qty-bs').textContent='Bs.'+fmt(t*A.rates.off)+' oficial';
+    };
+    document.getElementById('qty-inp')?.addEventListener('input',updBatchTotals);
+    document.getElementById('price-inp')?.addEventListener('input',updBatchTotals);
   }
+}
+
+function editCartPrice(idx){
+  const it=A.cart[idx];
+  if(!it)return;
+  openModal(`<div class="mo-hdr"><span class="mo-ttl">Editar Precio</span>
+    <button class="btn btn-g btn-ico" onclick="closeModal()"><i data-lucide="x"></i></button></div>
+  <div class="mo-body">
+    <div style="padding:9px 11px;background:var(--s2);border-radius:var(--r2);margin-bottom:12px;border:1px solid var(--bdr)">
+      <div class="fw8">${it.productName}</div>
+      ${it.serial?`<div class="sm muted">SN: ${it.serial}</div>`:`<div class="sm muted">Masivo · ${it.qty} uds.</div>`}
+    </div>
+    <div class="fg"><label class="fl">Precio unitario (USD)</label>
+      <input type="number" class="fc" id="edit-price-inp" value="${it.unitPrice}" min="0" step="0.01"
+        style="font-size:22px;text-align:center;height:52px;font-weight:800">
+    </div>
+    <div id="edit-price-preview" style="padding:8px 11px;background:var(--brand-tint);border-radius:var(--r2);border:1px solid rgba(26,86,219,.2);font-size:12px;color:var(--brand);font-weight:700;text-align:center">
+      Total: $${fmt(it.unitPrice*(it.qty||1))}
+    </div>
+  </div>
+  <div class="mo-foot">
+    <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+    <button class="btn btn-p" onclick="applyCartPrice(${idx})"><i data-lucide="check"></i>Aplicar</button>
+  </div>`);
+  const inp=document.getElementById('edit-price-inp');
+  inp?.addEventListener('input',function(){
+    const p=parseFloat(this.value)||0;
+    const prev=document.getElementById('edit-price-preview');
+    if(prev) prev.textContent='Total: $'+fmt(p*(it.qty||1));
+  });
+  setTimeout(()=>inp?.select(),80);
+}
+function applyCartPrice(idx){
+  const price=parseFloat(document.getElementById('edit-price-inp')?.value)||0;
+  if(price<0){toast('El precio no puede ser negativo','err');return;}
+  A.cart[idx].unitPrice=price;
+  closeModal();
+  renderCart();
+  toast('Precio actualizado ✓','ok');
+}
+
+function addSerialToCartCustom(pid,pname,sid,serial){
+  const priceEl=document.getElementById('srl-price-'+sid);
+  const price=parseFloat(priceEl?.value)||0;
+  if(price<0){toast('El precio no puede ser negativo','err');return;}
+  addToCart(pid,pname,sid,serial,price,true);
 }
 
 function addToCart(pid,pname,sid,serial,price,serialized=true){
@@ -1232,6 +1303,21 @@ function addBatchToCart(pid,pname,price,maxQty){
   if(existing){existing.qty=Math.min(existing.qty+qty,maxQty);renderCart();toast(`${pname}: ${existing.qty} uds. en carrito`,'ok');return;}
   A.cart.push({productId:pid,productName:pname,serialId:null,serial:'',unitPrice:parseFloat(price),qty,serialized:false,maxQty:maxQty});
   renderCart();toast(`${pname} ×${qty} agregado ✓`,'ok');
+}
+function addBatchToCartCustom(pid,pname,maxQty){
+  const qty=Math.min(parseInt(document.getElementById('qty-inp')?.value)||1,maxQty);
+  const price=parseFloat(document.getElementById('price-inp')?.value)||0;
+  if(price<0){toast('El precio no puede ser negativo','err');return;}
+  closeModal();
+  const existing=A.cart.find(i=>i.productId===pid&&!i.serialized);
+  if(existing){
+    existing.qty=Math.min(existing.qty+qty,maxQty);
+    existing.unitPrice=price; // update price to custom
+    existing.maxQty=maxQty;
+    renderCart();toast(`${pname}: ${existing.qty} uds. @ $${fmt(price)}`,'ok');return;
+  }
+  A.cart.push({productId:pid,productName:pname,serialId:null,serial:'',unitPrice:price,qty,serialized:false,maxQty:maxQty});
+  renderCart();toast(`${pname} ×${qty} @ $${fmt(price)} agregado ✓`,'ok');
 }
 function removeFromCart(idx){A.cart.splice(idx,1);renderCart();}
 
@@ -1256,7 +1342,10 @@ function renderCart(){
         ${it.serial?`<div class="cart-serial">SN: ${it.serial}</div>`:`<div class="cart-serial">Masivo · ${it.qty} uds.</div>`}
       </div>
       ${qtyControls}
-      <div class="cart-usd" style="flex-shrink:0">$${fmt(it.unitPrice*(it.qty||1))}</div>
+      <div style="flex-shrink:0;text-align:right">
+        <div class="cart-usd" style="cursor:pointer" onclick="editCartPrice(${i})" title="Toca para editar precio">$${fmt(it.unitPrice*(it.qty||1))}</div>
+        ${it.qty>1?`<div style="font-size:9px;color:var(--txt3)">$${fmt(it.unitPrice)}/ud</div>`:''}
+      </div>
       <button class="btn btn-g btn-ico" style="color:var(--err);flex-shrink:0;width:24px;height:24px" onclick="removeFromCart(${i})"><i data-lucide="x"></i></button>
     </div>`;
   }).join('');
@@ -1510,14 +1599,16 @@ async function vSales(){
 
 async function vCusts(){
   const custs=await DL.getCustomers();
+  const adm=A.role==='admin';
   const rows=custs.map(c=>`<tr>
     <td><div class="fw8">${c.lastName}, ${c.firstName}</div></td>
     <td class="mono">${c.idNumber}</td><td>${c.phone||'—'}</td>
     <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${c.address||'—'}</td>
     <td class="sm muted">${fmtD(c.createdAt||c.created_at)}</td>
     <td><div class="tacts">
-      <button class="btn btn-g btn-ico" onclick="moCust(${c.id})"><i data-lucide="pencil"></i></button>
-      <button class="btn btn-g btn-ico" style="color:var(--err)" onclick="cfDelCust(${c.id},'${esc(c.firstName+' '+c.lastName)}')"><i data-lucide="trash-2"></i></button>
+      ${adm?`<button class="btn btn-g btn-ico" onclick="moCust(${c.id})"><i data-lucide="pencil"></i></button>
+      <button class="btn btn-g btn-ico" style="color:var(--err)" onclick="cfDelCust(${c.id},'${esc(c.firstName+' '+c.lastName)}')"><i data-lucide="trash-2"></i></button>`
+      :'<span class="sm muted">—</span>'}
     </div></td>
   </tr>`).join('');
   return`<div class="page">
@@ -1540,8 +1631,9 @@ async function filtCusts(q){
     <td class="mono">${c.idNumber}</td><td>${c.phone||'—'}</td><td>${c.address||'—'}</td>
     <td class="sm muted">${fmtD(c.createdAt||c.created_at)}</td>
     <td><div class="tacts">
-      <button class="btn btn-g btn-ico" onclick="moCust(${c.id})"><i data-lucide="pencil"></i></button>
-      <button class="btn btn-g btn-ico" style="color:var(--err)" onclick="cfDelCust(${c.id},'${esc(c.firstName+' '+c.lastName)}')"><i data-lucide="trash-2"></i></button>
+      ${A.role==='admin'?`<button class="btn btn-g btn-ico" onclick="moCust(${c.id})"><i data-lucide="pencil"></i></button>
+      <button class="btn btn-g btn-ico" style="color:var(--err)" onclick="cfDelCust(${c.id},'${esc(c.firstName+' '+c.lastName)}')"><i data-lucide="trash-2"></i></button>`
+      :'<span class="sm muted">—</span>'}
     </div></td>
   </tr>`).join('');
   lucide.createIcons({el:tb});
